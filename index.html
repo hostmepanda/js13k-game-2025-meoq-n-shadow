@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Черный и Белый кот</title>
+    <script src="js/kontra.js"></script>
+    <style>
+        canvas { background: #87ceeb; display:block; margin:0 auto; }
+        .controls { text-align:center; margin-top:5px; }
+        button { width:50px; height:50px; margin:2px; font-size:16px; }
+    </style>
+</head>
+<body>
+
+<canvas id="game" width="800" height="400"></canvas>
+
+<div class="controls">
+    <div>
+        <button id="left">◀</button>
+        <button id="jump">▲</button>
+        <button id="right">▶</button>
+    </div>
+    <div>
+        <button id="switch">↔</button>
+        <button id="eat">E</button>
+        <button id="poop">K</button>
+        <button id="claw">✦</button>
+    </div>
+</div>
+
+<script>
+    kontra.init();
+
+    let keys = {};
+    function setKey(key, value){ keys[key] = value; }
+
+    let activeCat = null;
+
+    // создаем спрайты котов
+    let whiteCat = kontra.Sprite({
+        x: 100, y: 300,
+        width: 30, height: 30,
+        color: 'white',
+        dx: 0, dy: 0,
+        size: 1,
+        update: function() {
+            this.dy += 0.5; // gravity
+            this.x += this.dx;
+            this.y += this.dy;
+
+            // пол
+            if(this.y + this.height*this.size > 370) {
+                this.y = 370 - this.height*this.size;
+                this.dy = 0;
+            }
+        }
+    });
+
+    let blackCat = kontra.Sprite({
+        x: 200, y: 300,
+        width: 30, height: 30,
+        color: 'black',
+        dx: 0, dy: 0,
+        update: function() {
+            this.dy += 0.5; // gravity
+            this.x += this.dx;
+            this.y += this.dy;
+
+            if(this.y + this.height > 370) {
+                this.y = 370 - this.height;
+                this.dy = 0;
+            }
+        }
+    });
+
+    activeCat = whiteCat;
+
+    // кнопки управления
+    document.getElementById('left').addEventListener('mousedown', ()=>setKey('a',true));
+    document.getElementById('left').addEventListener('mouseup', ()=>setKey('a',false));
+    document.getElementById('right').addEventListener('mousedown', ()=>setKey('d',true));
+    document.getElementById('right').addEventListener('mouseup', ()=>setKey('d',false));
+    document.getElementById('jump').addEventListener('click', ()=>{ if(activeCat.dy===0) activeCat.dy=-10; });
+    document.getElementById('switch').addEventListener('click', ()=>{ activeCat = activeCat===whiteCat?blackCat:whiteCat; });
+    document.getElementById('eat').addEventListener('click', ()=>{ if(activeCat===whiteCat) activeCat.size += 0.05; });
+    document.getElementById('poop').addEventListener('click', ()=>{ if(activeCat===whiteCat) activeCat.size=Math.max(0.5, activeCat.size-0.1); });
+    document.getElementById('claw').addEventListener('click', ()=>{ if(activeCat===blackCat) console.log('Когти!'); });
+
+    // основной цикл
+    let loop = kontra.GameLoop({
+        update: function() {
+            activeCat.dx = 0;
+            if(keys['a']) activeCat.dx = -3;
+            if(keys['d']) activeCat.dx = 3;
+
+            whiteCat.update();
+            blackCat.update();
+        },
+        render: function() {
+            whiteCat.render();
+            blackCat.render();
+
+            let ctx = kontra.context;
+            ctx.fillStyle = 'black';
+            ctx.fillText('Белый размер: '+whiteCat.size.toFixed(2), 10,20);
+            ctx.fillText('Активный кот: '+(activeCat===whiteCat?'Белый':'Черный'),10,40);
+        }
+    });
+
+    loop.start();
+</script>
+
+</body>
+</html>

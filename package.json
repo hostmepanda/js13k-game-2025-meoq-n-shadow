@@ -1,0 +1,16 @@
+{
+  "name": "js13k-game-2025-meoq-n-shadow",
+  "version": "0.0.0",
+  "description": "Game for JS13K contest of 2025. Year's topic: black cat",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com//hostmepanda/js13k-game-2025-meoq-n-shadow.git"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "hostmepanda",
+  "type": "commonjs",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
