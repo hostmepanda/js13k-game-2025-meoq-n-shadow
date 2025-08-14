@@ -1,5 +1,4 @@
 export function setupControls({ whiteCat, blackCat, setMove, getActiveCat, setActiveCat, moves }) {
-    // Удаляем привязку к WASD через кнопки и добавляем обработчик событий клавиатуры
     document.addEventListener('keydown', (event) => {
         console.log(event.key);
         switch(event.key) {
