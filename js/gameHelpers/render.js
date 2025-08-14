@@ -1,3 +1,3 @@
-export function gameLoopRenderMethod() {
+export function gameLoopRenderMethod(gameObjects) {
 
 }

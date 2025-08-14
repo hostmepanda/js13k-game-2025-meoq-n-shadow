@@ -1,3 +1,3 @@
-export function gameLoopUpdateMethod() {
+export function gameLoopUpdateMethod(updateObjects) {
 
 }

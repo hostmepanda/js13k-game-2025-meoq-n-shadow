@@ -4,12 +4,12 @@ import { init, Sprite, GameLoop } from './engine/kontra.mjs'
 import {gameLoopUpdateMethod} from './gameHelpers/update'
 import {gameLoopRenderMethod} from './gameHelpers/render'
 
-const { canvas, context } = init();
-
 (() => {
+  const { canvas, context } = init();
+
   new GameLoop({
-    update: gameLoopUpdateMethod,
-    render: gameLoopRenderMethod,
+    update: () => gameLoopUpdateMethod({}),
+    render: () => gameLoopRenderMethod({}),
   })
   .start();
 })()
