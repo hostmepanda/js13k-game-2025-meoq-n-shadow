@@ -22,7 +22,6 @@ export function level1Init (gameObjects, playerState, Sprite) {
     width: 40,
     height: 40,
     color: 'black',
-
   })
 }
 
@@ -31,6 +30,7 @@ export function renderLevel1 (gameObjects, playerState) {
     white,
     black,
     enemies,
+    backgrounds,
     obstacles,
     boss,
     exit,
