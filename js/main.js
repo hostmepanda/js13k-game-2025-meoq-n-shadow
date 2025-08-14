@@ -2,23 +2,28 @@ import { createCats } from './cats.js';
 import { setupControls } from './controls.js';
 
 let { canvas, context } = kontra.init();
-let keys = {};
+let moves = {
+    up: false,
+    left: false,
+    right: false,
+    jump: false,
+};
 
-function setKey(key, value) { keys[key] = value; }
+function setMove(key, value) { moves[key] = value; }
 
-let { whiteCat, blackCat } = createCats(kontra);
+let { whiteCat, blackCat } = createCats(kontra, moves);
 let activeCat = whiteCat;
 
 function getActiveCat() { return activeCat; }
 function setActiveCat(cat) { activeCat = cat; }
 
-setupControls({ whiteCat, blackCat, setKey, getActiveCat, setActiveCat });
+setupControls({ whiteCat, blackCat, setMove, getActiveCat, setActiveCat, moves });
 
 let loop = kontra.GameLoop({
     update: function() {
         activeCat.dx = 0;
-        if(keys['a']) activeCat.dx = -3;
-        if(keys['d']) activeCat.dx = 3;
+        if(moves.left) activeCat.dx = -3;
+        if(moves.right) activeCat.dx = 3;
 
         whiteCat.update();
         blackCat.update();
