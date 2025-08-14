@@ -23,7 +23,7 @@ export function renderMainMenu(canvas, context) {
   context.fillStyle = 'white';
   context.font = '30px Arial';
   context.fillText('JS13K 2025: Meow & Shadow', canvas.width / 2 - 175, canvas.height / 2 - 30);
-  context.fillText('Нажмите пробел, чтобы начать', canvas.width / 2 - 200, canvas.height / 2 + 30);
+  context.fillText('Hit space to start', canvas.width / 2 - 200, canvas.height / 2 + 30);
 }
 
 export function updateMainMenu(gameObjects, GameState, canvas) {

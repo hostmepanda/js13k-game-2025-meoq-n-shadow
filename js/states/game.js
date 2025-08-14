@@ -7,7 +7,7 @@ export const GAME_STATE = {
   VICTORYBLACK: 'vb',
 }
 export const GameState = {
-  currentState: GAME_STATE.MENU,
+  currentState: GAME_STATE.LEVEL1,
 }
 
 export const CANVAS = {

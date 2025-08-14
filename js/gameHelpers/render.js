@@ -8,7 +8,7 @@ export function gameLoopRenderMethod(gameObjects, GameState, canvas, context) {
       renderMainMenu(canvas, context)
       break
     case GAME_STATE.LEVEL1:
-      renderLevel1(gameObjects[GAME_STATE.LEVEL1], GameState)
+      renderLevel1(gameObjects, GameState)
       break
   }
 }

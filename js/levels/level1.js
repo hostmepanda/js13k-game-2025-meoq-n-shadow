@@ -10,22 +10,32 @@ export function level1Init (gameObjects, playerState, Sprite) {
     },
   }
   gameObjects[GAME_STATE.LEVEL1].white = Sprite({
-    x: 0,
-    y: CANVAS.height - 12,
-    width: 5,
-    height: 10,
+    x: 20,
+    y: CANVAS.height - 12 - 40,
+    width: 40,
+    height: 40,
     color: 'white',
   })
   gameObjects[GAME_STATE.LEVEL1].black = Sprite({
-    x: 0,
-    y: CANVAS.height - 12,
-    width: 5,
-    height: 10,
-    color: 'white',
+    x: 40,
+    y: CANVAS.height - 12 - 40,
+    width: 40,
+    height: 40,
+    color: 'black',
+
   })
 }
 
 export function renderLevel1 (gameObjects, playerState) {
-  gameObjects.white.render()
-  gameObjects.black.render()
+  const {
+    white,
+    black,
+    enemies,
+    obstacles,
+    boss,
+    exit,
+  } = gameObjects[GAME_STATE.LEVEL1]
+
+  white.render()
+  black.render()
 }

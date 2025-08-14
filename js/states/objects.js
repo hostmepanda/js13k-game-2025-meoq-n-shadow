@@ -5,8 +5,6 @@ export const gameObjects = {
     input: {
       space: false,
     },
-    title: null,
-    startLabel: null,
   },
   [GAME_STATE.LEVEL1]: {
     white: null,
