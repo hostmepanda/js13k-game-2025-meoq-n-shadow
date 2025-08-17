@@ -12,7 +12,7 @@
   "main": "index.html",
   "scripts": {
     "dev": "vite",
-    "build": "esbuild js/main.js --bundle --minify --outfile=dist/game.js"
+    "build": "esbuild js/game.js --bundle --minify --outfile=dist/game.js"
   },
   "devDependencies": {
     "esbuild": "^0.25.9",
