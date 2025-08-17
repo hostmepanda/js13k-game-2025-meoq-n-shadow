@@ -16,6 +16,12 @@ export function level1Init (gameObjects, playerState, Sprite) {
     width: 40,
     height: 40,
     color: 'white',
+    // Добавляем физические свойства
+    velocityY: 0,
+    isJumping: false,
+    jumpForce: -500, // Отрицательное значение, т.к. ось Y направлена вниз
+    onGround: true,
+
   })
   gameObjects[GAME_STATE.LEVEL1].black = Sprite({
     x: 40,
@@ -23,6 +29,12 @@ export function level1Init (gameObjects, playerState, Sprite) {
     width: 40,
     height: 40,
     color: 'black',
+    // Добавляем физические свойства
+    velocityY: 0,
+    isJumping: false,
+    jumpForce: -500, // Отрицательное значение, т.к. ось Y направлена вниз
+    onGround: true,
+
   })
 
   // Инициализируем backgrounds, если его еще нет
@@ -47,6 +59,32 @@ export function level1Init (gameObjects, playerState, Sprite) {
   };
 
   gameObjects[GAME_STATE.LEVEL1].keyboard = initKeyboardControls()
+
+  // ЗДЕСЬ привязываем клавиши - ОДИН РАЗ при инициализации
+  gameObjects[GAME_STATE.LEVEL1].keyboard.bindKey('KeyW', 'pressed', () => {
+    console.log("W key pressed - trying to jump");
+    if (gameObjects[GAME_STATE.LEVEL1].white.onGround) {
+      console.log("Jumping white!");
+      gameObjects[GAME_STATE.LEVEL1].white.velocityY = gameObjects[GAME_STATE.LEVEL1].white.jumpForce;
+      gameObjects[GAME_STATE.LEVEL1].white.isJumping = true;
+      gameObjects[GAME_STATE.LEVEL1].white.onGround = false;
+    } else {
+      console.log("White not on ground, can't jump");
+    }
+  });
+
+  gameObjects[GAME_STATE.LEVEL1].keyboard.bindKey('ArrowUp', 'pressed', () => {
+    console.log("Arrow Up pressed - trying to jump");
+    if (gameObjects[GAME_STATE.LEVEL1].black.onGround) {
+      console.log("Jumping black!");
+      gameObjects[GAME_STATE.LEVEL1].black.velocityY = gameObjects[GAME_STATE.LEVEL1].black.jumpForce;
+      gameObjects[GAME_STATE.LEVEL1].black.isJumping = true;
+      gameObjects[GAME_STATE.LEVEL1].black.onGround = false;
+    } else {
+      console.log("Black not on ground, can't jump");
+    }
+  });
+
 }
 
 export function renderLevel1 (gameObjects, playerState, { canvas, context }) {
@@ -71,7 +109,7 @@ export function renderLevel1 (gameObjects, playerState, { canvas, context }) {
   black.render()
 }
 
-export function updateLevel1 (gameObjects, playerState, { canvas, context }, deltaTime) {
+export function updateLevel1(gameObjects, playerState, { canvas, context }, deltaTime) {
   const {
     white,
     black,
@@ -81,15 +119,29 @@ export function updateLevel1 (gameObjects, playerState, { canvas, context }, del
     boss,
     exit,
     keyboard,
-  } = gameObjects
+  } = gameObjects;
 
-// Константа скорости движения
+  // Константы для физики
   const MOVE_SPEED = 200; // пикселей в секунду
+  const GRAVITY = 980; // сила гравитации (пикселей в секунду в квадрате)
 
-  // Белый персонаж
-  if (keyboard.isKeyPressed('KeyW')) {
-    white.y -= MOVE_SPEED * deltaTime;
+  // ОБРАБОТКА ФИЗИКИ ДЛЯ БЕЛОГО ПЕРСОНАЖА
+
+  // Применяем гравитацию
+  white.velocityY += GRAVITY * deltaTime;
+
+  // Применяем вертикальную скорость к позиции
+  white.y += white.velocityY * deltaTime;
+
+  // Проверяем приземление
+  if (white.y >= obstacles.floorLine - white.height) {
+    white.y = obstacles.floorLine - white.height;
+    white.velocityY = 0;
+    white.onGround = true;
+    white.isJumping = false;
   }
+
+  // Горизонтальное движение
   if (keyboard.isKeyPressed('KeyS')) {
     white.y += MOVE_SPEED * deltaTime;
   }
@@ -100,10 +152,23 @@ export function updateLevel1 (gameObjects, playerState, { canvas, context }, del
     white.x += MOVE_SPEED * deltaTime;
   }
 
-  // Черный персонаж
-  if (keyboard.isKeyPressed('ArrowUp')) {
-    black.y -= MOVE_SPEED * deltaTime;
+  // ОБРАБОТКА ФИЗИКИ ДЛЯ ЧЕРНОГО ПЕРСОНАЖА
+
+  // Применяем гравитацию
+  black.velocityY += GRAVITY * deltaTime;
+
+  // Применяем вертикальную скорость к позиции
+  black.y += black.velocityY * deltaTime;
+
+  // Проверяем приземление
+  if (black.y >= obstacles.floorLine - black.height) {
+    black.y = obstacles.floorLine - black.height;
+    black.velocityY = 0;
+    black.onGround = true;
+    black.isJumping = false;
   }
+
+  // Горизонтальное движение
   if (keyboard.isKeyPressed('ArrowDown')) {
     black.y += MOVE_SPEED * deltaTime;
   }
@@ -113,5 +178,4 @@ export function updateLevel1 (gameObjects, playerState, { canvas, context }, del
   if (keyboard.isKeyPressed('ArrowRight')) {
     black.x += MOVE_SPEED * deltaTime;
   }
-
 }
