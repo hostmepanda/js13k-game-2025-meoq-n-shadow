@@ -3,7 +3,7 @@ import {initKeyboardControls} from '../gameHelpers/keyboard'
 
 export function level1Init (gameObjects, playerState, Sprite) {
   const levelState = {
-    obstacles: {
+    level: {
       floorLine: CANVAS.height - 20,
     },
     boss: {
@@ -85,6 +85,9 @@ export function level1Init (gameObjects, playerState, Sprite) {
     }
   });
 
+  gameObjects[GAME_STATE.LEVEL1].level = levelState.level
+  gameObjects[GAME_STATE.LEVEL1].boss = levelState.boss
+
 }
 
 export function renderLevel1 (gameObjects, playerState, { canvas, context }) {
@@ -116,32 +119,24 @@ export function updateLevel1(gameObjects, playerState, { canvas, context }, delt
     enemies,
     backgrounds,
     obstacles,
+    level,
     boss,
     exit,
     keyboard,
   } = gameObjects;
 
-  // Константы для физики
   const MOVE_SPEED = 200; // пикселей в секунду
   const GRAVITY = 980; // сила гравитации (пикселей в секунду в квадрате)
-
-  // ОБРАБОТКА ФИЗИКИ ДЛЯ БЕЛОГО ПЕРСОНАЖА
-
-  // Применяем гравитацию
   white.velocityY += GRAVITY * deltaTime;
-
-  // Применяем вертикальную скорость к позиции
   white.y += white.velocityY * deltaTime;
 
-  // Проверяем приземление
-  if (white.y >= obstacles.floorLine - white.height) {
-    white.y = obstacles.floorLine - white.height;
+  if (white.y >= level.floorLine - white.height) {
+    white.y = level.floorLine - white.height;
     white.velocityY = 0;
     white.onGround = true;
     white.isJumping = false;
   }
 
-  // Горизонтальное движение
   if (keyboard.isKeyPressed('KeyS')) {
     white.y += MOVE_SPEED * deltaTime;
   }
@@ -151,18 +146,11 @@ export function updateLevel1(gameObjects, playerState, { canvas, context }, delt
   if (keyboard.isKeyPressed('KeyD')) {
     white.x += MOVE_SPEED * deltaTime;
   }
-
-  // ОБРАБОТКА ФИЗИКИ ДЛЯ ЧЕРНОГО ПЕРСОНАЖА
-
-  // Применяем гравитацию
   black.velocityY += GRAVITY * deltaTime;
-
-  // Применяем вертикальную скорость к позиции
   black.y += black.velocityY * deltaTime;
 
-  // Проверяем приземление
-  if (black.y >= obstacles.floorLine - black.height) {
-    black.y = obstacles.floorLine - black.height;
+  if (black.y >= level.floorLine - black.height) {
+    black.y = level.floorLine - black.height;
     black.velocityY = 0;
     black.onGround = true;
     black.isJumping = false;
