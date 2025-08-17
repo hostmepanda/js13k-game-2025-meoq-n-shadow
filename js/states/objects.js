@@ -14,6 +14,7 @@ export const gameObjects = {
     obstacles: [],
     boss:null,
     exit: null,
+    keyboard: {},
   },
   [GAME_STATE.LEVEL2]: {
     white: null,
@@ -23,5 +24,6 @@ export const gameObjects = {
     obstacles: [],
     boss:null,
     exit: null,
+    keyboard: {},
   },
 };

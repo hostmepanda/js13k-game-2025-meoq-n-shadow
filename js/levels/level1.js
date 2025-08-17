@@ -1,4 +1,5 @@
 import {CANVAS, GAME_STATE} from '../states/game'
+import {initKeyboardControls} from '../gameHelpers/keyboard'
 
 export function level1Init (gameObjects, playerState, Sprite) {
   const levelState = {
@@ -45,6 +46,45 @@ export function level1Init (gameObjects, playerState, Sprite) {
     }
   };
 
+  const keyboard = initKeyboardControls();
+
+  // Биндим клавиши для управления белым персонажем
+  keyboard.bindKey('KeyW', 'pressed', () => {
+    gameObjects[GAME_STATE.LEVEL1].white.y -= 5; // Движение вверх
+  });
+
+  keyboard.bindKey('KeyS', 'pressed', () => {
+    gameObjects[GAME_STATE.LEVEL1].white.y += 5; // Движение вниз
+  });
+
+  keyboard.bindKey('KeyA', 'pressed', () => {
+    gameObjects[GAME_STATE.LEVEL1].white.x -= 5; // Движение влево
+  });
+
+  keyboard.bindKey('KeyD', 'pressed', () => {
+    gameObjects[GAME_STATE.LEVEL1].white.x += 5; // Движение вправо
+  });
+
+  // Биндим клавиши для управления черным персонажем
+  keyboard.bindKey('ArrowUp', 'pressed', () => {
+    gameObjects[GAME_STATE.LEVEL1].black.y -= 5; // Движение вверх
+  });
+
+  keyboard.bindKey('ArrowDown', 'pressed', () => {
+    gameObjects[GAME_STATE.LEVEL1].black.y += 5; // Движение вниз
+  });
+
+  keyboard.bindKey('ArrowLeft', 'pressed', () => {
+    gameObjects[GAME_STATE.LEVEL1].black.x -= 5; // Движение влево
+  });
+
+  keyboard.bindKey('ArrowRight', 'pressed', () => {
+    gameObjects[GAME_STATE.LEVEL1].black.x += 5; // Движение вправо
+  });
+
+  // Сохраняем контроллер клавиатуры для доступа из других функций
+  gameObjects[GAME_STATE.LEVEL1].keyboard = keyboard;
+
 
 }
 
@@ -68,4 +108,25 @@ export function renderLevel1 (gameObjects, playerState, { canvas, context }) {
 
   white.render()
   black.render()
+}
+
+export function updateLevel1 (gameObjects, playerState, { canvas, context }) {
+  const {
+    white,
+    black,
+    enemies,
+    backgrounds,
+    obstacles,
+    boss,
+    exit,
+    keyboard,
+  } = gameObjects[GAME_STATE.LEVEL1]
+
+  if (keyboard.isKeyPressed('KeyW')) {
+    white.y -= 200 * deltaTime; // Скорость * время
+  }
+
+  if (keyboard.isKeyPressed('KeyS')) {
+    white.y += 200 * deltaTime;
+  }
 }
