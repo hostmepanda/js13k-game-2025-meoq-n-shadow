@@ -745,7 +745,6 @@ function updateBlackCatAttack(character, enemies, delta) {
       }
 
     });
-    console.log('--character', {character: character.attackTimer})
     // Если таймер истек, завершаем атаку
     if (character.attackTimer <= 0) {
       character.isAttacking = false;
