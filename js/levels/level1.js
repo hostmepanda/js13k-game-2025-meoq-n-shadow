@@ -1,7 +1,7 @@
 import {CANVAS, GAME_STATE, GameState, updateCamera} from '../states/game'
 import {initKeyboardControls} from '../gameHelpers/keyboard'
 
-export function level1Init (gameObjects, { PlayerState, GameState }, Sprite, {canvas}) {
+export function level1Init(gameObjects, {PlayerState, GameState}, Sprite, {canvas}) {
   const levelState = {
     level: {
       floorLine: CANVAS.height - 20,
@@ -17,7 +17,7 @@ export function level1Init (gameObjects, { PlayerState, GameState }, Sprite, {ca
     minX: 0,
     maxX: levelState.level.levelWidth - CANVAS.width,
     minY: 0,
-    maxY: levelState.level.levelHeight - CANVAS.height
+    maxY: levelState.level.levelHeight - CANVAS.height,
   }
 
   gameObjects[GAME_STATE.LEVEL1].white = Sprite({
@@ -56,28 +56,28 @@ export function level1Init (gameObjects, { PlayerState, GameState }, Sprite, {ca
   })
 
 // Инициализация состояния игрока
-  PlayerState.activeCharacter = 'white'; // По умолчанию активен белый персонаж
+  PlayerState.activeCharacter = 'white' // По умолчанию активен белый персонаж
 
   // Инициализируем backgrounds, если его еще нет
-  gameObjects[GAME_STATE.LEVEL1].backgrounds = gameObjects[GAME_STATE.LEVEL1].backgrounds || {};
+  gameObjects[GAME_STATE.LEVEL1].backgrounds = gameObjects[GAME_STATE.LEVEL1].backgrounds || {}
 
   // Создаем объект фона с градиентом заката
   gameObjects[GAME_STATE.LEVEL1].backgrounds.sunset = {
-    render: function(ctx) {
+    render: function (ctx) {
       // Создаем градиент от верха к низу
-      const gradient = ctx.createLinearGradient(0, 0, 0, CANVAS.height);
+      const gradient = ctx.createLinearGradient(0, 0, 0, CANVAS.height)
 
       // Добавляем цвета заката (темно-синий -> фиолетовый -> оранжевый -> желтый)
-      gradient.addColorStop(0, '#1a2b56');    // Темно-синий (верх неба)
-      gradient.addColorStop(0.4, '#864d9e');  // Фиолетовый
-      gradient.addColorStop(0.7, '#dd5e5e');  // Оранжево-красный
-      gradient.addColorStop(0.9, '#f9d423');  // Желтый (у горизонта)
+      gradient.addColorStop(0, '#1a2b56')    // Темно-синий (верх неба)
+      gradient.addColorStop(0.4, '#864d9e')  // Фиолетовый
+      gradient.addColorStop(0.7, '#dd5e5e')  // Оранжево-красный
+      gradient.addColorStop(0.9, '#f9d423')  // Желтый (у горизонта)
 
       // Заполняем фон градиентом
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, CANVAS.width, CANVAS.height);
-    }
-  };
+      ctx.fillStyle = gradient
+      ctx.fillRect(0, 0, CANVAS.width, CANVAS.height)
+    },
+  }
 
   gameObjects[GAME_STATE.LEVEL1].keyboard = initKeyboardControls()
   gameObjects[GAME_STATE.LEVEL1].level = levelState.level
@@ -93,14 +93,14 @@ export function level1Init (gameObjects, { PlayerState, GameState }, Sprite, {ca
         height: 15,
         collected: false,
         color: 'blue', // Синий квадратик
-        type: 'sizeFood' // Тип: еда для увеличения размера
-      });
+        type: 'sizeFood', // Тип: еда для увеличения размера
+      })
     }
   }
 
 }
 
-export function renderLevel1 (gameObjects, {PlayerState}, { canvas, context }) {
+export function renderLevel1(gameObjects, {PlayerState}, {canvas, context}) {
   const {
     white,
     black,
@@ -112,53 +112,59 @@ export function renderLevel1 (gameObjects, {PlayerState}, { canvas, context }) {
   } = gameObjects[GAME_STATE.LEVEL1]
 
   function renderWithCamera(context, camera, drawFunction) {
-    context.save();
+    context.save()
 
     // Смещаем всё на отрицательное положение камеры
-    context.translate(-camera.x, -camera.y);
+    context.translate(-camera.x, -camera.y)
 
     // Выполняем функцию отрисовки
-    drawFunction(context);
+    drawFunction(context)
 
-    context.restore();
+    context.restore()
   }
+
   function renderBackground(context, canvas, camera) {
     // Градиентный фон, если нет изображения
-    const gradient = context.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#87CEEB');
-    gradient.addColorStop(1, '#E0F7FA');
+    const gradient = context.createLinearGradient(0, 0, 0, canvas.height)
+    gradient.addColorStop(0, '#87CEEB')
+    gradient.addColorStop(1, '#E0F7FA')
 
-    context.fillStyle = gradient;
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = gradient
+    context.fillRect(0, 0, canvas.width, canvas.height)
   }
 
   // Очищаем весь холст
-  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.clearRect(0, 0, canvas.width, canvas.height)
 
   // Отрисовываем фон с учетом камеры
-  renderBackground(context, canvas, GameState.camera);
+  renderBackground(context, canvas, GameState.camera)
 
   // Отрисовываем все объекты с учетом положения камеры
   renderWithCamera(context, GameState.camera, (ctx) => {
     // Отрисовка всех игровых объектов
 
     // Например, отрисовка земли
-    ctx.fillStyle = 'brown';
-    ctx.fillRect(0, canvas.height - 20, canvas.width * 7, 20);
+    ctx.fillStyle = 'brown'
+    ctx.fillRect(0, canvas.height - 20, canvas.width * 7, 20)
+
+    if (gameObjects[GAME_STATE.LEVEL1].poops.length > 0) {
+      renderPoops(context, gameObjects[GAME_STATE.LEVEL1].poops)
+    }
 
     if (gameObjects[GAME_STATE.LEVEL1].collectables.length > 0) {
       renderFoodItems(context, gameObjects[GAME_STATE.LEVEL1].collectables)
     }
 
+
     white.render()
     black.render()
-  });
+  })
 
   // Интерфейс поверх всего (без смещения камеры)
   // renderUI(context, playerState);
 }
 
-export function updateLevel1(gameObjects, {GameState, PlayerState}, { canvas, context }, deltaTime) {
+export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, context}, deltaTime) {
   const {
     white,
     black,
@@ -168,35 +174,35 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, { canvas, co
     boss,
     exit,
     keyboard,
-  } = gameObjects;
+  } = gameObjects
 
   // Проверяем наличие объектов
   if (!white || !black) {
-    console.error('Персонажи не определены!');
-    return;
+    console.error('Персонажи не определены!')
+    return
   }
 
   // Создаем obstacles, если его нет
   if (!obstacles || obstacles.floorLine === undefined) {
     if (!gameObjects.obstacles) {
-      gameObjects.obstacles = {};
+      gameObjects.obstacles = {}
     }
-    gameObjects.obstacles.floorLine = canvas.height - 20;
-    console.warn(`Создан floorLine на уровне ${gameObjects.obstacles.floorLine}`);
+    gameObjects.obstacles.floorLine = canvas.height - 20
+    console.warn(`Создан floorLine на уровне ${gameObjects.obstacles.floorLine}`)
   }
 
   // Инициализируем состояние для активного персонажа, если его нет
   if (PlayerState.activeCharacter === undefined) {
-    PlayerState.activeCharacter = 'white'; // По умолчанию выбран белый персонаж
+    PlayerState.activeCharacter = 'white' // По умолчанию выбран белый персонаж
   }
 
   // Обработка переключения персонажа по нажатию Shift
   if (keyboard.isKeyPressed('ShiftLeft') || keyboard.isKeyPressed('ShiftRight')) {
     // Используем debounce, чтобы предотвратить многократное переключение при удержании
     if (!PlayerState.lastShiftTime || Date.now() - PlayerState.lastShiftTime > 300) {
-      PlayerState.activeCharacter = PlayerState.activeCharacter === 'white' ? 'black' : 'white';
-      PlayerState.lastShiftTime = Date.now();
-      console.log(`Переключились на ${PlayerState.activeCharacter} персонажа`);
+      PlayerState.activeCharacter = PlayerState.activeCharacter === 'white' ? 'black' : 'white'
+      PlayerState.lastShiftTime = Date.now()
+      console.log(`Переключились на ${PlayerState.activeCharacter} персонажа`)
     }
   }
 
@@ -246,49 +252,63 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, { canvas, co
 
 
   // Обновляем физику для обоих персонажей
-  updateCharacterPhysics(white);
-  updateCharacterPhysics(black);
+  updateCharacterPhysics(white)
+  updateCharacterPhysics(black)
+  updatePoops(gameObjects, deltaTime, {canvas, context})
 
   // Получаем активного персонажа
-  const activeCharacter = PlayerState.activeCharacter === 'white' ? white : black;
+  const activeCharacter = PlayerState.activeCharacter === 'white' ? white : black
 
   // Управление активным персонажем
   if (keyboard.isKeyPressed('KeyW') && activeCharacter.onGround) {
-    activeCharacter.velocityY = activeCharacter.jumpForce || JUMP_FORCE;
-    activeCharacter.isJumping = true;
-    activeCharacter.onGround = false;
-    console.log(`${PlayerState.activeCharacter} прыгает!`);
+    activeCharacter.velocityY = activeCharacter.jumpForce || JUMP_FORCE
+    activeCharacter.isJumping = true
+    activeCharacter.onGround = false
+
+    console.log(`${PlayerState.activeCharacter} прыгает!`)
   }
-  const currentMoveSpeed = activeCharacter.moveSpeed || MOVE_SPEED;
+  const currentMoveSpeed = activeCharacter.moveSpeed || MOVE_SPEED
 
   if (keyboard.isKeyPressed('KeyA')) {
-    activeCharacter.x -= currentMoveSpeed * deltaTime;
+    activeCharacter.x -= currentMoveSpeed * deltaTime
   }
   if (keyboard.isKeyPressed('KeyD')) {
-    activeCharacter.x += currentMoveSpeed * deltaTime;
+    activeCharacter.x += currentMoveSpeed * deltaTime
+  }
+
+  if (keyboard.isKeyPressed('Space') && !activeCharacter.poopCooldown) {
+    if (createPoop(activeCharacter, gameObjects)) {
+      // Устанавливаем задержку на какание, чтобы не спамить
+      activeCharacter.poopCooldown = true
+
+      // Сбрасываем задержку через 1 секунду
+      setTimeout(() => {
+        activeCharacter.poopCooldown = false
+      }, 1000)
+    }
   }
 
   // Проверка столкновений с едой для белого кота
-  checkFoodCollision(white, gameObjects.collectables);
+  checkFoodCollision(white, gameObjects.collectables)
 
   // Ограничиваем движение персонажей границами уровня
-  white.x = Math.max(0, Math.min(white.x, canvas.width * 7 - white.width));
-  black.x = Math.max(0, Math.min(black.x, canvas.width * 7 - black.width));
+  white.x = Math.max(0, Math.min(white.x, canvas.width * 7 - white.width))
+  black.x = Math.max(0, Math.min(black.x, canvas.width * 7 - black.width))
 
-  updateCamera(GameState, activeCharacter);
+  updateCamera(GameState, activeCharacter)
 
   // Визуальное обозначение активного персонажа
-  white.alpha = PlayerState.activeCharacter === 'white' ? 1.0 : 0.7;
-  black.alpha = PlayerState.activeCharacter === 'black' ? 1.0 : 0.7;
+  white.alpha = PlayerState.activeCharacter === 'white' ? 1.0 : 0.7
+  black.alpha = PlayerState.activeCharacter === 'black' ? 1.0 : 0.7
 }
 
 // Функция для проверки столкновения с едой и её сбора
 function checkFoodCollision(character, foodItems) {
   for (let i = 0; i < foodItems.length; i++) {
-    const food = foodItems[i];
+    const food = foodItems[i]
 
     // Пропускаем уже собранную еду
-    if (food.collected) continue;
+    if (food.collected) continue
 
     // Проверяем столкновение с едой
     if (character.x < food.x + food.width &&
@@ -297,65 +317,65 @@ function checkFoodCollision(character, foodItems) {
       character.y + character.height > food.y) {
 
       // Отмечаем еду как собранную
-      food.collected = true;
+      food.collected = true
 
       // Применяем эффект в зависимости от типа еды
       if (food.type === 'sizeFood' && character.color === 'white') {
         // Увеличиваем размер белого кота
-        increaseCatSize(character);
+        increaseCatSize(character)
       }
 
       // Можно добавить звуковой эффект или анимацию здесь
-      console.log("Еда собрана!");
+      console.log('Еда собрана!')
 
-      return true;
+      return true
     }
   }
 
-  return false;
+  return false
 }
 
 // Функция для увеличения размера кота
 function increaseCatSize(character) {
   // Максимальный множитель размера: 4
-  const MAX_SIZE_MULTIPLIER = 4;
+  const MAX_SIZE_MULTIPLIER = 4
 
   // Увеличиваем множитель на определенное значение
-  const sizeIncrement = 0.5; // Каждая еда увеличивает размер на 50%
+  const sizeIncrement = 0.5 // Каждая еда увеличивает размер на 50%
 
   // Проверяем, не достигли ли максимального размера
   if (character.sizeMultiplier < MAX_SIZE_MULTIPLIER) {
     // Запоминаем текущую позицию "ног" персонажа
-    const bottomY = character.y + character.height;
+    const bottomY = character.y + character.height
 
     // Увеличиваем множитель размера
-    character.sizeMultiplier = Math.min(MAX_SIZE_MULTIPLIER, character.sizeMultiplier + sizeIncrement);
+    character.sizeMultiplier = Math.min(MAX_SIZE_MULTIPLIER, character.sizeMultiplier + sizeIncrement)
 
     // Применяем новый размер
-    character.width = character.originalWidth * character.sizeMultiplier;
-    character.height = character.originalHeight * character.sizeMultiplier;
+    character.width = character.originalWidth * character.sizeMultiplier
+    character.height = character.originalHeight * character.sizeMultiplier
 
     // Корректируем позицию Y, чтобы "ноги" оставались на том же уровне
-    character.y = bottomY - character.height;
+    character.y = bottomY - character.height
 
     // Регулируем физические параметры в зависимости от размера
     // Чем больше кот, тем ниже он прыгает
-    const BASE_JUMP_FORCE = -550;
-    const BASE_MOVE_SPEED = 200;
+    const BASE_JUMP_FORCE = -550
+    const BASE_MOVE_SPEED = 200
 
     // Чем больше кот, тем ниже он прыгает
     // При размере 1 -> 100% силы прыжка
     // При размере 4 -> примерно 40% силы прыжка
-    character.jumpForce = BASE_JUMP_FORCE * (1 / (1 + (character.sizeMultiplier - 1) * 0.5));
+    character.jumpForce = BASE_JUMP_FORCE * (1 / (1 + (character.sizeMultiplier - 1) * 0.5))
 
     // Чем больше кот, тем медленнее он двигается
     // При размере 1 -> 100% скорости
     // При размере 4 -> примерно 45% скорости
-    character.moveSpeed = BASE_MOVE_SPEED * (1 / (1 + (character.sizeMultiplier - 1) * 0.4));
+    character.moveSpeed = BASE_MOVE_SPEED * (1 / (1 + (character.sizeMultiplier - 1) * 0.4))
 
 
-    console.log(`Кот увеличился! Новый множитель: ${character.sizeMultiplier}`);
-    console.log(`Новая сила прыжка: ${character.jumpForce}, Новая скорость: ${character.moveSpeed}`);
+    console.log(`Кот увеличился! Новый множитель: ${character.sizeMultiplier}`)
+    console.log(`Новая сила прыжка: ${character.jumpForce}, Новая скорость: ${character.moveSpeed}`)
   }
 }
 
@@ -364,14 +384,283 @@ function renderFoodItems(context, foodItems) {
   foodItems.forEach(food => {
     // Рисуем только несобранную еду
     if (!food.collected) {
-      context.fillStyle = food.color;
-      context.fillRect(food.x, food.y, food.width, food.height);
+      context.fillStyle = food.color
+      context.fillRect(food.x, food.y, food.width, food.height)
 
       // Можно добавить эффект "свечения" для лучшей видимости
-      context.shadowColor = 'rgba(0, 0, 255, 0.7)';
-      context.shadowBlur = 10;
-      context.fillRect(food.x, food.y, food.width, food.height);
-      context.shadowBlur = 0;
+      context.shadowColor = 'rgba(0, 0, 255, 0.7)'
+      context.shadowBlur = 10
+      context.fillRect(food.x, food.y, food.width, food.height)
+      context.shadowBlur = 0
     }
-  });
+  })
+}
+
+// Функция для создания какашки
+function createPoop(character, gameObjects) {
+  // Проверяем, достаточно ли большой размер кота
+  if (character.sizeMultiplier > 1) {
+    // Уменьшаем размер кота после какания
+    const poopSizeReduction = 0.2 // Уменьшение размера на 20%
+
+    // Запоминаем текущую позицию "ног" персонажа
+    const bottomY = character.y + character.height
+
+    // Уменьшаем множитель размера, но не меньше 1
+    character.sizeMultiplier = Math.max(1, character.sizeMultiplier - poopSizeReduction)
+
+    // Пересчитываем размеры
+    character.width = character.originalWidth * character.sizeMultiplier
+    character.height = character.originalHeight * character.sizeMultiplier
+
+    // Корректируем позицию Y, чтобы "ноги" оставались на том же уровне
+    character.y = bottomY - character.height
+
+    // Регулируем физические параметры в зависимости от размера
+    const BASE_JUMP_FORCE = -550
+    const BASE_MOVE_SPEED = 200
+
+    // Обновляем силу прыжка и скорость после изменения размера
+    character.jumpForce = BASE_JUMP_FORCE * (1 / (1 + (character.sizeMultiplier - 1) * 0.5))
+    character.moveSpeed = BASE_MOVE_SPEED * (1 / (1 + (character.sizeMultiplier - 1) * 0.4))
+
+    // Создаем какашку
+    const poopSize = 15 + (character.sizeMultiplier - 1) * 5 // Размер какашки зависит от размера кота
+
+    // Определяем положение какашки под котом
+    const poopX = character.direction === 'left'
+      ? character.x + character.width - poopSize / 2
+      : character.x + poopSize / 2
+
+    // Добавляем какашку в массив
+    gameObjects.poops.push({
+      x: poopX,
+      y: character.y + character.height - poopSize,
+      width: poopSize,
+      height: poopSize,
+      createdAt: Date.now(),
+      isMonster: false,                    // Флаг монстра
+      transformAt: Date.now() + 5000,      // Время превращения (через 5 секунд)
+      velocityX: 0,                        // Скорость по X (для движения монстра)
+      velocityY: 0,                        // Скорость по Y
+      direction: Math.random() > 0.5 ? 'left' : 'right', // Случайное направление
+      onGround: false,                     // Флаг нахождения на земле
+      jumpTimer: 0,                         // Таймер для прыжков
+    })
+
+    console.log('Кот покакал! Размер уменьшился до', character.sizeMultiplier.toFixed(2))
+
+    // Добавляем эффект
+    if (gameObjects.effects) {
+      gameObjects.effects.push({
+        x: character.x + character.width / 2,
+        y: character.y - 20,
+        text: 'Покакал! Размер ↓',
+        color: 'brown',
+        alpha: 1,
+        type: 'poopText',
+        createdAt: Date.now(),
+        duration: 1500,
+        offsetY: 0,
+      })
+    }
+
+    return true // Успешно покакал
+  }
+
+  return false // Не удалось покакать (размер слишком мал)
+}
+
+// Функция для отрисовки какашек
+function renderPoops(context, poops) {
+  poops.forEach(poop => {
+    if (poop.isMonster) {
+      // Рисуем монстра
+      context.fillStyle = '#5D2906' // Темно-коричневый для монстра
+      context.fillRect(poop.x, poop.y, poop.width, poop.height)
+
+      // Рисуем глаза монстру
+      context.fillStyle = 'white'
+
+      // Определяем позицию глаз в зависимости от направления
+      const eyeSize = poop.width * 0.15
+      const eyeY = poop.y + poop.height * 0.3
+
+      let leftEyeX, rightEyeX
+
+      if (poop.direction === 'left') {
+        leftEyeX = poop.x + poop.width * 0.2
+        rightEyeX = poop.x + poop.width * 0.5
+      } else {
+        leftEyeX = poop.x + poop.width * 0.5
+        rightEyeX = poop.x + poop.width * 0.8
+      }
+
+      // Рисуем глаза
+      context.fillRect(leftEyeX, eyeY, eyeSize, eyeSize)
+      context.fillRect(rightEyeX, eyeY, eyeSize, eyeSize)
+
+      // Рисуем зрачки
+      context.fillStyle = 'red'
+      context.fillRect(leftEyeX + eyeSize * 0.25, eyeY + eyeSize * 0.25, eyeSize * 0.5, eyeSize * 0.5)
+      context.fillRect(rightEyeX + eyeSize * 0.25, eyeY + eyeSize * 0.25, eyeSize * 0.5, eyeSize * 0.5)
+
+      // Рисуем рот
+      context.fillStyle = 'black'
+      context.beginPath()
+      context.arc(
+        poop.x + poop.width / 2,
+        poop.y + poop.height * 0.7,
+        poop.width * 0.3,
+        0.1 * Math.PI,
+        0.9 * Math.PI,
+        false,
+      )
+      context.fill()
+
+      // Рисуем зубы
+      context.fillStyle = 'white'
+      const teethWidth = poop.width * 0.08
+      const teethHeight = poop.height * 0.08
+      const teethY = poop.y + poop.height * 0.65
+
+      // Рисуем 3 зуба
+      for (let i = 0; i < 3; i++) {
+        const teethX = poop.x + poop.width * (0.35 + i * 0.15)
+        context.fillRect(teethX, teethY, teethWidth, teethHeight)
+      }
+
+    } else {
+      // Рисуем обычную какашку (старый код)
+      context.fillStyle = '#8B4513' // Коричневый цвет
+      context.fillRect(poop.x, poop.y, poop.width, poop.height)
+
+      // Добавляем более темные точки для текстуры
+      context.fillStyle = '#5D2906' // Темно-коричневый
+
+      // Рисуем несколько случайно расположенных точек
+      const numDots = 3 + Math.floor(poop.width / 5)
+      for (let i = 0; i < numDots; i++) {
+        const dotSize = 2 + Math.random() * 3
+        const dotX = poop.x + Math.random() * (poop.width - dotSize)
+        const dotY = poop.y + Math.random() * (poop.height - dotSize)
+        context.fillRect(dotX, dotY, dotSize, dotSize)
+      }
+    }
+  })
+}
+
+function updatePoops(gameObjects, deltaTime, {canvas, context}) {
+  const now = Date.now()
+  const {poops, obstacles} = gameObjects
+
+  for (let i = 0; i < poops.length; i++) {
+    const poop = poops[i]
+
+    // Проверяем, не пора ли превратиться в монстра
+    if (!poop.isMonster && now >= poop.transformAt) {
+      // Превращаем какашку в монстра
+      poop.isMonster = true
+
+      // Добавляем эффект трансформации
+      if (gameObjects.effects) {
+        gameObjects.effects.push({
+          x: poop.x + poop.width / 2,
+          y: poop.y - 20,
+          text: 'Ожило!',
+          color: 'darkred',
+          alpha: 1,
+          type: 'transformText',
+          createdAt: now,
+          duration: 1500,
+          offsetY: 0,
+        })
+      }
+
+      // Увеличиваем немного размер при превращении
+      const growFactor = 1.2
+      poop.width *= growFactor
+      poop.height *= growFactor
+
+      // Начальная скорость для монстра
+      poop.velocityX = poop.direction === 'left' ? -50 : 50
+
+      console.log('Какашка превратилась в монстра!')
+    }
+
+    // Обновляем поведение монстра
+    if (poop.isMonster) {
+      // Применяем гравитацию
+      if (!poop.onGround) {
+        poop.velocityY += 980 * deltaTime // Гравитация
+      }
+
+      // Обновляем позицию по Y
+      poop.y += poop.velocityY * deltaTime
+
+      // Обновляем позицию по X
+      poop.x += poop.velocityX * deltaTime
+
+      // Проверка столкновения с землей и препятствиями
+      poop.onGround = false
+
+      // Проверяем столкновение с препятствиями
+      for (const obstacle of obstacles) {
+        // Проверка столкновения по X
+        if (
+          poop.x < obstacle.x + obstacle.width &&
+          poop.x + poop.width > obstacle.x &&
+          poop.y < obstacle.y + obstacle.height &&
+          poop.y + poop.height > obstacle.y
+        ) {
+          // Проверка столкновения сверху (монстр стоит на препятствии)
+          if (poop.y + poop.height > obstacle.y &&
+            poop.y + poop.height < obstacle.y + obstacle.height / 2) {
+            poop.y = obstacle.y - poop.height
+            poop.velocityY = 0
+            poop.onGround = true
+          }
+          // Проверка боковых столкновений
+          else if (poop.velocityX > 0 && poop.x + poop.width > obstacle.x &&
+            poop.x < obstacle.x) {
+            // Столкновение справа
+            poop.x = obstacle.x - poop.width
+            poop.direction = 'left'
+            poop.velocityX *= -1
+          } else if (poop.velocityX < 0 && poop.x < obstacle.x + obstacle.width &&
+            poop.x + poop.width > obstacle.x + obstacle.width) {
+            // Столкновение слева
+            poop.x = obstacle.x + obstacle.width
+            poop.direction = 'right'
+            poop.velocityX *= -1
+          }
+        }
+      }
+
+      // Проверка падения на землю
+      if (poop.y > gameObjects.level.floorLine - poop.height) {
+        poop.y = gameObjects.level.floorLine - poop.height
+        poop.velocityY = 0
+        poop.onGround = true
+      }
+
+      // Случайные прыжки
+      poop.jumpTimer -= deltaTime
+
+      if (poop.onGround && poop.jumpTimer <= 0) {
+        // Случайный шанс прыжка
+        if (Math.random() < 0.02) {
+          poop.velocityY = -350 - Math.random() * 150 // Случайная сила прыжка
+          poop.onGround = false
+          poop.jumpTimer = 1 + Math.random() * 2 // Задержка между прыжками
+        }
+
+        // Случайный шанс изменить направление
+        if (Math.random() < 0.01) {
+          poop.direction = poop.direction === 'left' ? 'right' : 'left'
+          poop.velocityX *= -1
+        }
+      }
+    }
+  }
 }

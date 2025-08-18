@@ -17,6 +17,7 @@ export const gameObjects = {
     keyboard: {},
     level: {},
     collectables: [],
+    poops: [],
   },
   [GAME_STATE.LEVEL2]: {
     white: null,
@@ -28,5 +29,7 @@ export const gameObjects = {
     exit: null,
     keyboard: {},
     collectables: [],
+    poops: [],
+
   },
 };
