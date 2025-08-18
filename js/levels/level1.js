@@ -30,6 +30,7 @@ export function level1Init (gameObjects, { PlayerState, GameState }, Sprite, {ca
     velocityY: 0,
     isJumping: false,
     jumpForce: -550, // Отрицательное значение, т.к. ось Y направлена вниз
+    moveSpeed: 200,
     onGround: true,
     alpha: 1.0, // для прозрачности
     originalWidth: 40,
@@ -48,6 +49,10 @@ export function level1Init (gameObjects, { PlayerState, GameState }, Sprite, {ca
     jumpForce: -550, // Отрицательное значение, т.к. ось Y направлена вниз
     onGround: true,
     alpha: 1.0, // для прозрачности
+    moveSpeed: 200,
+    originalWidth: 40,
+    originalHeight: 40,
+    sizeMultiplier: 1,
   })
 
 // Инициализация состояния игрока
@@ -254,12 +259,13 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, { canvas, co
     activeCharacter.onGround = false;
     console.log(`${PlayerState.activeCharacter} прыгает!`);
   }
+  const currentMoveSpeed = activeCharacter.moveSpeed || MOVE_SPEED;
 
   if (keyboard.isKeyPressed('KeyA')) {
-    activeCharacter.x -= MOVE_SPEED * deltaTime;
+    activeCharacter.x -= currentMoveSpeed * deltaTime;
   }
   if (keyboard.isKeyPressed('KeyD')) {
-    activeCharacter.x += MOVE_SPEED * deltaTime;
+    activeCharacter.x += currentMoveSpeed * deltaTime;
   }
 
   // Проверка столкновений с едой для белого кота
@@ -293,7 +299,6 @@ function checkFoodCollision(character, foodItems) {
       // Отмечаем еду как собранную
       food.collected = true;
 
-        console.log('--// Увеличиваем размер белого кота', { food, character })
       // Применяем эффект в зависимости от типа еды
       if (food.type === 'sizeFood' && character.color === 'white') {
         // Увеличиваем размер белого кота
@@ -334,11 +339,26 @@ function increaseCatSize(character) {
     character.y = bottomY - character.height;
 
     // Регулируем физические параметры в зависимости от размера
-    character.jumpForce = -550 * (1 + (character.sizeMultiplier - 1) * 0.3); // Более высокий прыжок с увеличением размера
+    // Чем больше кот, тем ниже он прыгает
+    const BASE_JUMP_FORCE = -550;
+    const BASE_MOVE_SPEED = 200;
+
+    // Чем больше кот, тем ниже он прыгает
+    // При размере 1 -> 100% силы прыжка
+    // При размере 4 -> примерно 40% силы прыжка
+    character.jumpForce = BASE_JUMP_FORCE * (1 / (1 + (character.sizeMultiplier - 1) * 0.5));
+
+    // Чем больше кот, тем медленнее он двигается
+    // При размере 1 -> 100% скорости
+    // При размере 4 -> примерно 45% скорости
+    character.moveSpeed = BASE_MOVE_SPEED * (1 / (1 + (character.sizeMultiplier - 1) * 0.4));
+
 
     console.log(`Кот увеличился! Новый множитель: ${character.sizeMultiplier}`);
+    console.log(`Новая сила прыжка: ${character.jumpForce}, Новая скорость: ${character.moveSpeed}`);
   }
 }
+
 
 function renderFoodItems(context, foodItems) {
   foodItems.forEach(food => {
