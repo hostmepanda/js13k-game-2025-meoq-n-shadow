@@ -35,7 +35,6 @@ export const GameState = {
 export function updateCamera(gameState, activeCharacter) {
   // Центрируем камеру на активном персонаже
   const targetX = activeCharacter.x - gameState.camera.width / 2 + activeCharacter.width / 2;
-  console.log('--camera update', {targetX})
   // Плавное следование (опционально)
   const cameraSpeed = 0.1; // Скорость движения камеры (0-1)
   gameState.camera.x += (targetX - gameState.camera.x) * cameraSpeed;
