@@ -36,6 +36,7 @@ export function level1Init(gameObjects, {PlayerState, GameState}, Sprite, {canva
     originalWidth: 40,
     originalHeight: 40,
     sizeMultiplier: 1,
+    facingRight: true,
   })
   gameObjects[GAME_STATE.LEVEL1].black = Sprite({
     x: 40,
@@ -53,6 +54,18 @@ export function level1Init(gameObjects, {PlayerState, GameState}, Sprite, {canva
     originalWidth: 40,
     originalHeight: 40,
     sizeMultiplier: 1,
+    // Добавляем свойства для атаки
+    isAttacking: false,
+    attackDuration: 0.03, // миллисекунды
+    attackTimer: 0,
+    attackRange: 60, // дальность атаки
+    attackDamage: 10, // урон от атаки
+    facingRight: true,
+    // Свойства для cooldown
+    attackCooldown: 0.5, // миллисекунды (время перезарядки)
+    attackCooldownTimer: 0, // текущий таймер перезарядки
+    canAttack: true, // флаг, может ли кот атаковать
+
   })
 
 // Инициализация состояния игрока
@@ -158,6 +171,24 @@ export function renderLevel1(gameObjects, {PlayerState}, {canvas, context}) {
 
     white.render()
     black.render()
+
+    // Если кот атакует, добавляем визуализацию атаки
+    if (black.isAttacking) {
+      context.fillStyle = 'rgba(255, 0, 0, 0.5)'; // Красное свечение
+
+      // Направление атаки зависит от свойства facingRight
+      if (black.facingRight) {
+        // Атака вправо
+        const attackX = black.x + black.width;
+        context.fillRect(attackX, black.y, black.attackRange, black.height);
+      } else {
+        // Атака влево
+        const attackX = black.x - black.attackRange;
+        context.fillRect(attackX, black.y, black.attackRange, black.height);
+      }
+    }
+
+
   })
 
   // Интерфейс поверх всего (без смещения камеры)
@@ -251,13 +282,14 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   }
 
 
+  const activeCharacter = PlayerState.activeCharacter === 'white' ? white : black
+
   // Обновляем физику для обоих персонажей
   updateCharacterPhysics(white)
   updateCharacterPhysics(black)
   updatePoops(gameObjects, deltaTime, {canvas, context})
 
-  // Получаем активного персонажа
-  const activeCharacter = PlayerState.activeCharacter === 'white' ? white : black
+  updateBlackCatAttack(activeCharacter, [...gameObjects.enemies, ...gameObjects.poops.filter(({ isMonster }) => isMonster)], deltaTime)
 
   // Управление активным персонажем
   if (keyboard.isKeyPressed('KeyW') && activeCharacter.onGround) {
@@ -271,21 +303,36 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
 
   if (keyboard.isKeyPressed('KeyA')) {
     activeCharacter.x -= currentMoveSpeed * deltaTime
+    activeCharacter.facingRight = false;
   }
   if (keyboard.isKeyPressed('KeyD')) {
     activeCharacter.x += currentMoveSpeed * deltaTime
+    activeCharacter.facingRight = true;
   }
 
   if (keyboard.isKeyPressed('Space') && !activeCharacter.poopCooldown) {
-    if (createPoop(activeCharacter, gameObjects)) {
-      // Устанавливаем задержку на какание, чтобы не спамить
-      activeCharacter.poopCooldown = true
+    if (PlayerState.activeCharacter === 'white') {
+      if (createPoop(activeCharacter, gameObjects)) {
+        // Устанавливаем задержку на какание, чтобы не спамить
+        activeCharacter.poopCooldown = true
 
-      // Сбрасываем задержку через 1 секунду
-      setTimeout(() => {
-        activeCharacter.poopCooldown = false
-      }, 1000)
+        // Сбрасываем задержку через 1 секунду
+        setTimeout(() => {
+          activeCharacter.poopCooldown = false
+        }, 1000)
+      }
     }
+    if (PlayerState.activeCharacter === 'black' && !activeCharacter.isAttacking && activeCharacter.canAttack) {
+      activeCharacter.isAttacking = true;
+      activeCharacter.attackTimer = activeCharacter.attackDuration;
+      activeCharacter.canAttack = false; // Запрещаем атаковать до истечения cooldown
+      activeCharacter.attackCooldownTimer = activeCharacter.attackCooldown; // Устанавливаем таймер перезарядки
+
+      // Здесь можно добавить звук атаки, если есть
+      // playSound('blackAttack');
+    }
+
+
   }
 
   // Проверка столкновений с едой для белого кота
@@ -663,4 +710,55 @@ function updatePoops(gameObjects, deltaTime, {canvas, context}) {
       }
     }
   }
+}
+
+function updateBlackCatAttack(character, enemies, delta) {
+  // Если кот атакует, уменьшаем таймер атаки
+  if (character.isAttacking) {
+    character.attackTimer -= delta;
+
+    // Проверяем попадание по врагам
+    enemies?.forEach(enemy => {
+      let inAttackRange = false;
+
+      if (character.facingRight) {
+        // Атака вправо
+        inAttackRange = (enemy.x >= character.x + character.width) &&
+          (enemy.x <= character.x + character.width + character.attackRange) &&
+          (enemy.y + enemy.height >= character.y) &&
+          (enemy.y <= character.y + character.height);
+      } else {
+        // Атака влево
+        inAttackRange = (enemy.x + enemy.width >= character.x - character.attackRange) &&
+          (enemy.x <= character.x) &&
+          (enemy.y + enemy.height >= character.y) &&
+          (enemy.y <= character.y + character.height);
+      }
+
+      if (inAttackRange) {
+        // Наносим урон врагу
+        enemy.health -= character.attackDamage;
+
+        // Визуальный эффект получения урона
+        enemy.hitEffect = true;
+        enemy.hitTimer = 200; // длительность эффекта
+      }
+
+    });
+    console.log('--character', {character: character.attackTimer})
+    // Если таймер истек, завершаем атаку
+    if (character.attackTimer <= 0) {
+      character.isAttacking = false;
+    }
+  }
+  // Обработка cooldown атаки
+  if (!character.canAttack) {
+    character.attackCooldownTimer -= delta;
+
+    // Если таймер cooldown истек, разрешаем атаковать снова
+    if (character.attackCooldownTimer <= 0) {
+      character.canAttack = true;
+    }
+  }
+
 }
