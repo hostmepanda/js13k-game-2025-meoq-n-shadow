@@ -5,7 +5,7 @@ import {gameLoopUpdateMethod} from './gameHelpers/update'
 import {gameLoopRenderMethod} from './gameHelpers/render'
 import {level1Init} from './levels/level1'
 import {gameObjects} from './states/objects'
-import {PlayerState} from './states/palyer'
+import {PlayerState} from './states/player'
 import {GameState} from './states/game'
 import {initMainMenu} from './menus/main'
 import {GameLoop} from './gameHelpers/loop'
@@ -14,12 +14,12 @@ import {GameLoop} from './gameHelpers/loop'
   const { canvas, context } = init();
 
   initMainMenu(gameObjects)
-  level1Init(gameObjects, PlayerState, Sprite)
+  level1Init(gameObjects, {PlayerState, GameState}, Sprite, { canvas, context})
 
 
   new GameLoop({
-    update: (deltaTime) => gameLoopUpdateMethod(gameObjects, GameState, canvas, context, deltaTime),
-    render: () => gameLoopRenderMethod(gameObjects, GameState, canvas, context),
+    update: (deltaTime) => gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canvas, context, deltaTime),
+    render: () => gameLoopRenderMethod(gameObjects, {GameState, PlayerState}, canvas, context),
   })
   .start();
 })()

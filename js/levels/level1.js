@@ -1,15 +1,25 @@
-import {CANVAS, GAME_STATE} from '../states/game'
+import {CANVAS, GAME_STATE, GameState, updateCamera} from '../states/game'
 import {initKeyboardControls} from '../gameHelpers/keyboard'
 
-export function level1Init (gameObjects, playerState, Sprite) {
+export function level1Init (gameObjects, { PlayerState, GameState }, Sprite, {canvas}) {
   const levelState = {
     level: {
       floorLine: CANVAS.height - 20,
+      levelWidth: canvas.width * 7,
+      levelHeight: canvas.height,
+
     },
     boss: {
       health: 100,
     },
   }
+  GameState.camera.levelBounds = {
+    minX: 0,
+    maxX: levelState.level.levelWidth - CANVAS.width,
+    minY: 0,
+    maxY: levelState.level.levelHeight - CANVAS.height
+  }
+
   gameObjects[GAME_STATE.LEVEL1].white = Sprite({
     x: 20,
     y: CANVAS.height - 12 - 40,
@@ -38,7 +48,7 @@ export function level1Init (gameObjects, playerState, Sprite) {
     alpha: 1.0, // для прозрачности
   })
 // Инициализация состояния игрока
-  playerState.activeCharacter = 'white'; // По умолчанию активен белый персонаж
+  PlayerState.activeCharacter = 'white'; // По умолчанию активен белый персонаж
 
   // Инициализируем backgrounds, если его еще нет
   gameObjects[GAME_STATE.LEVEL1].backgrounds = gameObjects[GAME_STATE.LEVEL1].backgrounds || {};
@@ -67,7 +77,7 @@ export function level1Init (gameObjects, playerState, Sprite) {
 
 }
 
-export function renderLevel1 (gameObjects, playerState, { canvas, context }) {
+export function renderLevel1 (gameObjects, {PlayerState}, { canvas, context }) {
   const {
     white,
     black,
@@ -78,18 +88,50 @@ export function renderLevel1 (gameObjects, playerState, { canvas, context }) {
     exit,
   } = gameObjects[GAME_STATE.LEVEL1]
 
-  // Рендерим фон с закатом первым, чтобы он был на заднем плане
-  if (backgrounds && backgrounds.sunset) {
-    // Получаем контекст из CANVAS
-    backgrounds.sunset.render(context);
+  function renderWithCamera(context, camera, drawFunction) {
+    context.save();
+
+    // Смещаем всё на отрицательное положение камеры
+    context.translate(-camera.x, -camera.y);
+
+    // Выполняем функцию отрисовки
+    drawFunction(context);
+
+    context.restore();
+  }
+  function renderBackground(context, canvas, camera) {
+    // Градиентный фон, если нет изображения
+    const gradient = context.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#87CEEB');
+    gradient.addColorStop(1, '#E0F7FA');
+
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, canvas.width, canvas.height);
   }
 
+  // Очищаем весь холст
+  context.clearRect(0, 0, canvas.width, canvas.height);
 
-  white.render()
-  black.render()
+  // Отрисовываем фон с учетом камеры
+  renderBackground(context, canvas, GameState.camera);
+
+  // Отрисовываем все объекты с учетом положения камеры
+  renderWithCamera(context, GameState.camera, (ctx) => {
+    // Отрисовка всех игровых объектов
+
+    // Например, отрисовка земли
+    ctx.fillStyle = 'brown';
+    ctx.fillRect(0, canvas.height - 20, canvas.width * 7, 20);
+
+    white.render()
+    black.render()
+  });
+
+  // Интерфейс поверх всего (без смещения камеры)
+  // renderUI(context, playerState);
 }
 
-export function updateLevel1(gameObjects, playerState, { canvas, context }, deltaTime) {
+export function updateLevel1(gameObjects, {GameState, PlayerState}, { canvas, context }, deltaTime) {
   const {
     white,
     black,
@@ -117,17 +159,17 @@ export function updateLevel1(gameObjects, playerState, { canvas, context }, delt
   }
 
   // Инициализируем состояние для активного персонажа, если его нет
-  if (playerState.activeCharacter === undefined) {
-    playerState.activeCharacter = 'white'; // По умолчанию выбран белый персонаж
+  if (PlayerState.activeCharacter === undefined) {
+    PlayerState.activeCharacter = 'white'; // По умолчанию выбран белый персонаж
   }
 
   // Обработка переключения персонажа по нажатию Shift
   if (keyboard.isKeyPressed('ShiftLeft') || keyboard.isKeyPressed('ShiftRight')) {
     // Используем debounce, чтобы предотвратить многократное переключение при удержании
-    if (!playerState.lastShiftTime || Date.now() - playerState.lastShiftTime > 300) {
-      playerState.activeCharacter = playerState.activeCharacter === 'white' ? 'black' : 'white';
-      playerState.lastShiftTime = Date.now();
-      console.log(`Переключились на ${playerState.activeCharacter} персонажа`);
+    if (!PlayerState.lastShiftTime || Date.now() - PlayerState.lastShiftTime > 300) {
+      PlayerState.activeCharacter = PlayerState.activeCharacter === 'white' ? 'black' : 'white';
+      PlayerState.lastShiftTime = Date.now();
+      console.log(`Переключились на ${PlayerState.activeCharacter} персонажа`);
     }
   }
 
@@ -181,14 +223,14 @@ export function updateLevel1(gameObjects, playerState, { canvas, context }, delt
   updateCharacterPhysics(black);
 
   // Получаем активного персонажа
-  const activeCharacter = playerState.activeCharacter === 'white' ? white : black;
+  const activeCharacter = PlayerState.activeCharacter === 'white' ? white : black;
 
   // Управление активным персонажем
   if (keyboard.isKeyPressed('KeyW') && activeCharacter.onGround) {
     activeCharacter.velocityY = activeCharacter.jumpForce || JUMP_FORCE;
     activeCharacter.isJumping = true;
     activeCharacter.onGround = false;
-    console.log(`${playerState.activeCharacter} прыгает!`);
+    console.log(`${PlayerState.activeCharacter} прыгает!`);
   }
 
   if (keyboard.isKeyPressed('KeyA')) {
@@ -198,7 +240,13 @@ export function updateLevel1(gameObjects, playerState, { canvas, context }, delt
     activeCharacter.x += MOVE_SPEED * deltaTime;
   }
 
+  // Ограничиваем движение персонажей границами уровня
+  white.x = Math.max(0, Math.min(white.x, canvas.width * 7 - white.width));
+  black.x = Math.max(0, Math.min(black.x, canvas.width * 7 - black.width));
+
+  updateCamera(GameState, activeCharacter);
+
   // Визуальное обозначение активного персонажа
-  white.alpha = playerState.activeCharacter === 'white' ? 1.0 : 0.7;
-  black.alpha = playerState.activeCharacter === 'black' ? 1.0 : 0.7;
+  white.alpha = PlayerState.activeCharacter === 'white' ? 1.0 : 0.7;
+  black.alpha = PlayerState.activeCharacter === 'black' ? 1.0 : 0.7;
 }
