@@ -1,18 +1,35 @@
 import {CANVAS, GAME_STATE, GameState, updateCamera} from '../states/game'
 import {initKeyboardControls} from '../gameHelpers/keyboard'
-// W = wall
-// F = floor
-// C = ceiling
-// L = lamp
-// c = chair
-// T = table
-// f = flower
-// D = door
-// O = window
-// R = wardrobe
-// E = enemy
-// B = boss
-// X = breakable wall
+
+const parseToColorMapper = {
+  // W = wall
+  'W': 'brown',
+  // F = floor
+  'F': 'darkgreen',
+  // C = ceiling
+  'C': 'black',
+  // L = lamp
+  'L': 'yellow',
+  // c = chair
+  'c': 'sienna',
+  // T = table
+  'T': 'peru',
+  // f = flower
+  'f': 'green',
+  // D = door
+  'D': 'darkred',
+  // O = window
+  'O': 'lightblue',
+  // R = wardrobe
+  'R': 'saddlebrown',
+  // E = enemy
+  'E': 'red',
+  // B = boss
+  'B': 'purple',
+  // X = breakable wall
+  'X': 'gray'
+}
+
 const level1 = [
   // 39 F one screen width
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
@@ -79,51 +96,33 @@ function parseLevel(levelMap, gameObjects, Sprite, tileSize = 20) {
 
       switch (ch) {
         case 'W':
-          cfg.color = 'brown'
-          break
         case 'F':
-          cfg.color = 'darkgreen'
-          break
         case 'C':
-          cfg.color = 'black'
+          cfg.collides = true
           break
+      }
+
+      switch (ch) {
         case 'L':
-          cfg.color = 'yellow'
-          break
         case 'c':
-          cfg.color = 'sienna'
-          break
         case 'T':
-          cfg.color = 'peru'
-          break
         case 'f':
-          cfg.color = 'green'
-          break
         case 'D':
-          cfg.color = 'darkred'
-          break
         case 'O':
-          cfg.color = 'lightblue'
-          break
         case 'R':
-          cfg.color = 'saddlebrown'
+          cfg.collides = false
           break
       }
 
       switch (ch) {
         case 'E':
-          cfg.color = 'red'
+        case 'X':
+          cfg.breakable = true
+        case 'B':
           cfg.enemy = true
           break
-        case 'B':
-          cfg.color = 'purple'
-          cfg.boss = true
-          break
-        case 'X':
-          cfg.color = 'gray'
-          cfg.breakable = true
-          break
       }
+      cfg.color = parseToColorMapper[ch] || cfg.color;
       gameObjects.enemies.push(Sprite(cfg));
     });
   });
