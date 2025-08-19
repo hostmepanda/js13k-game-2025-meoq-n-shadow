@@ -32,25 +32,25 @@ const parseToColorMapper = {
 
 const level1 = [
   // 39 F one screen width
-  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
   "W..................................................W",
   "W.......................E..........................W",
   "W.............................................B....W",
   "W..................................................W",
-  "W..................................................F",
-  "W..................................................F",
-  "W..................................................F",
-  "W..................................................F",
-  "WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.....FFFFFFF",
-  "W..................................................F",
-  "W........OOOO......................................F",
-  "W........OOOO......................................F",
-  "W........OOOO......................................F",
-  "W..................................................F",
-  "W..........................FF......................F",
-  "W........................FFFF......................F",
-  "W......................FFFFFF......................F",
-  "W............c.....c.FFFFFFFF......................F",
+  "W..................................................W",
+  "W..................................................W",
+  "W..................................................W",
+  "W..................................................W",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW.....WWWWWWW",
+  "W..................................................W",
+  "W........OOOO......................................W",
+  "W........OOOO......................................W",
+  "W........OOOO......................................W",
+  "W..................................................W",
+  "W..........................FF......................W",
+  "W......FF................FFWW......................W",
+  "W......................FFWWWW......................W",
+  "W............c.....c.FFWWWWWW......................W",
   "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 ];
 
@@ -91,39 +91,28 @@ function parseLevel(levelMap, gameObjects, Sprite, tileSize = 20) {
         y: y * tileSize,
         width: tileSize,
         height: tileSize,
-        color: "gray"
+        color: parseToColorMapper?.[ch] ?? "gray",
+        type: ch
       };
 
-      switch (ch) {
-        case 'W':
-        case 'F':
-        case 'C':
-          cfg.collides = true
-          break
+      if (['W','F','C'].includes(ch)) {
+        cfg.collides = true
+        gameObjects.obstacles.push(Sprite(cfg));
       }
 
-      switch (ch) {
-        case 'L':
-        case 'c':
-        case 'T':
-        case 'f':
-        case 'D':
-        case 'O':
-        case 'R':
-          cfg.collides = false
-          break
+      if (['L','c','T','f','D','O','R'].includes(ch)) {
+        cfg.collides = false
+        gameObjects.obstacles.push(Sprite(cfg));
       }
 
-      switch (ch) {
-        case 'E':
-        case 'X':
+      if (['E','X','B'].includes(ch)) {
+        cfg.collides = true
+        cfg.enemy = true
+        if (ch === 'X') {
           cfg.breakable = true
-        case 'B':
-          cfg.enemy = true
-          break
+        }
+        gameObjects.enemies.push(Sprite(cfg));
       }
-      cfg.color = parseToColorMapper[ch] || cfg.color;
-      gameObjects.enemies.push(Sprite(cfg));
     });
   });
 }
@@ -337,7 +326,7 @@ export function renderLevel1(gameObjects, {PlayerState}, {canvas, context}) {
   // renderUI(context, playerState);
 }
 
-export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, context}, deltaTime) {
+export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, context}, deltaTime, { collides }) {
   const {
     white,
     black,
@@ -391,45 +380,47 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   // Функция для обновления физики персонажа с резким прыжком
   function updateCharacterPhysics(character) {
     // Применяем гравитацию с разными значениями для подъема и падения
-    if (!character.onGround) {
+    if (!character.onGround) { // или !character.isOnGround, в зависимости от того, какое имя вы выберете
       // Если персонаж движется вверх (отрицательная скорость Y)
       if (character.velocityY < 0) {
-        character.velocityY += GRAVITY_UP * deltaTime
+        character.velocityY += GRAVITY_UP * deltaTime;
       } else {
         // Если персонаж движется вниз (положительная скорость Y)
-        character.velocityY += GRAVITY_DOWN * deltaTime
+        character.velocityY += GRAVITY_DOWN * deltaTime;
       }
 
       // Ограничиваем максимальную скорость падения
       if (character.velocityY > MAX_FALL_SPEED) {
-        character.velocityY = MAX_FALL_SPEED
+        character.velocityY = MAX_FALL_SPEED;
       }
     }
 
     // Применяем вертикальную скорость
-    character.y += character.velocityY * deltaTime
+    character.y += character.velocityY * deltaTime;
 
-    // Проверяем приземление
-    if (character.y >= level.floorLine - character.height) {
-      character.y = level.floorLine - character.height
-      character.velocityY = 0
-      character.onGround = true
-      character.isJumping = false
+    // Можно оставить только проверку верхней границы
+    if (character.y < 0) {
+      character.y = 0;
+      character.velocityY = 0;
     }
 
-    // Ограничиваем верхнюю границу
-    if (character.y < 0) {
-      character.y = 0
-      character.velocityY = 0
+    // И добавить проверку нижней границы уровня как последнюю защиту
+    if (character.y >= level.floorLine - character.height) {
+      character.y = level.floorLine - character.height;
+      character.velocityY = 0;
+      character.onGround = true; // или character.isOnGround = true
+      character.isJumping = false;
     }
   }
-
 
   const activeCharacter = PlayerState.activeCharacter === 'white' ? white : black
 
   // Обновляем физику для обоих персонажей
   updateCharacterPhysics(white)
   updateCharacterPhysics(black)
+  checkEnvironmentCollisions(white, gameObjects.obstacles, collides);
+  checkEnvironmentCollisions(black, gameObjects.obstacles, collides);
+
   updatePoops(gameObjects, deltaTime, {canvas, context})
 
   updateBlackCatAttack(activeCharacter, gameObjects.enemies, deltaTime)
@@ -474,8 +465,6 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
       // Здесь можно добавить звук атаки, если есть
       // playSound('blackAttack');
     }
-
-
   }
 
   // Проверка столкновений с едой для белого кота
@@ -490,6 +479,82 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   // Визуальное обозначение активного персонажа
   white.alpha = PlayerState.activeCharacter === 'white' ? 1.0 : 0.7
   black.alpha = PlayerState.activeCharacter === 'black' ? 1.0 : 0.7
+}
+
+function checkEnvironmentCollisions(player, obstacles, isCollided) {
+  obstacles.filter(({ collides }) => collides).forEach(obstacle => {
+    if (isCollided(player,obstacle)) {
+      const playerLeft = player.x;
+      const playerRight = player.x + player.width;
+      const playerTop = player.y;
+      const playerBottom = player.y + player.height;
+
+      const obstacleLeft = obstacle.x;
+      const obstacleRight = obstacle.x + obstacle.width;
+      const obstacleTop = obstacle.y;
+      const obstacleBottom = obstacle.y + obstacle.height;
+
+      // Вычисляем величину перекрытия по каждой оси
+      const overlapLeft = playerRight - obstacleLeft;
+      const overlapRight = obstacleRight - playerLeft;
+      const overlapTop = playerBottom - obstacleTop;
+      const overlapBottom = obstacleBottom - playerTop;
+
+      // Предыдущие координаты игрока (до текущего шага)
+      const prevPlayerBottom = playerBottom - player.dy;
+      const prevPlayerTop = playerTop - player.dy;
+      const prevPlayerRight = playerRight - player.dx;
+      const prevPlayerLeft = playerLeft - player.dx;
+
+      if (prevPlayerBottom <= obstacleTop && player.dy > 0) {
+        // Коллизия сверху (игрок на полу)
+        player.y = obstacleTop - player.height;
+        player.dy = 0;
+        player.onGround = true;
+      }
+      // Если игрок был ниже препятствия и двигался вверх
+      else if (prevPlayerTop >= obstacleBottom && player.dy < 0) {
+        // Коллизия снизу (игрок ударился головой)
+        player.y = obstacleBottom;
+        player.dy = 0;
+      }
+      // Если игрок был слева от препятствия и двигался вправо
+      else if (prevPlayerRight <= obstacleLeft && player.dx > 0) {
+        // Коллизия справа (игрок уперся в правую стену)
+        player.x = obstacleLeft - player.width - player.dx;
+        player.dx = 0;
+      }
+      // Если игрок был справа от препятствия и двигался влево
+      else if (prevPlayerLeft >= obstacleRight && player.dx < 0) {
+        // Коллизия слева (игрок уперся в левую стену)
+        player.x = obstacleRight;
+        player.dx = 0;
+      }
+      // Если невозможно определить по предыдущей позиции, используем наименьшее перекрытие
+      else {
+        const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+
+        if (minOverlap === overlapTop) {
+          // Наименьшее перекрытие сверху
+          player.y = obstacleTop - player.height;
+          player.dy = 0;
+          player.onGround = true;
+        } else if (minOverlap === overlapBottom) {
+          // Наименьшее перекрытие снизу
+          player.y = obstacleBottom;
+          player.dy = 0;
+        } else if (minOverlap === overlapLeft) {
+          // Наименьшее перекрытие слева
+          player.x = obstacleLeft - player.width;
+          player.dx = 0;
+        } else if (minOverlap === overlapRight) {
+          // Наименьшее перекрытие справа
+          player.x = obstacleRight;
+          player.dx = 0;
+        }
+      }
+    }
+  })
 }
 
 // Функция для проверки столкновения с едой и её сбора
