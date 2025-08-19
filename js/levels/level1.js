@@ -1,5 +1,6 @@
 import {CANVAS, GAME_STATE, GameState, updateCamera} from '../states/game'
 import {initKeyboardControls} from '../gameHelpers/keyboard'
+import {collides} from '../engine/kontra.mjs'
 
 const parseToColorMapper = {
   // W = wall
@@ -41,12 +42,12 @@ const level1 = [
   "W..................................................W",
   "W..................................................W",
   "W..................................................W",
-  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW.....WWWWWWW",
-  "W..................................................W",
-  "W........OOOO......................................W",
-  "W........OOOO......................................W",
-  "W........OOOO......................................W",
-  "W..................................................W",
+  "WFFFFFFFFFF....FFFFFFF.....F.FF..FF....F.FF......FFW",
+  "W............................................WW....W",
+  "W............................................WW....W",
+  "W............................................WW....W",
+  "W........OOOO..............................FF......W",
+  "W..................................FFFF............W",
   "W..........................FF......................W",
   "W......FF................FFWW......................W",
   "W......................FFWWWW......................W",
@@ -326,7 +327,7 @@ export function renderLevel1(gameObjects, {PlayerState}, {canvas, context}) {
   // renderUI(context, playerState);
 }
 
-export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, context}, deltaTime, { collides }) {
+export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, context}, deltaTime) {
   const {
     white,
     black,
@@ -418,8 +419,8 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   // Обновляем физику для обоих персонажей
   updateCharacterPhysics(white)
   updateCharacterPhysics(black)
-  checkEnvironmentCollisions(white, gameObjects.obstacles, collides);
-  checkEnvironmentCollisions(black, gameObjects.obstacles, collides);
+  checkEnvironmentCollisions(white, gameObjects.obstacles);
+  checkEnvironmentCollisions(black, gameObjects.obstacles);
 
   updatePoops(gameObjects, deltaTime, {canvas, context})
 
@@ -481,81 +482,49 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   black.alpha = PlayerState.activeCharacter === 'black' ? 1.0 : 0.7
 }
 
-function checkEnvironmentCollisions(player, obstacles, isCollided) {
-  obstacles.filter(({ collides }) => collides).forEach(obstacle => {
-    if (isCollided(player,obstacle)) {
+function isCollided(a, b) {
+  return a.x < b.x + b.width &&
+    a.x + a.width > b.x &&
+    a.y < b.y + b.height &&
+    a.y + a.height > b.y;
+}
+
+function checkEnvironmentCollisions(player, obstacles) {
+  const collidableObstacles = obstacles.filter(({ collides }) => collides);
+  collidableObstacles.forEach(obstacle => {
+    if (isCollided(player, obstacle)) {
       const playerLeft = player.x;
-      const playerRight = player.x + player.width;
       const playerTop = player.y;
-      const playerBottom = player.y + player.height;
+      const playerRight = playerLeft + player.width;
+      const playerBottom = playerTop + player.height;
 
       const obstacleLeft = obstacle.x;
-      const obstacleRight = obstacle.x + obstacle.width;
       const obstacleTop = obstacle.y;
-      const obstacleBottom = obstacle.y + obstacle.height;
+      const obstacleRight = obstacleLeft + obstacle.width;
+      const obstacleBottom = obstacleTop + obstacle.height;
 
-      // Вычисляем величину перекрытия по каждой оси
-      const overlapLeft = playerRight - obstacleLeft;
-      const overlapRight = obstacleRight - playerLeft;
-      const overlapTop = playerBottom - obstacleTop;
-      const overlapBottom = obstacleBottom - playerTop;
+      const isPlayerLeftBetweenObstacle = playerLeft >= obstacleLeft && playerLeft <= obstacleRight
+      const isPlayerRightBetweenObstacle = playerRight >= obstacleLeft && playerRight <= obstacleRight
+      const isPlayerTopAboveObstacle = playerTop <= obstacleTop
+      const isPlayerBottomAboveObstacle = playerBottom <= obstacleTop
+      const isPlayerTopBetweenTopAndBottom = playerTop >= obstacleBottom && playerTop <= obstacleTop
+      const isPlayerBottomBetweenTopAndBottom = playerBottom >= obstacleBottom && playerBottom <= obstacleTop
 
-      // Предыдущие координаты игрока (до текущего шага)
-      const prevPlayerBottom = playerBottom - player.dy;
-      const prevPlayerTop = playerTop - player.dy;
-      const prevPlayerRight = playerRight - player.dx;
-      const prevPlayerLeft = playerLeft - player.dx;
-
-      if (prevPlayerBottom <= obstacleTop && player.dy > 0) {
-        // Коллизия сверху (игрок на полу)
-        player.y = obstacleTop - player.height;
-        player.dy = 0;
-        player.onGround = true;
-      }
-      // Если игрок был ниже препятствия и двигался вверх
-      else if (prevPlayerTop >= obstacleBottom && player.dy < 0) {
-        // Коллизия снизу (игрок ударился головой)
-        player.y = obstacleBottom;
-        player.dy = 0;
-      }
-      // Если игрок был слева от препятствия и двигался вправо
-      else if (prevPlayerRight <= obstacleLeft && player.dx > 0) {
-        // Коллизия справа (игрок уперся в правую стену)
-        player.x = obstacleLeft - player.width - player.dx;
-        player.dx = 0;
-      }
-      // Если игрок был справа от препятствия и двигался влево
-      else if (prevPlayerLeft >= obstacleRight && player.dx < 0) {
-        // Коллизия слева (игрок уперся в левую стену)
-        player.x = obstacleRight;
-        player.dx = 0;
-      }
-      // Если невозможно определить по предыдущей позиции, используем наименьшее перекрытие
-      else {
-        const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
-
-        if (minOverlap === overlapTop) {
-          // Наименьшее перекрытие сверху
-          player.y = obstacleTop - player.height;
-          player.dy = 0;
-          player.onGround = true;
-        } else if (minOverlap === overlapBottom) {
-          // Наименьшее перекрытие снизу
-          player.y = obstacleBottom;
-          player.dy = 0;
-        } else if (minOverlap === overlapLeft) {
-          // Наименьшее перекрытие слева
-          player.x = obstacleLeft - player.width;
-          player.dx = 0;
-        } else if (minOverlap === overlapRight) {
-          // Наименьшее перекрытие справа
-          player.x = obstacleRight;
-          player.dx = 0;
+      if (isPlayerLeftBetweenObstacle || isPlayerRightBetweenObstacle) {
+        if (playerTop <= obstacleBottom) {
+          player.y = obstacleBottom
+          player.velocityY = 0
+        }
+        if (isPlayerBottomAboveObstacle && isPlayerTopAboveObstacle) {
+          player.y = obstacleBottom - player.height;
+          player.velocityY = 0;
+          player.onGround = true
         }
       }
     }
   })
 }
+
 
 // Функция для проверки столкновения с едой и её сбора
 function checkFoodCollision(character, foodItems) {

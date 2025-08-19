@@ -1,5 +1,5 @@
 // TODO: import from kontra.min.mjs to reduce size before bundling for prod
-import { init, Sprite, collides } from './engine/kontra.mjs'
+import { init, Sprite } from './engine/kontra.mjs'
 
 import {gameLoopUpdateMethod} from './gameHelpers/update'
 import {gameLoopRenderMethod} from './gameHelpers/render'
@@ -18,7 +18,7 @@ import {GameLoop} from './gameHelpers/loop'
 
 
   new GameLoop({
-    update: (deltaTime) => gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canvas, context, deltaTime, { collides }),
+    update: (deltaTime) => gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canvas, context, deltaTime),
     render: () => gameLoopRenderMethod(gameObjects, {GameState, PlayerState}, canvas, context),
   })
   .start();
