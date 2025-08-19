@@ -1,5 +1,123 @@
 import {CANVAS, GAME_STATE, GameState, updateCamera} from '../states/game'
 import {initKeyboardControls} from '../gameHelpers/keyboard'
+// W = wall
+// F = floor
+// C = ceiling
+// L = lamp
+// c = chair
+// T = table
+// f = flower
+// D = door
+// O = window
+// R = wardrobe
+// E = enemy
+// B = boss
+// X = breakable wall
+const level1 = [
+  // 39 F one screen width
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "W..................................................W",
+  "W.......................E..........................W",
+  "W.............................................B....W",
+  "W..................................................W",
+  "W..................................................F",
+  "W..................................................F",
+  "W..................................................F",
+  "W..................................................F",
+  "WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.....FFFFFFF",
+  "W..................................................F",
+  "W........OOOO......................................F",
+  "W........OOOO......................................F",
+  "W........OOOO......................................F",
+  "W..................................................F",
+  "W..........................FF......................F",
+  "W........................FFFF......................F",
+  "W......................FFFFFF......................F",
+  "W............c.....c.FFFFFFFF......................F",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+];
+
+// Объединяем в одну карту
+function combineScreens(screens) {
+  const result = [];
+  const height = 10; // Высота экрана в тайлах
+
+  for (let y = 0; y < height; y++) {
+    let row = '';
+
+    for (let screen = 0; screen < screens.length; screen++) {
+      const screenRows = screens[screen].split('\n');
+      const currentRow = screenRows[y].trim();
+
+      if (screen === 0) {
+        row += currentRow;
+      } else if (screen === screens.length - 1) {
+        row += currentRow.substring(1);
+      } else {
+        row += currentRow.substring(1, currentRow.length - 1);
+      }
+    }
+
+    result.push(row);
+  }
+
+  return result.join('\n');
+}
+
+function parseLevel(levelMap, gameObjects, Sprite, tileSize = 20) {
+
+  levelMap.forEach((row, y) => {
+    [...row].forEach((ch, x) => {
+      if (ch === ".") return;
+      let cfg = { x: x * tileSize, y: y * tileSize, width: tileSize, height: tileSize, color: "gray" };
+
+      switch (ch) {
+        case "W": cfg.color = "brown";
+          gameObjects.obstacles.push(Sprite(cfg));
+          break;
+        case "F": cfg.color = "darkgreen";
+          gameObjects.obstacles.push(Sprite(cfg));
+          break;
+        case "C": cfg.color = "black";
+          gameObjects.obstacles.push(Sprite(cfg));
+          break;
+        case "L": cfg.color = "yellow";
+          gameObjects.obstacles.push(Sprite(cfg));
+          break;
+        case "c": cfg.color = "sienna";
+          gameObjects.obstacles.push(Sprite(cfg));
+          break;
+        case "T": cfg.color = "peru";
+          gameObjects.obstacles.push(Sprite(cfg));
+          break;
+        case "f": cfg.color = "green";
+          gameObjects.obstacles.push(Sprite(cfg));
+          break;
+        case "D": cfg.color = "darkred";
+          gameObjects.obstacles.push(Sprite(cfg));
+          break;
+        case "O": cfg.color = "lightblue";
+          gameObjects.obstacles.push(Sprite(cfg));
+          break;
+        case "R": cfg.color = "saddlebrown";
+          gameObjects.obstacles.push(Sprite(cfg));
+          break;
+        case "E": cfg.color = "red"; cfg.enemy = true;
+          gameObjects.enemies.push(Sprite(cfg));
+          break;
+        case "B": cfg.color = "purple"; cfg.boss = true;
+          gameObjects.enemies.push(Sprite(cfg));
+          break;
+        case "X": cfg.color = "gray"; cfg.breakable = true;
+          gameObjects.enemies.push(Sprite(cfg));
+          break;
+      }
+    });
+  });
+}
+
+
+
 
 export function level1Init(gameObjects, {PlayerState, GameState}, Sprite, {canvas}) {
   const levelState = {
@@ -7,12 +125,11 @@ export function level1Init(gameObjects, {PlayerState, GameState}, Sprite, {canva
       floorLine: CANVAS.height - 20,
       levelWidth: canvas.width * 7,
       levelHeight: canvas.height,
-
-    },
-    boss: {
-      health: 100,
     },
   }
+
+  parseLevel(level1, gameObjects[GAME_STATE.LEVEL1], Sprite)
+
   GameState.camera.levelBounds = {
     minX: 0,
     maxX: levelState.level.levelWidth - CANVAS.width,
@@ -65,7 +182,6 @@ export function level1Init(gameObjects, {PlayerState, GameState}, Sprite, {canva
     attackCooldown: 0.5, // миллисекунды (время перезарядки)
     attackCooldownTimer: 0, // текущий таймер перезарядки
     canAttack: true, // флаг, может ли кот атаковать
-
   })
 
 // Инициализация состояния игрока
@@ -94,7 +210,6 @@ export function level1Init(gameObjects, {PlayerState, GameState}, Sprite, {canva
 
   gameObjects[GAME_STATE.LEVEL1].keyboard = initKeyboardControls()
   gameObjects[GAME_STATE.LEVEL1].level = levelState.level
-  gameObjects[GAME_STATE.LEVEL1].boss = levelState.boss
 
   for (let i = 0; i < 7; i++) {
     // Пропускаем первый экран для разнообразия
@@ -117,11 +232,6 @@ export function renderLevel1(gameObjects, {PlayerState}, {canvas, context}) {
   const {
     white,
     black,
-    enemies,
-    backgrounds,
-    obstacles,
-    boss,
-    exit,
   } = gameObjects[GAME_STATE.LEVEL1]
 
   function renderWithCamera(context, camera, drawFunction) {
@@ -160,14 +270,34 @@ export function renderLevel1(gameObjects, {PlayerState}, {canvas, context}) {
     ctx.fillStyle = 'brown'
     ctx.fillRect(0, canvas.height - 20, canvas.width * 7, 20)
 
-    if (gameObjects[GAME_STATE.LEVEL1].poops.length > 0) {
-      renderPoops(context, gameObjects[GAME_STATE.LEVEL1].poops)
+    if (gameObjects[GAME_STATE.LEVEL1].backgrounds.length > 0) {
+      gameObjects[GAME_STATE.LEVEL1].backgrounds.forEach(background => {
+        background.render()
+      })
+    }
+
+    if (gameObjects[GAME_STATE.LEVEL1].obstacles.length > 0) {
+      gameObjects[GAME_STATE.LEVEL1].obstacles.forEach(background => {
+        background.render()
+      })
     }
 
     if (gameObjects[GAME_STATE.LEVEL1].collectables.length > 0) {
       renderFoodItems(context, gameObjects[GAME_STATE.LEVEL1].collectables)
+      gameObjects[GAME_STATE.LEVEL1].collectables.forEach(collectable => {collectable?.render?.()})
     }
 
+    if (gameObjects[GAME_STATE.LEVEL1].boss) {
+      gameObjects[GAME_STATE.LEVEL1].boss.render()
+    }
+
+    if (gameObjects[GAME_STATE.LEVEL1].enemies.length > 0) {
+      renderPoops(context, gameObjects[GAME_STATE.LEVEL1].enemies)
+
+      gameObjects[GAME_STATE.LEVEL1].enemies.forEach(enemy => {
+        enemy?.render?.()
+      })
+    }
 
     white.render()
     black.render()
@@ -202,6 +332,7 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
     enemies,
     backgrounds,
     obstacles,
+    level,
     boss,
     exit,
     keyboard,
@@ -214,12 +345,12 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   }
 
   // Создаем obstacles, если его нет
-  if (!obstacles || obstacles.floorLine === undefined) {
-    if (!gameObjects.obstacles) {
-      gameObjects.obstacles = {}
+  if (!level || level.floorLine === undefined) {
+    if (!gameObjects.level) {
+      gameObjects.level = {}
     }
-    gameObjects.obstacles.floorLine = canvas.height - 20
-    console.warn(`Создан floorLine на уровне ${gameObjects.obstacles.floorLine}`)
+    gameObjects.level.floorLine = canvas.height - 20
+    console.warn(`Создан floorLine на уровне ${gameObjects.level.floorLine}`)
   }
 
   // Инициализируем состояние для активного персонажа, если его нет
@@ -267,8 +398,8 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
     character.y += character.velocityY * deltaTime
 
     // Проверяем приземление
-    if (character.y >= obstacles.floorLine - character.height) {
-      character.y = obstacles.floorLine - character.height
+    if (character.y >= level.floorLine - character.height) {
+      character.y = level.floorLine - character.height
       character.velocityY = 0
       character.onGround = true
       character.isJumping = false
@@ -289,7 +420,7 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   updateCharacterPhysics(black)
   updatePoops(gameObjects, deltaTime, {canvas, context})
 
-  updateBlackCatAttack(activeCharacter, [...gameObjects.enemies, ...gameObjects.poops.filter(({ isMonster }) => isMonster)], deltaTime)
+  updateBlackCatAttack(activeCharacter, gameObjects.enemies, deltaTime)
 
   // Управление активным персонажем
   if (keyboard.isKeyPressed('KeyW') && activeCharacter.onGround) {
@@ -480,7 +611,7 @@ function createPoop(character, gameObjects) {
       : character.x + poopSize / 2
 
     // Добавляем какашку в массив
-    gameObjects.poops.push({
+    gameObjects.enemies.push({
       x: poopX,
       y: character.y + character.height - poopSize,
       width: poopSize,
@@ -599,10 +730,10 @@ function renderPoops(context, poops) {
 
 function updatePoops(gameObjects, deltaTime, {canvas, context}) {
   const now = Date.now()
-  const {poops, obstacles} = gameObjects
+  const {enemies, obstacles, effects} = gameObjects
 
-  for (let i = 0; i < poops.length; i++) {
-    const poop = poops[i]
+  for (let i = 0; i < enemies.length; i++) {
+    const poop = enemies[i]
 
     // Проверяем, не пора ли превратиться в монстра
     if (!poop.isMonster && now >= poop.transformAt) {
