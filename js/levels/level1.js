@@ -33,26 +33,26 @@ const parseToColorMapper = {
 
 const level1 = [
   // 39 F one screen width
-  "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
-  "W..................................................W",
-  "W.......................E..........................W",
-  "W.............................................B....W",
-  "W..................................................W",
-  "W..................................................W",
-  "W..................................................W",
-  "W..................................................W",
-  "W..................................................W",
-  "WFFFFFFFFFF....FFFFFFF.....F.FF..FF....F.FF......FFW",
-  "W............................................WW....W",
-  "W..........................FF................WW....W",
-  "W..........................WW................WW....W",
-  "W........OOOO..............WW..............FF......W",
-  "W.................FF.......WW......FFFF............W",
-  "W..........................WW......................W",
-  "W......FF..............FFFFWW......................W",
-  "W......................WWWWWW......................W",
-  "W............c.....c.FFWWWWWW......................W",
-  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+  "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+  "W.....................................................................................................................................................................................................................................................W",
+  "W.......................E.............................................................................................................................................................................................................................W",
+  "W.............................................B.......................................................................................................................................................................................................W",
+  "W.........................................................................................................w...........................................................................................................................................W",
+  "W.........................................................................................................w...........................................................................................................................................W",
+  "W.........................................................................................................w...........................................................................................................................................W",
+  "W.........................................................................................................w...........................................................................................................................................W",
+  "W.........................................................................................................W...........................................................................................................................................W",
+  "WFFFFFFFFFF....FFFFFFF.....F.FF..FF....F.FF......FF...........FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.............................................FFFF..........................................................................................W",
+  "W............................................WW...........................................................W.............................................W.............................................................................................W",
+  "W..........................FF................WW...........................................................W.......................................FFFFFFW.............................................................................................W",
+  "W..........................WW................WW...........................................................W.............................................W.............................................................................................W",
+  "W........OOOO..............WW..............FF.............................................................W.............................................W.............................................................................................W",
+  "W.................FF.......WW.............................................................................W.............................................W.............................................................................................W",
+  "W..........................WW.............................................................................W.............................................W.............................................................................................W",
+  "W......FF..............FFFFWW.............................................................................WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW............W.............................................................................................W",
+  "W......................WWWWWW...........................................................................................................................W.............................................................................................W",
+  "W............c.....c.FFWWWWWW...........................................................................................................................W.............................................................................................W",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 ];
 
 // Объединяем в одну карту
@@ -109,6 +109,7 @@ function parseLevel(levelMap, gameObjects, Sprite, tileSize = 20) {
       if (['E','X','B'].includes(ch)) {
         cfg.collides = true
         cfg.enemy = true
+        cfg.health = 10
         if (ch === 'X') {
           cfg.breakable = true
         }
@@ -497,7 +498,6 @@ function checkEnvironmentCollisions(player, obstacles) {
         if (playerBottom >= obstacleBottom) {
           player.y = obstacleBottom
         }
-        console.log(player.velocityY)
         if (playerBottom >= obstacleTop && playerTop <= obstacleTop) {
           player.y = obstacleTop - player.height
           player.onGround = true
@@ -773,92 +773,41 @@ function updatePoops(gameObjects, deltaTime, {canvas, context}) {
     const poop = enemies[i]
 
     // Проверяем, не пора ли превратиться в монстра
-    if (!poop.isMonster && now >= poop.transformAt) {
-      // Превращаем какашку в монстра
-      poop.isMonster = true
+    if (!poop.isMonster) {
 
-      // Добавляем эффект трансформации
-      if (gameObjects.effects) {
-        gameObjects.effects.push({
-          x: poop.x + poop.width / 2,
-          y: poop.y - 20,
-          text: 'Ожило!',
-          color: 'darkred',
-          alpha: 1,
-          type: 'transformText',
-          createdAt: now,
-          duration: 1500,
-          offsetY: 0,
-        })
+      if (now >= poop.transformAt) {
+        // Превращаем какашку в монстра
+        poop.isMonster = true
+
+        // Добавляем эффект трансформации
+        if (gameObjects.effects) {
+          gameObjects.effects.push({
+            x: poop.x + poop.width / 2,
+            y: poop.y - 20,
+            text: 'Ожило!',
+            color: 'darkred',
+            alpha: 1,
+            type: 'transformText',
+            createdAt: now,
+            duration: 1500,
+            offsetY: 0,
+          })
+        }
+
+        // Увеличиваем немного размер при превращении
+        const growFactor = 1.2
+        poop.width *= growFactor
+        poop.height *= growFactor
+
+        // Начальная скорость для монстра
+        poop.velocityX = poop.direction === 'left' ? -50 : 50
+
+        console.log('Какашка превратилась в монстра!')
       }
-
-      // Увеличиваем немного размер при превращении
-      const growFactor = 1.2
-      poop.width *= growFactor
-      poop.height *= growFactor
-
-      // Начальная скорость для монстра
-      poop.velocityX = poop.direction === 'left' ? -50 : 50
-
-      console.log('Какашка превратилась в монстра!')
     }
 
     // Обновляем поведение монстра
     if (poop.isMonster) {
-      // Применяем гравитацию
-      if (!poop.onGround) {
-        poop.velocityY += 980 * deltaTime // Гравитация
-      }
-
-      // Обновляем позицию по Y
-      poop.y += poop.velocityY * deltaTime
-
-      // Обновляем позицию по X
-      poop.x += poop.velocityX * deltaTime
-
-      // Проверка столкновения с землей и препятствиями
-      poop.onGround = false
-
-      // Проверяем столкновение с препятствиями
-      for (const obstacle of obstacles) {
-        // Проверка столкновения по X
-        if (
-          poop.x < obstacle.x + obstacle.width &&
-          poop.x + poop.width > obstacle.x &&
-          poop.y < obstacle.y + obstacle.height &&
-          poop.y + poop.height > obstacle.y
-        ) {
-          // Проверка столкновения сверху (монстр стоит на препятствии)
-          if (poop.y + poop.height > obstacle.y &&
-            poop.y + poop.height < obstacle.y + obstacle.height / 2) {
-            poop.y = obstacle.y - poop.height
-            poop.velocityY = 0
-            poop.onGround = true
-          }
-          // Проверка боковых столкновений
-          else if (poop.velocityX > 0 && poop.x + poop.width > obstacle.x &&
-            poop.x < obstacle.x) {
-            // Столкновение справа
-            poop.x = obstacle.x - poop.width
-            poop.direction = 'left'
-            poop.velocityX *= -1
-          } else if (poop.velocityX < 0 && poop.x < obstacle.x + obstacle.width &&
-            poop.x + poop.width > obstacle.x + obstacle.width) {
-            // Столкновение слева
-            poop.x = obstacle.x + obstacle.width
-            poop.direction = 'right'
-            poop.velocityX *= -1
-          }
-        }
-      }
-
-      // Проверка падения на землю
-      if (poop.y > gameObjects.level.floorLine - poop.height) {
-        poop.y = gameObjects.level.floorLine - poop.height
-        poop.velocityY = 0
-        poop.onGround = true
-      }
-
       // Случайные прыжки
       poop.jumpTimer -= deltaTime
 
@@ -876,6 +825,60 @@ function updatePoops(gameObjects, deltaTime, {canvas, context}) {
           poop.velocityX *= -1
         }
       }
+    }
+
+
+    if (!poop.onGround) {
+      poop.velocityY += 980 * deltaTime // Гравитация
+    }
+
+    // Обновляем позицию по Y
+    poop.y += poop.velocityY * deltaTime
+
+    // Обновляем позицию по X
+    poop.x += poop.velocityX * deltaTime
+
+    // Проверка столкновения с землей и препятствиями
+    poop.onGround = false
+
+    // Проверяем столкновение с препятствиями
+    for (const obstacle of obstacles) {
+      // Проверка столкновения по X
+      if (
+        poop.x < obstacle.x + obstacle.width &&
+        poop.x + poop.width > obstacle.x &&
+        poop.y < obstacle.y + obstacle.height &&
+        poop.y + poop.height > obstacle.y
+      ) {
+        // Проверка столкновения сверху (монстр стоит на препятствии)
+        if (poop.y + poop.height > obstacle.y &&
+          poop.y + poop.height < obstacle.y + obstacle.height / 2) {
+          poop.y = obstacle.y - poop.height
+          poop.velocityY = 0
+          poop.onGround = true
+        }
+        // Проверка боковых столкновений
+        else if (poop.velocityX > 0 && poop.x + poop.width > obstacle.x &&
+          poop.x < obstacle.x) {
+          // Столкновение справа
+          poop.x = obstacle.x - poop.width
+          poop.direction = 'left'
+          poop.velocityX *= -1
+        } else if (poop.velocityX < 0 && poop.x < obstacle.x + obstacle.width &&
+          poop.x + poop.width > obstacle.x + obstacle.width) {
+          // Столкновение слева
+          poop.x = obstacle.x + obstacle.width
+          poop.direction = 'right'
+          poop.velocityX *= -1
+        }
+      }
+    }
+
+    // Проверка падения на землю
+    if (poop.y > gameObjects.level.floorLine - poop.height) {
+      poop.y = gameObjects.level.floorLine - poop.height
+      poop.velocityY = 0
+      poop.onGround = true
     }
   }
 }
