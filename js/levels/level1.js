@@ -69,49 +69,62 @@ function parseLevel(levelMap, gameObjects, Sprite, tileSize = 20) {
   levelMap.forEach((row, y) => {
     [...row].forEach((ch, x) => {
       if (ch === ".") return;
-      let cfg = { x: x * tileSize, y: y * tileSize, width: tileSize, height: tileSize, color: "gray" };
+      let cfg = {
+        x: x * tileSize,
+        y: y * tileSize,
+        width: tileSize,
+        height: tileSize,
+        color: "gray"
+      };
 
       switch (ch) {
-        case "W": cfg.color = "brown";
-          gameObjects.obstacles.push(Sprite(cfg));
-          break;
-        case "F": cfg.color = "darkgreen";
-          gameObjects.obstacles.push(Sprite(cfg));
-          break;
-        case "C": cfg.color = "black";
-          gameObjects.obstacles.push(Sprite(cfg));
-          break;
-        case "L": cfg.color = "yellow";
-          gameObjects.obstacles.push(Sprite(cfg));
-          break;
-        case "c": cfg.color = "sienna";
-          gameObjects.obstacles.push(Sprite(cfg));
-          break;
-        case "T": cfg.color = "peru";
-          gameObjects.obstacles.push(Sprite(cfg));
-          break;
-        case "f": cfg.color = "green";
-          gameObjects.obstacles.push(Sprite(cfg));
-          break;
-        case "D": cfg.color = "darkred";
-          gameObjects.obstacles.push(Sprite(cfg));
-          break;
-        case "O": cfg.color = "lightblue";
-          gameObjects.obstacles.push(Sprite(cfg));
-          break;
-        case "R": cfg.color = "saddlebrown";
-          gameObjects.obstacles.push(Sprite(cfg));
-          break;
-        case "E": cfg.color = "red"; cfg.enemy = true;
-          gameObjects.enemies.push(Sprite(cfg));
-          break;
-        case "B": cfg.color = "purple"; cfg.boss = true;
-          gameObjects.enemies.push(Sprite(cfg));
-          break;
-        case "X": cfg.color = "gray"; cfg.breakable = true;
-          gameObjects.enemies.push(Sprite(cfg));
-          break;
+        case 'W':
+          cfg.color = 'brown'
+          break
+        case 'F':
+          cfg.color = 'darkgreen'
+          break
+        case 'C':
+          cfg.color = 'black'
+          break
+        case 'L':
+          cfg.color = 'yellow'
+          break
+        case 'c':
+          cfg.color = 'sienna'
+          break
+        case 'T':
+          cfg.color = 'peru'
+          break
+        case 'f':
+          cfg.color = 'green'
+          break
+        case 'D':
+          cfg.color = 'darkred'
+          break
+        case 'O':
+          cfg.color = 'lightblue'
+          break
+        case 'R':
+          cfg.color = 'saddlebrown'
+          break
       }
+
+      switch (ch) {
+        case 'E':
+          cfg.color = 'red'
+          cfg.enemy = true
+          break
+        case 'B':
+          cfg.color = 'purple'
+          cfg.boss = true
+          break
+        case 'X':
+          cfg.color = 'gray'
+          cfg.breakable = true
+          break
+      }
+      gameObjects.enemies.push(Sprite(cfg));
     });
   });
 }
