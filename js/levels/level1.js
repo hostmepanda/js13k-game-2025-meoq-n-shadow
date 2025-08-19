@@ -510,17 +510,17 @@ function checkEnvironmentCollisions(player, obstacles) {
       const isPlayerTopBetweenTopAndBottom = playerTop >= obstacleBottom && playerTop <= obstacleTop
       const isPlayerBottomBetweenTopAndBottom = playerBottom >= obstacleBottom && playerBottom <= obstacleTop
 
-      if (isPlayerLeftBetweenObstacle || isPlayerRightBetweenObstacle) {
-        if (playerTop <= obstacleBottom) {
+      // if (isPlayerLeftBetweenObstacle || isPlayerRightBetweenObstacle) {
+        if (playerBottom >= obstacleBottom) {
           player.y = obstacleBottom
           player.velocityY = 0
         }
-        if (isPlayerBottomAboveObstacle && isPlayerTopAboveObstacle) {
-          player.y = obstacleBottom - player.height;
-          player.velocityY = 0;
+        if (playerBottom >= obstacleTop && playerTop <= obstacleTop) {
+          player.y = obstacleTop - player.height
+          player.velocityY = 0
           player.onGround = true
         }
-      }
+      // }
     }
   })
 }
