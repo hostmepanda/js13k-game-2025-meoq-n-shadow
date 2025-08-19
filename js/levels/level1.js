@@ -485,6 +485,8 @@ function checkEnvironmentCollisions(player, obstacles) {
   const collidableObstacles = obstacles.filter(({ collides }) => collides);
   collidableObstacles.forEach(obstacle => {
     if (isCollided(player, obstacle)) {
+      player.velocityY = 500
+
       const playerLeft = player.x;
       const playerTop = player.y;
       const playerRight = playerLeft + player.width;
@@ -495,23 +497,23 @@ function checkEnvironmentCollisions(player, obstacles) {
       const obstacleRight = obstacleLeft + obstacle.width;
       const obstacleBottom = obstacleTop + obstacle.height;
 
-      const isPlayerLeftBetweenObstacle = playerLeft >= obstacleLeft && playerLeft <= obstacleRight
-      const isPlayerRightBetweenObstacle = playerRight >= obstacleLeft && playerRight <= obstacleRight
-      const isPlayerTopAboveObstacle = playerTop <= obstacleTop
-      const isPlayerBottomAboveObstacle = playerBottom <= obstacleTop
-      const isPlayerTopBetweenTopAndBottom = playerTop >= obstacleBottom && playerTop <= obstacleTop
-      const isPlayerBottomBetweenTopAndBottom = playerBottom >= obstacleBottom && playerBottom <= obstacleTop
-
-      // if (isPlayerLeftBetweenObstacle || isPlayerRightBetweenObstacle) {
+      if (obstacle.type === 'F') {
         if (playerBottom >= obstacleBottom) {
           player.y = obstacleBottom
-          player.velocityY = 0
         }
         if (playerBottom >= obstacleTop && playerTop <= obstacleTop) {
           player.y = obstacleTop - player.height
           player.onGround = true
         }
-      // }
+      }
+
+      if (obstacle.type === 'W') {
+        if (player.facingRight) {
+          player.x = obstacleLeft - player.width
+        } else {
+          player.x = obstacleRight
+        }
+      }
     }
   })
 }
