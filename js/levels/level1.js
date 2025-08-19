@@ -372,48 +372,14 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
 
   // Константы для физики
   const MOVE_SPEED = 200    // пикселей в секунду
-  const GRAVITY_UP = 1200   // Гравитация при движении вверх
-  const GRAVITY_DOWN = 1500 // Гравитация при падении
   const JUMP_FORCE = -550   // Начальная скорость прыжка
-  const MAX_FALL_SPEED = 800 // Максимальная скорость падения
-
-
-  // Функция для обновления физики персонажа с резким прыжком
-  function updateCharacterPhysics(character) {
-    // Применяем гравитацию с разными значениями для подъема и падения
-    if (!character.onGround) { // или !character.isOnGround, в зависимости от того, какое имя вы выберете
-      // Если персонаж движется вверх (отрицательная скорость Y)
-      if (character.velocityY < 0) {
-        character.velocityY += GRAVITY_UP * deltaTime;
-      } else {
-        // Если персонаж движется вниз (положительная скорость Y)
-        character.velocityY += GRAVITY_DOWN * deltaTime;
-      }
-
-      // Ограничиваем максимальную скорость падения
-      if (character.velocityY > MAX_FALL_SPEED) {
-        character.velocityY = MAX_FALL_SPEED;
-      }
-    }
-
-    // Применяем вертикальную скорость
-    character.y += character.velocityY * deltaTime;
-
-    // Можно оставить только проверку верхней границы
-    if (character.y < 0) {
-      character.y = 0;
-      character.velocityY = 0;
-    }
-  }
 
   const activeCharacter = PlayerState.activeCharacter === 'white' ? white : black
-
+  updateCharacterPhysics(white, deltaTime)
+  updateCharacterPhysics(black, deltaTime)
   // Обновляем физику для обоих персонажей
-  updateCharacterPhysics(white)
-  updateCharacterPhysics(black)
   checkEnvironmentCollisions(white, gameObjects.obstacles);
   checkEnvironmentCollisions(black, gameObjects.obstacles);
-
   updatePoops(gameObjects, deltaTime, {canvas, context})
 
   updateBlackCatAttack(activeCharacter, gameObjects.enemies, deltaTime)
@@ -474,6 +440,38 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   black.alpha = PlayerState.activeCharacter === 'black' ? 1.0 : 0.7
 }
 
+// Функция для обновления физики персонажа с резким прыжком
+function updateCharacterPhysics(character, deltaTime) {
+  const GRAVITY_UP = 1200   // Гравитация при движении вверх
+  const GRAVITY_DOWN = 1500 // Гравитация при падении
+  const MAX_FALL_SPEED = 800 // Максимальная скорость падения
+
+  // Применяем гравитацию с разными значениями для подъема и падения
+  if (!character.onGround) { // или !character.isOnGround, в зависимости от того, какое имя вы выберете
+    // Если персонаж движется вверх (отрицательная скорость Y)
+    if (character.velocityY < 0) {
+      character.velocityY += GRAVITY_UP * deltaTime;
+    } else {
+      // Если персонаж движется вниз (положительная скорость Y)
+      character.velocityY += GRAVITY_DOWN * deltaTime;
+    }
+
+    // Ограничиваем максимальную скорость падения
+    if (character.velocityY > MAX_FALL_SPEED) {
+      character.velocityY = MAX_FALL_SPEED;
+    }
+  }
+
+  // Применяем вертикальную скорость
+  character.y += character.velocityY * deltaTime;
+
+  // Можно оставить только проверку верхней границы
+  if (character.y < 0) {
+    character.y = 0;
+    character.velocityY = 0;
+  }
+}
+
 function isCollided(a, b) {
   return a.x < b.x + b.width &&
     a.x + a.width > b.x &&
@@ -485,8 +483,6 @@ function checkEnvironmentCollisions(player, obstacles) {
   const collidableObstacles = obstacles.filter(({ collides }) => collides);
   collidableObstacles.forEach(obstacle => {
     if (isCollided(player, obstacle)) {
-      player.velocityY = 500
-
       const playerLeft = player.x;
       const playerTop = player.y;
       const playerRight = playerLeft + player.width;
@@ -501,9 +497,11 @@ function checkEnvironmentCollisions(player, obstacles) {
         if (playerBottom >= obstacleBottom) {
           player.y = obstacleBottom
         }
+        console.log(player.velocityY)
         if (playerBottom >= obstacleTop && playerTop <= obstacleTop) {
           player.y = obstacleTop - player.height
           player.onGround = true
+          player.velocityY = 500
         }
       }
 
