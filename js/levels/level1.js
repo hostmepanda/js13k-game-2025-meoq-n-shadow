@@ -404,14 +404,6 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
       character.y = 0;
       character.velocityY = 0;
     }
-
-    // И добавить проверку нижней границы уровня как последнюю защиту
-    if (character.y >= level.floorLine - character.height) {
-      character.y = level.floorLine - character.height;
-      character.velocityY = 0;
-      character.onGround = true; // или character.isOnGround = true
-      character.isJumping = false;
-    }
   }
 
   const activeCharacter = PlayerState.activeCharacter === 'white' ? white : black
@@ -517,7 +509,6 @@ function checkEnvironmentCollisions(player, obstacles) {
         }
         if (playerBottom >= obstacleTop && playerTop <= obstacleTop) {
           player.y = obstacleTop - player.height
-          player.velocityY = 0
           player.onGround = true
         }
       // }
