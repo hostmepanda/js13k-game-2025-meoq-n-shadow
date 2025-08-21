@@ -653,73 +653,39 @@ function createPoop(character, gameObjects, Sprite) {
       direction: Math.random() > 0.5 ? 'left' : 'right',
       onGround: false,
       jumpTimer: 0,
-
-      // Метод обновления спрайта
-      update(dt) {
-        // Здесь можно добавить логику обновления какашки
-        // Например, проверку на превращение в монстра
-        if (!this.isMonster && Date.now() > this.transformAt) {
-          this.isMonster = true;
-          this.color = 'darkbrown'; // Меняем цвет при превращении
+      update(deltaTime) {
+        const now = Date.now()
+        if (!this.isMonster) {
+          if (now >= this.transformAt) {
+            this.isMonster = true
+            const growFactor = 1.2
+            this.width *= growFactor
+            this.height *= growFactor
+            this.velocityX = this.direction === 'left' ? -50 : 50
+            console.log('Какашка превратилась в монстра!')
+          }
         }
-
-        // Другая логика движения и обновления состояния
+        if (this.isMonster) {
+          this.jumpTimer -= deltaTime
+          if (this.onGround && this.jumpTimer <= 0) {
+            if (Math.random() < 0.02) {
+              this.velocityY = -350 - Math.random() * 150 // Случайная сила прыжка
+              this.onGround = false
+              this.jumpTimer = 1 + Math.random() * 2 // Задержка между прыжками
+            }
+            if (Math.random() < 0.01) {
+              this.direction = this.direction === 'left' ? 'right' : 'left'
+              this.velocityX *= -1
+            }
+          }
+        }
       },
-
-      // Переопределяем метод рендеринга, если нужна кастомная отрисовка
       render() {
-        this.context.fillStyle = this.color;
-        this.context.beginPath();
 
-        // Рисуем какашку в виде кружка или другой формы
-        this.context.arc(this.x, this.y, this.width/2, 0, Math.PI * 2);
-        this.context.fill();
-
-        // Или можно использовать встроенный метод отрисовки
-        // this.draw();
       }
     });
-
-    // Добавляем какашку в массив
     gameObjects.enemies.push(poop);
-
     console.log('Кот покакал! Размер уменьшился до', character.sizeMultiplier.toFixed(2))
-
-    // Добавляем эффект
-    if (gameObjects.effects) {
-      // Также можно создать эффект как спрайт Kontra.js
-      const effect = Sprite({
-        x: character.x + character.width / 2,
-        y: character.y - 20,
-        text: 'Покакал! Размер ↓',
-        color: 'brown',
-        alpha: 1,
-        type: 'poopText',
-        createdAt: Date.now(),
-        duration: 1500,
-        offsetY: 0,
-
-        render() {
-          this.context.globalAlpha = this.alpha;
-          this.context.fillStyle = this.color;
-          this.context.font = '14px Arial';
-          this.context.textAlign = 'center';
-          this.context.fillText(this.text, this.x, this.y + this.offsetY);
-          this.context.globalAlpha = 1;
-        },
-
-        update(dt) {
-          const elapsedTime = Date.now() - this.createdAt;
-          this.alpha = Math.max(0, 1 - (elapsedTime / this.duration));
-          this.offsetY -= 0.5; // Эффект плавного поднятия текста
-
-          return elapsedTime < this.duration; // Возвращаем false, когда эффект должен исчезнуть
-        }
-      });
-
-      gameObjects.effects.push(effect);
-    }
-
     return true // Успешно покакал
   }
 
@@ -812,62 +778,8 @@ function updatePoops(gameObjects, deltaTime, {canvas, context}) {
 
   for (let i = 0; i < enemies.length; i++) {
     const poop = enemies[i]
-
+    poop.update(deltaTime)
     // Проверяем, не пора ли превратиться в монстра
-    if (!poop.isMonster) {
-
-      if (now >= poop.transformAt) {
-        // Превращаем какашку в монстра
-        poop.isMonster = true
-
-        // Добавляем эффект трансформации
-        if (gameObjects.effects) {
-          gameObjects.effects.push({
-            x: poop.x + poop.width / 2,
-            y: poop.y - 20,
-            text: 'Ожило!',
-            color: 'darkred',
-            alpha: 1,
-            type: 'transformText',
-            createdAt: now,
-            duration: 1500,
-            offsetY: 0,
-          })
-        }
-
-        // Увеличиваем немного размер при превращении
-        const growFactor = 1.2
-        poop.width *= growFactor
-        poop.height *= growFactor
-
-        // Начальная скорость для монстра
-        poop.velocityX = poop.direction === 'left' ? -50 : 50
-
-        console.log('Какашка превратилась в монстра!')
-      }
-    }
-
-    // Обновляем поведение монстра
-    if (poop.isMonster) {
-      // Случайные прыжки
-      poop.jumpTimer -= deltaTime
-
-      if (poop.onGround && poop.jumpTimer <= 0) {
-        // Случайный шанс прыжка
-        if (Math.random() < 0.02) {
-          poop.velocityY = -350 - Math.random() * 150 // Случайная сила прыжка
-          poop.onGround = false
-          poop.jumpTimer = 1 + Math.random() * 2 // Задержка между прыжками
-        }
-
-        // Случайный шанс изменить направление
-        if (Math.random() < 0.01) {
-          poop.direction = poop.direction === 'left' ? 'right' : 'left'
-          poop.velocityX *= -1
-        }
-      }
-    }
-
 
     if (!poop.onGround) {
       poop.velocityY += 980 * deltaTime // Гравитация
