@@ -354,7 +354,7 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   updateCharacterPhysics(black, deltaTime)
   // Обновляем физику для обоих персонажей
   checkEnvironmentCollisions(white, gameObjects.obstacles);
-  // checkEnvironmentCollisions(black, gameObjects.obstacles);
+  checkEnvironmentCollisions(black, gameObjects.obstacles);
   updatePoops(gameObjects, deltaTime, {canvas, context})
 
   updateBlackCatAttack(activeCharacter, gameObjects.enemies, deltaTime)
@@ -469,7 +469,6 @@ function checkEnvironmentCollisions(player, obstacles, deltaTime) {
           player.y = obstacle.y - player.height;
           player.onGround = true;
           player.isJumping = false
-          player.velocityY = GRAVITY_DOWN;
         } else if (
           player.isJumping &&
           player.y + player.height >= obstacle.y + obstacle.height &&
@@ -889,7 +888,7 @@ function updateBlackCatAttack(character, enemies, delta) {
       if (inAttackRange) {
         // Наносим урон врагу
         enemy.health -= character.attackDamage;
-
+        enemy.isAlive = false
         // Визуальный эффект получения урона
         enemy.hitEffect = true;
         enemy.hitTimer = 200; // длительность эффекта
