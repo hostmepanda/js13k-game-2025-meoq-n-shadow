@@ -276,6 +276,12 @@ export function renderLevel1(gameObjects, {PlayerState}, {canvas, context}) {
       })
     }
 
+    if (gameObjects[GAME_STATE.LEVEL1].effects.length > 0) {
+      gameObjects[GAME_STATE.LEVEL1].enemies.forEach(effect => {
+        effect?.render?.()
+      })
+    }
+
     white.render()
     black.render()
 
@@ -469,6 +475,7 @@ function checkEnvironmentCollisions(player, obstacles, deltaTime) {
           player.y = obstacle.y - player.height;
           player.onGround = true;
           player.isJumping = false
+          player.velocityY = GRAVITY_DOWN;
         } else if (
           player.isJumping &&
           player.y + player.height >= obstacle.y + obstacle.height &&
