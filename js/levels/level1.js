@@ -42,48 +42,20 @@ const level1 = [
   "W.........................................................................................................w...........................................................................................................................................W",
   "W.........................................................................................................w...........................................................................................................................................W",
   "W.........................................................................................................W...........................................................................................................................................W",
-  "WFFFFFFFFFF....FFFFFFF.....F.FF..FF....F.FF......FF...........FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.............................................FFFF..........................................................................................W",
-  "W............................................WW...........................................................W.............................................W.............................................................................................W",
-  "W..........................FF................WW...........................................................W.......................................FFFFFFW.............................................................................................W",
-  "W..........................WW................WW...........................................................W.............................................W.............................................................................................W",
-  "W........OOOO..............WW..............FF.............................................................W.............................................W.............................................................................................W",
-  "W.................FF.......WW.............................................................................W.............................................W.............................................................................................W",
-  "W..........................WW.............................................................................W.............................................W.............................................................................................W",
-  "W......FF..............FFFFWW.............................................................................WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW............W.............................................................................................W",
+  "W.............FFFFFFF.....F.FF..FF....F.FF......FF...........FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.............................................FFFF...........................................................................................W",
+  "W......FF....................................WW...........................................................W.............................................W.............................................................................................W",
+  "W......FF..................FF................WW...........................................................W.......................................FFFFFFW.............................................................................................W",
+  "W......FF..................WW................WW...........................................................W.............................................W.............................................................................................W",
+  "W......FFOOOO..............WW..............FF.............................................................W.............................................W.............................................................................................W",
+  "W......FF.........FF.......WW.............................................................................W.............................................W.............................................................................................W",
+  "W......FF..................WW.............................................................................W.............................................W.............................................................................................W",
+  "W......................FFFFWW.............................................................................WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW............W.............................................................................................W",
   "W......................WWWWWW...........................................................................................................................W.............................................................................................W",
   "W............c.....c.FFWWWWWW...........................................................................................................................W.............................................................................................W",
   "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 ];
 
-// Объединяем в одну карту
-function combineScreens(screens) {
-  const result = [];
-  const height = 10; // Высота экрана в тайлах
-
-  for (let y = 0; y < height; y++) {
-    let row = '';
-
-    for (let screen = 0; screen < screens.length; screen++) {
-      const screenRows = screens[screen].split('\n');
-      const currentRow = screenRows[y].trim();
-
-      if (screen === 0) {
-        row += currentRow;
-      } else if (screen === screens.length - 1) {
-        row += currentRow.substring(1);
-      } else {
-        row += currentRow.substring(1, currentRow.length - 1);
-      }
-    }
-
-    result.push(row);
-  }
-
-  return result.join('\n');
-}
-
 function parseLevel(levelMap, gameObjects, Sprite, tileSize = 20) {
-
   levelMap.forEach((row, y) => {
     [...row].forEach((ch, x) => {
       if (ch === ".") return;
@@ -157,6 +129,7 @@ export function level1Init(gameObjects, {PlayerState, GameState}, Sprite, {canva
     originalHeight: 40,
     sizeMultiplier: 1,
     facingRight: true,
+    isMoving: false,
   })
   gameObjects[GAME_STATE.LEVEL1].black = Sprite({
     x: 40,
@@ -185,6 +158,7 @@ export function level1Init(gameObjects, {PlayerState, GameState}, Sprite, {canva
     attackCooldown: 0.5, // миллисекунды (время перезарядки)
     attackCooldownTimer: 0, // текущий таймер перезарядки
     canAttack: true, // флаг, может ли кот атаковать
+    isMoving: false,
   })
 
 // Инициализация состояния игрока
@@ -380,7 +354,7 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   updateCharacterPhysics(black, deltaTime)
   // Обновляем физику для обоих персонажей
   checkEnvironmentCollisions(white, gameObjects.obstacles);
-  checkEnvironmentCollisions(black, gameObjects.obstacles);
+  // checkEnvironmentCollisions(black, gameObjects.obstacles);
   updatePoops(gameObjects, deltaTime, {canvas, context})
 
   updateBlackCatAttack(activeCharacter, gameObjects.enemies, deltaTime)
@@ -398,10 +372,16 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   if (keyboard.isKeyPressed('KeyA')) {
     activeCharacter.x -= currentMoveSpeed * deltaTime
     activeCharacter.facingRight = false;
+    activeCharacter.isMoving = true;
   }
   if (keyboard.isKeyPressed('KeyD')) {
     activeCharacter.x += currentMoveSpeed * deltaTime
     activeCharacter.facingRight = true;
+    activeCharacter.isMoving = true;
+  }
+
+  if (!keyboard.isKeyPressed('KeyA') && !keyboard.isKeyPressed('KeyD')) {
+    activeCharacter.isMoving = false;
   }
 
   if (keyboard.isKeyPressed('Space') && !activeCharacter.poopCooldown) {
@@ -441,12 +421,12 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   black.alpha = PlayerState.activeCharacter === 'black' ? 1.0 : 0.7
 }
 
+const GRAVITY_UP = 1200   // Гравитация при движении вверх
+const GRAVITY_DOWN = 1500 // Гравитация при падении
+const MAX_FALL_SPEED = 800 // Максимальная скорость падения
+
 // Функция для обновления физики персонажа с резким прыжком
 function updateCharacterPhysics(character, deltaTime) {
-  const GRAVITY_UP = 1200   // Гравитация при движении вверх
-  const GRAVITY_DOWN = 1500 // Гравитация при падении
-  const MAX_FALL_SPEED = 800 // Максимальная скорость падения
-
   // Применяем гравитацию с разными значениями для подъема и падения
   if (!character.onGround) { // или !character.isOnGround, в зависимости от того, какое имя вы выберете
     // Если персонаж движется вверх (отрицательная скорость Y)
@@ -467,9 +447,9 @@ function updateCharacterPhysics(character, deltaTime) {
   character.y += character.velocityY * deltaTime;
 
   // Можно оставить только проверку верхней границы
-  if (character.y < 0) {
-    character.y = 0;
-    character.velocityY = 0;
+  if (character.y < 20) {
+    character.y = 20;
+    character.velocityY = GRAVITY_DOWN;
   }
 }
 
@@ -480,37 +460,37 @@ function isCollided(a, b) {
     a.y + a.height > b.y;
 }
 
-function checkEnvironmentCollisions(player, obstacles) {
+function checkEnvironmentCollisions(player, obstacles, deltaTime) {
   const collidableObstacles = obstacles.filter(({ collides }) => collides);
   collidableObstacles.forEach(obstacle => {
     if (isCollided(player, obstacle)) {
-      const playerLeft = player.x;
-      const playerTop = player.y;
-      const playerRight = playerLeft + player.width;
-      const playerBottom = playerTop + player.height;
-
-      const obstacleLeft = obstacle.x;
-      const obstacleTop = obstacle.y;
-      const obstacleRight = obstacleLeft + obstacle.width;
-      const obstacleBottom = obstacleTop + obstacle.height;
-
       if (obstacle.type === 'F') {
-        if (playerBottom >= obstacleBottom) {
-          player.y = obstacleBottom
-        }
-        if (playerBottom >= obstacleTop && playerTop <= obstacleTop) {
-          player.y = obstacleTop - player.height
-          player.onGround = true
-          player.velocityY = 500
+        if (player.y + player.height >= obstacle.y && player.y <= obstacle.y) {
+          player.y = obstacle.y - player.height;
+          player.onGround = true;
+          player.isJumping = false
+          player.velocityY = GRAVITY_DOWN;
+        } else if (
+          player.isJumping &&
+          player.y + player.height >= obstacle.y + obstacle.height &&
+          player.y <= obstacle.y + obstacle.height
+        ) {
+          player.y = obstacle.y + obstacle.height
+          player.velocityY = GRAVITY_DOWN;
         }
       }
 
       if (obstacle.type === 'W') {
         if (player.facingRight) {
-          player.x = obstacleLeft - player.width
+          player.x = obstacle.x - player.width
         } else {
-          player.x = obstacleRight
+          player.x = obstacle.x + obstacle.width;
         }
+      }
+
+      if (player.y <= 10) {
+        player.y = 10;
+        player.velocityY = -10 * deltaTime;
       }
     }
   })
