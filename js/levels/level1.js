@@ -302,7 +302,7 @@ export function renderLevel1(gameObjects, {PlayerState}, {canvas, context}) {
   // renderUI(context, playerState);
 }
 
-export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, context}, deltaTime) {
+export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, context}, deltaTime, Sprite) {
   const {
     white,
     black,
@@ -386,7 +386,7 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
 
   if (keyboard.isKeyPressed('Space') && !activeCharacter.poopCooldown) {
     if (PlayerState.activeCharacter === 'white') {
-      if (createPoop(activeCharacter, gameObjects)) {
+      if (createPoop(activeCharacter, gameObjects, Sprite)) {
         // Устанавливаем задержку на какание, чтобы не спамить
         activeCharacter.poopCooldown = true
 
@@ -591,7 +591,7 @@ function renderFoodItems(context, foodItems) {
 }
 
 // Функция для создания какашки
-function createPoop(character, gameObjects) {
+function createPoop(character, gameObjects, Sprite) {
   // Проверяем, достаточно ли большой размер кота
   if (character.sizeMultiplier > 1) {
     // Уменьшаем размер кота после какания
@@ -626,27 +626,62 @@ function createPoop(character, gameObjects) {
       ? character.x + character.width - poopSize / 2
       : character.x + poopSize / 2
 
-    // Добавляем какашку в массив
-    gameObjects.enemies.push({
+    // Импортируем Sprite из Kontra.js (должно быть в начале файла)
+    // import { Sprite } from '../engine/kontra.mjs';
+
+    // Создаем спрайт какашки с помощью Kontra.js
+    const poop = Sprite({
       x: poopX,
       y: character.y + character.height - poopSize,
       width: poopSize,
       height: poopSize,
+      color: 'brown', // Добавляем цвет
+
+      // Свойства из оригинального объекта
       createdAt: Date.now(),
-      isMonster: false,                    // Флаг монстра
-      transformAt: Date.now() + 5000,      // Время превращения (через 5 секунд)
-      velocityX: 0,                        // Скорость по X (для движения монстра)
-      velocityY: 0,                        // Скорость по Y
-      direction: Math.random() > 0.5 ? 'left' : 'right', // Случайное направление
-      onGround: false,                     // Флаг нахождения на земле
-      jumpTimer: 0,                         // Таймер для прыжков
-    })
+      isMonster: false,
+      transformAt: Date.now() + 5000,
+      velocityX: 0,
+      velocityY: 0,
+      direction: Math.random() > 0.5 ? 'left' : 'right',
+      onGround: false,
+      jumpTimer: 0,
+
+      // Метод обновления спрайта
+      update(dt) {
+        // Здесь можно добавить логику обновления какашки
+        // Например, проверку на превращение в монстра
+        if (!this.isMonster && Date.now() > this.transformAt) {
+          this.isMonster = true;
+          this.color = 'darkbrown'; // Меняем цвет при превращении
+        }
+
+        // Другая логика движения и обновления состояния
+      },
+
+      // Переопределяем метод рендеринга, если нужна кастомная отрисовка
+      render() {
+        this.context.fillStyle = this.color;
+        this.context.beginPath();
+
+        // Рисуем какашку в виде кружка или другой формы
+        this.context.arc(this.x, this.y, this.width/2, 0, Math.PI * 2);
+        this.context.fill();
+
+        // Или можно использовать встроенный метод отрисовки
+        // this.draw();
+      }
+    });
+
+    // Добавляем какашку в массив
+    gameObjects.enemies.push(poop);
 
     console.log('Кот покакал! Размер уменьшился до', character.sizeMultiplier.toFixed(2))
 
     // Добавляем эффект
     if (gameObjects.effects) {
-      gameObjects.effects.push({
+      // Также можно создать эффект как спрайт Kontra.js
+      const effect = Sprite({
         x: character.x + character.width / 2,
         y: character.y - 20,
         text: 'Покакал! Размер ↓',
@@ -656,7 +691,26 @@ function createPoop(character, gameObjects) {
         createdAt: Date.now(),
         duration: 1500,
         offsetY: 0,
-      })
+
+        render() {
+          this.context.globalAlpha = this.alpha;
+          this.context.fillStyle = this.color;
+          this.context.font = '14px Arial';
+          this.context.textAlign = 'center';
+          this.context.fillText(this.text, this.x, this.y + this.offsetY);
+          this.context.globalAlpha = 1;
+        },
+
+        update(dt) {
+          const elapsedTime = Date.now() - this.createdAt;
+          this.alpha = Math.max(0, 1 - (elapsedTime / this.duration));
+          this.offsetY -= 0.5; // Эффект плавного поднятия текста
+
+          return elapsedTime < this.duration; // Возвращаем false, когда эффект должен исчезнуть
+        }
+      });
+
+      gameObjects.effects.push(effect);
     }
 
     return true // Успешно покакал
@@ -664,6 +718,7 @@ function createPoop(character, gameObjects) {
 
   return false // Не удалось покакать (размер слишком мал)
 }
+
 
 // Функция для отрисовки какашек
 function renderPoops(context, poops) {

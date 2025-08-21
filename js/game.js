@@ -18,7 +18,7 @@ import {GameLoop} from './gameHelpers/loop'
 
 
   new GameLoop({
-    update: (deltaTime) => gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canvas, context, deltaTime),
+    update: (deltaTime) => gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canvas, context, deltaTime, Sprite),
     render: () => gameLoopRenderMethod(gameObjects, {GameState, PlayerState}, canvas, context),
   })
   .start();
