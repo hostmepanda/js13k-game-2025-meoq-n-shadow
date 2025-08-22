@@ -79,9 +79,9 @@ function parseLevel(levelMap, gameObjects, Sprite, tileSize = 20) {
       }
 
       if (['E','X','B'].includes(ch)) {
-        cfg.collides = true
         cfg.enemy = true
-        cfg.health = 10
+        cfg.isMonster = true
+        cfg.health = 100
         if (ch === 'X') {
           cfg.breakable = true
         }
@@ -472,8 +472,8 @@ function isCollided(a, b) {
 }
 
 function checkEnvironmentCollisions(player, obstacles, deltaTime) {
-  const collidableObstacles = obstacles.filter(({ collides }) => collides);
-  collidableObstacles.forEach(obstacle => {
+  const collidingObstacles = obstacles.filter(({ collides }) => collides);
+  collidingObstacles.forEach(obstacle => {
     if (isCollided(player, obstacle)) {
       if (obstacle.type === 'F') {
         if (player.y + player.height >= obstacle.y && player.y <= obstacle.y) {
