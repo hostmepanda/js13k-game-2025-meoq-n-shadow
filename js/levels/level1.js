@@ -88,6 +88,7 @@ function parseLevel(levelMap, gameObjects, Sprite, tileSize = 20) {
         cfg.isMonster = true
         cfg.health = 100
         cfg.canDie = true
+        cfg.collisionDamage = 10
         if (ch === 'X') {
           cfg.collides = true
           cfg.health = 12
@@ -139,6 +140,8 @@ export function level1Init(gameObjects, {PlayerState, GameState}, Sprite, {canva
     facingRight: true,
     isMoving: false,
     attackDamage: 10, // урон от атаки
+    health: 100,
+    lives: 10,
   })
   gameObjects[GAME_STATE.LEVEL1].black = Sprite({
     x: 40,
@@ -168,6 +171,8 @@ export function level1Init(gameObjects, {PlayerState, GameState}, Sprite, {canva
     attackCooldownTimer: 0, // текущий таймер перезарядки
     canAttack: true, // флаг, может ли кот атаковать
     isMoving: false,
+    health: 100,
+    lives: 10,
   })
 
 // Инициализация состояния игрока
@@ -312,8 +317,64 @@ export function renderLevel1(gameObjects, {PlayerState}, {canvas, context}) {
   })
 
   // Интерфейс поверх всего (без смещения камеры)
-  // renderUI(context, playerState);
+  renderUI(context, PlayerState);
 }
+
+/**
+ * Отрисовывает пользовательский интерфейс поверх игрового мира
+ * @param {CanvasRenderingContext2D} context - Контекст канваса для отрисовки
+ * @param {Object} playerState - Объект с состоянием игрока (здоровье, оружие и т.д.)
+ */
+function renderUI(context, playerState) {
+  // Сохраняем текущее состояние контекста
+  context.save();
+
+  // Устанавливаем параметры текста
+  context.font = '16px Arial';
+  context.fillStyle = 'white';
+  context.textAlign = 'left';
+
+  // Отрисовываем здоровье игрока
+  context.fillText(`Здоровье: ${playerState.health}`, 20, 30);
+
+  // Отрисовываем патроны/боеприпасы
+  context.fillText(`Патроны: ${playerState?.ammo}`, 20, 60);
+
+  // Отрисовка полоски здоровья
+  const healthBarWidth = 150;
+  const healthBarHeight = 15;
+  const healthPercentage = Math.max(0, playerState.health / 100);
+
+  // Фон полоски здоровья
+  context.fillStyle = 'rgba(0, 0, 0, 0.5)';
+  context.fillRect(20, 80, healthBarWidth, healthBarHeight);
+
+  // Сама полоска здоровья
+  context.fillStyle = playerState.health > 30 ? 'green' : 'red';
+  context.fillRect(20, 80, healthBarWidth * healthPercentage, healthBarHeight);
+
+
+  // Отрисовываем активное оружие
+  if (playerState?.weapon) {
+    context.fillText(`Оружие: ${playerState.weapon.name}`, 20, 110);
+  }
+
+  // Отрисовка счета или других игровых параметров
+  context.textAlign = 'right';
+  context.fillStyle = 'white';
+  context.fillText(`Счет: ${playerState.score}`, context.canvas.width - 20, 30);
+
+  // Если игрок получает урон, показываем индикатор урона
+  if (playerState?.damageTaken > 0) {
+    const alpha = Math.min(0.7, playerState.damageTaken / 100);
+    context.fillStyle = `rgba(255, 0, 0, ${alpha})`;
+    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+  }
+
+  // Восстанавливаем состояние контекста
+  context.restore();
+}
+
 
 export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, context}, deltaTime, Sprite) {
   const {
@@ -502,6 +563,15 @@ function checkEnemyCollisions(player, gameObjects, deltaTime) {
             player.x = enemy.x + enemy.width;
           }
         }
+      } else if (enemy.type === 'E') {
+        if (player.facingRight) {
+          player.velocityX = -2
+          player.x = enemy.x - player.width
+        } else {
+          player.velocityX = 2
+          player.x = enemy.x + enemy.width;
+        }
+        player.health -= enemy.collisionDamage
       }
     }
   })
