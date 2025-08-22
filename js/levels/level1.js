@@ -269,8 +269,6 @@ export function renderLevel1(gameObjects, {PlayerState}, {canvas, context}) {
     }
 
     if (gameObjects[GAME_STATE.LEVEL1].enemies.length > 0) {
-      renderPoops(context, gameObjects[GAME_STATE.LEVEL1].enemies)
-
       gameObjects[GAME_STATE.LEVEL1].enemies.forEach(enemy => {
         enemy?.render?.()
       })
@@ -356,14 +354,21 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   const JUMP_FORCE = -550   // Начальная скорость прыжка
 
   const activeCharacter = PlayerState.activeCharacter === 'white' ? white : black
+
+  // Обновляем физику для обоих персонажей
   updateCharacterPhysics(white, deltaTime)
   updateCharacterPhysics(black, deltaTime)
-  // Обновляем физику для обоих персонажей
+
   checkEnvironmentCollisions(white, gameObjects.obstacles);
   checkEnvironmentCollisions(black, gameObjects.obstacles);
+
   updatePoops(gameObjects, deltaTime, {canvas, context})
 
-  updateBlackCatAttack(activeCharacter, gameObjects.enemies, deltaTime)
+  enemies.forEach((enemy) => {
+    checkEnemyCollisionWithEnvironment(gameObjects.obstacles.filter(({ collides }) => collides), enemy)
+  })
+
+  updateBlackCatAttack(activeCharacter, gameObjects, deltaTime)
 
   // Управление активным персонажем
   if (keyboard.isKeyPressed('KeyW') && activeCharacter.onGround) {
@@ -653,7 +658,21 @@ function createPoop(character, gameObjects, Sprite) {
       direction: Math.random() > 0.5 ? 'left' : 'right',
       onGround: false,
       jumpTimer: 0,
+      health: 100,
+      isAlive: true,
       update(deltaTime) {
+        if (!this.isAlive) {
+          console.log('Какашка убита!')
+          this.isMonster = false
+          this.isAlive = true
+          this.transformAt = Date.now() + 5000
+          this.velocityX = 0
+          this.velocityY = 0
+          this.onGround = false
+          this.jumpTimer = 0
+          this.health = 100
+        }
+
         const now = Date.now()
         if (!this.isMonster) {
           if (now >= this.transformAt) {
@@ -679,10 +698,15 @@ function createPoop(character, gameObjects, Sprite) {
             }
           }
         }
-      },
-      render() {
 
-      }
+        if (!this.onGround) {
+          this.velocityY += 980 * deltaTime
+        }
+
+        this.y += this.velocityY * deltaTime
+        this.x += this.velocityX * deltaTime
+        this.onGround = false
+      },
     });
     gameObjects.enemies.push(poop);
     console.log('Кот покакал! Размер уменьшился до', character.sizeMultiplier.toFixed(2))
@@ -693,158 +717,54 @@ function createPoop(character, gameObjects, Sprite) {
 }
 
 
-// Функция для отрисовки какашек
-function renderPoops(context, poops) {
-  poops.forEach(poop => {
-    if (poop.isMonster) {
-      // Рисуем монстра
-      context.fillStyle = '#5D2906' // Темно-коричневый для монстра
-      context.fillRect(poop.x, poop.y, poop.width, poop.height)
+function updatePoops(gameObjects, deltaTime, {canvas, context}) {
+  const {enemies} = gameObjects
+  enemies.forEach((enemy) => {
+    enemy.update(deltaTime)
+  })
+}
 
-      // Рисуем глаза монстру
-      context.fillStyle = 'white'
-
-      // Определяем позицию глаз в зависимости от направления
-      const eyeSize = poop.width * 0.15
-      const eyeY = poop.y + poop.height * 0.3
-
-      let leftEyeX, rightEyeX
-
-      if (poop.direction === 'left') {
-        leftEyeX = poop.x + poop.width * 0.2
-        rightEyeX = poop.x + poop.width * 0.5
-      } else {
-        leftEyeX = poop.x + poop.width * 0.5
-        rightEyeX = poop.x + poop.width * 0.8
+function checkEnemyCollisionWithEnvironment(obstacles, enemy) {
+  obstacles.forEach(obstacle => {
+    if (
+      enemy.x < obstacle.x + obstacle.width &&
+      enemy.x + enemy.width > obstacle.x &&
+      enemy.y < obstacle.y + obstacle.height &&
+      enemy.y + enemy.height > obstacle.y
+    ) {
+      // Проверка столкновения сверху (монстр стоит на препятствии)
+      if (enemy.y + enemy.height > obstacle.y &&
+        enemy.y + enemy.height < obstacle.y + obstacle.height / 2) {
+        enemy.y = obstacle.y - enemy.height
+        enemy.velocityY = 0
+        enemy.onGround = true
       }
-
-      // Рисуем глаза
-      context.fillRect(leftEyeX, eyeY, eyeSize, eyeSize)
-      context.fillRect(rightEyeX, eyeY, eyeSize, eyeSize)
-
-      // Рисуем зрачки
-      context.fillStyle = 'red'
-      context.fillRect(leftEyeX + eyeSize * 0.25, eyeY + eyeSize * 0.25, eyeSize * 0.5, eyeSize * 0.5)
-      context.fillRect(rightEyeX + eyeSize * 0.25, eyeY + eyeSize * 0.25, eyeSize * 0.5, eyeSize * 0.5)
-
-      // Рисуем рот
-      context.fillStyle = 'black'
-      context.beginPath()
-      context.arc(
-        poop.x + poop.width / 2,
-        poop.y + poop.height * 0.7,
-        poop.width * 0.3,
-        0.1 * Math.PI,
-        0.9 * Math.PI,
-        false,
-      )
-      context.fill()
-
-      // Рисуем зубы
-      context.fillStyle = 'white'
-      const teethWidth = poop.width * 0.08
-      const teethHeight = poop.height * 0.08
-      const teethY = poop.y + poop.height * 0.65
-
-      // Рисуем 3 зуба
-      for (let i = 0; i < 3; i++) {
-        const teethX = poop.x + poop.width * (0.35 + i * 0.15)
-        context.fillRect(teethX, teethY, teethWidth, teethHeight)
-      }
-
-    } else {
-      // Рисуем обычную какашку (старый код)
-      context.fillStyle = '#8B4513' // Коричневый цвет
-      context.fillRect(poop.x, poop.y, poop.width, poop.height)
-
-      // Добавляем более темные точки для текстуры
-      context.fillStyle = '#5D2906' // Темно-коричневый
-
-      // Рисуем несколько случайно расположенных точек
-      const numDots = 3 + Math.floor(poop.width / 5)
-      for (let i = 0; i < numDots; i++) {
-        const dotSize = 2 + Math.random() * 3
-        const dotX = poop.x + Math.random() * (poop.width - dotSize)
-        const dotY = poop.y + Math.random() * (poop.height - dotSize)
-        context.fillRect(dotX, dotY, dotSize, dotSize)
+      // Проверка боковых столкновений
+      else if (enemy.velocityX > 0 && enemy.x + enemy.width > obstacle.x &&
+        enemy.x < obstacle.x) {
+        // Столкновение справа
+        enemy.x = obstacle.x - enemy.width
+        enemy.direction = 'left'
+        enemy.velocityX *= -1
+      } else if (enemy.velocityX < 0 && enemy.x < obstacle.x + obstacle.width &&
+        enemy.x + enemy.width > obstacle.x + obstacle.width) {
+        // Столкновение слева
+        enemy.x = obstacle.x + obstacle.width
+        enemy.direction = 'right'
+        enemy.velocityX *= -1
       }
     }
   })
 }
 
-function updatePoops(gameObjects, deltaTime, {canvas, context}) {
-  const now = Date.now()
-  const {enemies, obstacles, effects} = gameObjects
-
-  for (let i = 0; i < enemies.length; i++) {
-    const poop = enemies[i]
-    poop.update(deltaTime)
-    // Проверяем, не пора ли превратиться в монстра
-
-    if (!poop.onGround) {
-      poop.velocityY += 980 * deltaTime // Гравитация
-    }
-
-    // Обновляем позицию по Y
-    poop.y += poop.velocityY * deltaTime
-
-    // Обновляем позицию по X
-    poop.x += poop.velocityX * deltaTime
-
-    // Проверка столкновения с землей и препятствиями
-    poop.onGround = false
-
-    // Проверяем столкновение с препятствиями
-    for (const obstacle of obstacles) {
-      // Проверка столкновения по X
-      if (
-        poop.x < obstacle.x + obstacle.width &&
-        poop.x + poop.width > obstacle.x &&
-        poop.y < obstacle.y + obstacle.height &&
-        poop.y + poop.height > obstacle.y
-      ) {
-        // Проверка столкновения сверху (монстр стоит на препятствии)
-        if (poop.y + poop.height > obstacle.y &&
-          poop.y + poop.height < obstacle.y + obstacle.height / 2) {
-          poop.y = obstacle.y - poop.height
-          poop.velocityY = 0
-          poop.onGround = true
-        }
-        // Проверка боковых столкновений
-        else if (poop.velocityX > 0 && poop.x + poop.width > obstacle.x &&
-          poop.x < obstacle.x) {
-          // Столкновение справа
-          poop.x = obstacle.x - poop.width
-          poop.direction = 'left'
-          poop.velocityX *= -1
-        } else if (poop.velocityX < 0 && poop.x < obstacle.x + obstacle.width &&
-          poop.x + poop.width > obstacle.x + obstacle.width) {
-          // Столкновение слева
-          poop.x = obstacle.x + obstacle.width
-          poop.direction = 'right'
-          poop.velocityX *= -1
-        }
-      }
-    }
-
-    // Проверка падения на землю
-    if (poop.y > gameObjects.level.floorLine - poop.height) {
-      poop.y = gameObjects.level.floorLine - poop.height
-      poop.velocityY = 0
-      poop.onGround = true
-    }
-  }
-}
-
-function updateBlackCatAttack(character, enemies, delta) {
+function updateBlackCatAttack(character, gameObjects, delta) {
   // Если кот атакует, уменьшаем таймер атаки
   if (character.isAttacking) {
     character.attackTimer -= delta;
 
     // Проверяем попадание по врагам
-    enemies?.forEach(enemy => {
+    gameObjects.enemies?.forEach((enemy, index) => {
       let inAttackRange = false;
-
       if (character.facingRight) {
         // Атака вправо
         inAttackRange = (enemy.x >= character.x + character.width) &&
@@ -859,13 +779,14 @@ function updateBlackCatAttack(character, enemies, delta) {
           (enemy.y <= character.y + character.height);
       }
 
-      if (inAttackRange) {
-        // Наносим урон врагу
+      if (inAttackRange && enemy.isMonster) {
         enemy.health -= character.attackDamage;
-        enemy.isAlive = false
-        // Визуальный эффект получения урона
         enemy.hitEffect = true;
         enemy.hitTimer = 200; // длительность эффекта
+        if (enemy.health <= 0) {
+          gameObjects.enemies[index].isAlive = false
+        }
+
       }
 
     });
