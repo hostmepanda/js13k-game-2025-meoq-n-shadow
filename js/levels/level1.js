@@ -652,7 +652,6 @@ function checkEnemyCollisions(player, gameObjects, deltaTime) {
     }
   })
   player.damageInvulnerabilityLeft = player.damageInvulnerabilityLeft <= 0 ? 0 : player.damageInvulnerabilityLeft - 10
-  console.log('player.damageInvulnerabilityLeft: ', player.damageInvulnerabilityLeft)
 }
 
 function checkEnvironmentCollisions(player, obstacles, deltaTime) {
