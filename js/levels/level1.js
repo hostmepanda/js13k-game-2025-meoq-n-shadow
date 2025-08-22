@@ -46,19 +46,22 @@ const level1 = [
   "W......FF....................................WW...........................................................W.............................................W.............................................................................................W",
   "W......FF..................FF................WW...........................................................W.......................................FFFFFFW.............................................................................................W",
   "W......FF..................WW................WW...........................................................W.............................................W.............................................................................................W",
-  "W......FFOOOO..............WW..............FF.............................................................W.............................................W.............................................................................................W",
-  "W......FF.........FF.......WW.............................................................................W.............................................W.............................................................................................W",
-  "W......FF..................WW.............................................................................W.............................................W.............................................................................................W",
-  "W......................FFFFWW.............................................................................WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW............W.............................................................................................W",
-  "W......................WWWWWW...........................................................................................................................W.............................................................................................W",
-  "W............c.....c.FFWWWWWW...........................................................................................................................W.............................................................................................W",
+  "W......FFOOOO..............WW..............FF.............................X...............................W.............................................W.............................................................................................W",
+  "W......FF.........FF.......WW.............................................X...............................W.............................................W.............................................................................................W",
+  "W......FF..................WW.............................................X...............................W.............................................W.............................................................................................W",
+  "W......................FFFFWW.............................................X...............................WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW............W.............................................................................................W",
+  "W......................WWWWWW.............................................X..............................XX.............................................W.............................................................................................W",
+  "W............c.....c.FFWWWWWW.............................................X..........XXXXXXXXXXXXXXXXXXXXXX.............................................W.............................................................................................W",
   "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 ];
 
 function parseLevel(levelMap, gameObjects, Sprite, tileSize = 20) {
   levelMap.forEach((row, y) => {
     [...row].forEach((ch, x) => {
-      if (ch === ".") return;
+      if (ch === ".") {
+        return
+      }
+
       let cfg = {
         x: x * tileSize,
         y: y * tileSize,
@@ -79,10 +82,15 @@ function parseLevel(levelMap, gameObjects, Sprite, tileSize = 20) {
       }
 
       if (['E','X','B'].includes(ch)) {
+        cfg.isDead = false
+        cfg.isAlive = true
         cfg.enemy = true
         cfg.isMonster = true
         cfg.health = 100
+        cfg.canDie = true
         if (ch === 'X') {
+          cfg.collides = true
+          cfg.health = 12
           cfg.breakable = true
         }
         gameObjects.enemies.push(Sprite(cfg));
@@ -114,34 +122,35 @@ export function level1Init(gameObjects, {PlayerState, GameState}, Sprite, {canva
 
   gameObjects[GAME_STATE.LEVEL1].white = Sprite({
     x: 20,
-    y: CANVAS.height - 12 - 40,
+    y: CANVAS.height - 4 * 40,
     width: 40,
     height: 40,
     color: 'white',
     // Добавляем физические свойства
     velocityY: 0,
-    isJumping: false,
+    isJumping: true,
     jumpForce: -550, // Отрицательное значение, т.к. ось Y направлена вниз
     moveSpeed: 200,
-    onGround: true,
+    onGround: false,
     alpha: 1.0, // для прозрачности
     originalWidth: 40,
     originalHeight: 40,
     sizeMultiplier: 1,
     facingRight: true,
     isMoving: false,
+    attackDamage: 10, // урон от атаки
   })
   gameObjects[GAME_STATE.LEVEL1].black = Sprite({
     x: 40,
-    y: CANVAS.height - 12 - 40,
+    y: CANVAS.height - 4 * 40,
     width: 40,
     height: 40,
     color: 'black',
     // Добавляем физические свойства
     velocityY: 0,
-    isJumping: false,
+    isJumping: true,
     jumpForce: -550, // Отрицательное значение, т.к. ось Y направлена вниз
-    onGround: true,
+    onGround: false,
     alpha: 1.0, // для прозрачности
     moveSpeed: 200,
     originalWidth: 40,
@@ -325,16 +334,6 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
     return
   }
 
-  // Создаем obstacles, если его нет
-  if (!level || level.floorLine === undefined) {
-    if (!gameObjects.level) {
-      gameObjects.level = {}
-    }
-    gameObjects.level.floorLine = canvas.height - 20
-    console.warn(`Создан floorLine на уровне ${gameObjects.level.floorLine}`)
-  }
-
-  // Инициализируем состояние для активного персонажа, если его нет
   if (PlayerState.activeCharacter === undefined) {
     PlayerState.activeCharacter = 'white' // По умолчанию выбран белый персонаж
   }
@@ -358,14 +357,21 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   // Обновляем физику для обоих персонажей
   updateCharacterPhysics(white, deltaTime)
   updateCharacterPhysics(black, deltaTime)
-
+  checkEnemyCollisions(white, gameObjects)
+  checkEnemyCollisions(black, gameObjects)
   checkEnvironmentCollisions(white, gameObjects.obstacles);
   checkEnvironmentCollisions(black, gameObjects.obstacles);
 
   updatePoops(gameObjects, deltaTime, {canvas, context})
 
   enemies.forEach((enemy) => {
-    checkEnemyCollisionWithEnvironment(gameObjects.obstacles.filter(({ collides }) => collides), enemy)
+    checkEnemyCollisionWithEnvironment(
+      [
+        ...gameObjects.obstacles.filter(({ collides }) => collides),
+        ...gameObjects.enemies.filter(({ collides }) => collides),
+      ],
+      enemy,
+    )
   })
 
   updateBlackCatAttack(activeCharacter, gameObjects, deltaTime)
@@ -430,6 +436,7 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   // Визуальное обозначение активного персонажа
   white.alpha = PlayerState.activeCharacter === 'white' ? 1.0 : 0.7
   black.alpha = PlayerState.activeCharacter === 'black' ? 1.0 : 0.7
+  gameObjects.enemies = gameObjects.enemies.filter(({ isDead }) => !isDead )
 }
 
 const GRAVITY_UP = 1200   // Гравитация при движении вверх
@@ -469,6 +476,36 @@ function isCollided(a, b) {
     a.x + a.width > b.x &&
     a.y < b.y + b.height &&
     a.y + a.height > b.y;
+}
+
+function checkEnemyCollisions(player, gameObjects, deltaTime) {
+  gameObjects.enemies.forEach((enemy, index) => {
+    if (isCollided(player, enemy)) {
+      if (enemy.type === 'X') {
+        if (player.color === 'white') {
+          const canBreak = player.sizeMultiplier * player.attackDamage >= enemy.health
+          console.log('canBreak: ', canBreak, player.sizeMultiplier, player.attackDamage, enemy.health)
+          if (canBreak) {
+            gameObjects.enemies[index].health = 0
+            gameObjects.enemies[index].isAlive = false
+            gameObjects.enemies[index].isDead = enemy.canDie
+          } else {
+            if (player.facingRight) {
+              player.x = enemy.x - player.width
+            } else {
+              player.x = enemy.x + enemy.width;
+            }
+          }
+        } else {
+          if (player.facingRight) {
+            player.x = enemy.x - player.width
+          } else {
+            player.x = enemy.x + enemy.width;
+          }
+        }
+      }
+    }
+  })
 }
 
 function checkEnvironmentCollisions(player, obstacles, deltaTime) {
@@ -660,6 +697,8 @@ function createPoop(character, gameObjects, Sprite) {
       jumpTimer: 0,
       health: 100,
       isAlive: true,
+      canDie: false,
+      isDead: false,
       update(deltaTime) {
         if (!this.isAlive) {
           console.log('Какашка убита!')
@@ -782,13 +821,12 @@ function updateBlackCatAttack(character, gameObjects, delta) {
       if (inAttackRange && enemy.isMonster) {
         enemy.health -= character.attackDamage;
         enemy.hitEffect = true;
-        enemy.hitTimer = 200; // длительность эффекта
+        enemy.hitTimer = 200 // длительность эффекта
         if (enemy.health <= 0) {
           gameObjects.enemies[index].isAlive = false
+          gameObjects.enemies[index].isDead = enemy.canDie
         }
-
       }
-
     });
     // Если таймер истек, завершаем атаку
     if (character.attackTimer <= 0) {
