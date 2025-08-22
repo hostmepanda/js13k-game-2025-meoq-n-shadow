@@ -28,7 +28,9 @@ const parseToColorMapper = {
   // B = boss
   'B': 'purple',
   // X = breakable wall
-  'X': 'gray'
+  'X': 'gray',
+  // P = poop
+  'P': 'brown'
 }
 
 const level1 = [
@@ -39,9 +41,9 @@ const level1 = [
   "W.............................................B.......................................................................................................................................................................................................W",
   "W.........................................................................................................w...........................................................................................................................................W",
   "W.........................................................................................................w...........................................................................................................................................W",
+  "W......................P..................................................................................w...........................................................................................................................................W",
   "W.........................................................................................................w...........................................................................................................................................W",
-  "W.........................................................................................................w...........................................................................................................................................W",
-  "W.........................................................................................................W...........................................................................................................................................W",
+  "W........................................................................P................................W...........................................................................................................................................W",
   "W.............FFFFFFF.....F.FF..FF....F.FF......FF...........FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.............................................FFFF...........................................................................................W",
   "W......FF....................................WW...........................................................W.............................................W.............................................................................................W",
   "W......FF..................FF................WW...........................................................W.......................................FFFFFFW.............................................................................................W",
@@ -90,11 +92,84 @@ function parseLevel(levelMap, gameObjects, Sprite, tileSize = 20) {
         cfg.canDie = true
         cfg.collisionDamage = 10
         if (ch === 'X') {
+          cfg.isMonster = false
           cfg.collides = true
           cfg.health = 12
           cfg.breakable = true
         }
         gameObjects.enemies.push(Sprite(cfg));
+      }
+
+      if (ch === 'P') {
+        gameObjects.enemies.push(Sprite({
+          type: 'P',
+          x: cfg.x,
+          y: cfg.y,
+          width: cfg.width,
+          height: cfg.height,
+          color: 'brown', // Добавляем цвет
+
+          // Свойства из оригинального объекта
+          createdAt: Date.now(),
+          isMonster: false,
+          transformAt: Date.now() + 5000,
+          velocityX: 0,
+          velocityY: 0,
+          direction: Math.random() > 0.5 ? 'left' : 'right',
+          onGround: false,
+          jumpTimer: 0,
+          health: 100,
+          isAlive: true,
+          canDie: false,
+          isDead: false,
+          update(deltaTime) {
+            if (!this.isAlive) {
+              console.log('Какашка убита!')
+              this.isMonster = false
+              this.isAlive = true
+              this.transformAt = Date.now() + 5000
+              this.velocityX = 0
+              this.velocityY = 0
+              this.onGround = false
+              this.jumpTimer = 0
+              this.health = 100
+            }
+
+            const now = Date.now()
+            if (!this.isMonster) {
+              if (now >= this.transformAt) {
+                this.isMonster = true
+                const growFactor = 1.2
+                this.width *= growFactor
+                this.height *= growFactor
+                this.velocityX = this.direction === 'left' ? -50 : 50
+                console.log('Какашка превратилась в монстра!')
+              }
+            }
+            if (this.isMonster) {
+              this.jumpTimer -= deltaTime
+              if (this.onGround && this.jumpTimer <= 0) {
+                if (Math.random() < 0.02) {
+                  this.velocityY = -350 - Math.random() * 150 // Случайная сила прыжка
+                  this.onGround = false
+                  this.jumpTimer = 1 + Math.random() * 2 // Задержка между прыжками
+                }
+                if (Math.random() < 0.01) {
+                  this.direction = this.direction === 'left' ? 'right' : 'left'
+                  this.velocityX *= -1
+                }
+              }
+            }
+
+            if (!this.onGround) {
+              this.velocityY += 980 * deltaTime
+            }
+
+            this.y += this.velocityY * deltaTime
+            this.x += this.velocityX * deltaTime
+            this.onGround = false
+          },
+        }))
       }
     });
   });
@@ -142,6 +217,7 @@ export function level1Init(gameObjects, {PlayerState, GameState}, Sprite, {canva
     attackDamage: 10, // урон от атаки
     health: 100,
     lives: 10,
+    damageInvulnerabilityLeft: 0,
   })
   gameObjects[GAME_STATE.LEVEL1].black = Sprite({
     x: 40,
@@ -173,6 +249,7 @@ export function level1Init(gameObjects, {PlayerState, GameState}, Sprite, {canva
     isMoving: false,
     health: 100,
     lives: 10,
+    damageInvulnerabilityLeft: 0,
   })
 
 // Инициализация состояния игрока
@@ -317,7 +394,7 @@ export function renderLevel1(gameObjects, {PlayerState}, {canvas, context}) {
   })
 
   // Интерфейс поверх всего (без смещения камеры)
-  renderUI(context, PlayerState);
+  renderUI(context, {PlayerState, white: gameObjects[GAME_STATE.LEVEL1].white, black: gameObjects[GAME_STATE.LEVEL1].black});
 }
 
 /**
@@ -330,15 +407,16 @@ function renderUI(context, playerState) {
   context.save();
 
   // Устанавливаем параметры текста
-  context.font = '16px Arial';
+  context.font = '10px Arial';
   context.fillStyle = 'white';
   context.textAlign = 'left';
 
   // Отрисовываем здоровье игрока
-  context.fillText(`Здоровье: ${playerState.health}`, 20, 30);
+  context.fillText(`Health white: ${playerState.white.health}`, 20, 20);
+  context.fillText(`Health black: ${playerState.black.health}`, 20, 40);
 
   // Отрисовываем патроны/боеприпасы
-  context.fillText(`Патроны: ${playerState?.ammo}`, 20, 60);
+  context.fillText(`Weapon: ${playerState?.ammo}`, 20, 60);
 
   // Отрисовка полоски здоровья
   const healthBarWidth = 150;
@@ -563,18 +641,18 @@ function checkEnemyCollisions(player, gameObjects, deltaTime) {
             player.x = enemy.x + enemy.width;
           }
         }
-      } else if (enemy.type === 'E') {
-        if (player.facingRight) {
-          player.velocityX = -2
-          player.x = enemy.x - player.width
-        } else {
-          player.velocityX = 2
-          player.x = enemy.x + enemy.width;
+      } else if (enemy.type === 'E' || enemy.type === 'P') {
+        if (enemy.type === 'P' && enemy.isMonster) {
+          if (player.damageInvulnerabilityLeft <= 0) {
+            player.health -= enemy?.collisionDamage ?? 1
+            player.damageInvulnerabilityLeft = 1000
+          }
         }
-        player.health -= enemy.collisionDamage
       }
     }
   })
+  player.damageInvulnerabilityLeft = player.damageInvulnerabilityLeft <= 0 ? 0 : player.damageInvulnerabilityLeft - 10
+  console.log('player.damageInvulnerabilityLeft: ', player.damageInvulnerabilityLeft)
 }
 
 function checkEnvironmentCollisions(player, obstacles, deltaTime) {
@@ -612,7 +690,6 @@ function checkEnvironmentCollisions(player, obstacles, deltaTime) {
     }
   })
 }
-
 
 // Функция для проверки столкновения с едой и её сбора
 function checkFoodCollision(character, foodItems) {
@@ -754,7 +831,7 @@ function createPoop(character, gameObjects, Sprite) {
       width: poopSize,
       height: poopSize,
       color: 'brown', // Добавляем цвет
-
+      type: 'P',
       // Свойства из оригинального объекта
       createdAt: Date.now(),
       isMonster: false,
