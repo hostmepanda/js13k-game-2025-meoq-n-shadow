@@ -362,9 +362,8 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   checkEnvironmentCollisions(white, gameObjects.obstacles);
   checkEnvironmentCollisions(black, gameObjects.obstacles);
 
-  updatePoops(gameObjects, deltaTime, {canvas, context})
-
   enemies.forEach((enemy) => {
+    enemy.update(deltaTime)
     checkEnemyCollisionWithEnvironment(
       [
         ...gameObjects.obstacles.filter(({ collides }) => collides),
@@ -753,14 +752,6 @@ function createPoop(character, gameObjects, Sprite) {
   }
 
   return false // Не удалось покакать (размер слишком мал)
-}
-
-
-function updatePoops(gameObjects, deltaTime, {canvas, context}) {
-  const {enemies} = gameObjects
-  enemies.forEach((enemy) => {
-    enemy.update(deltaTime)
-  })
 }
 
 function checkEnemyCollisionWithEnvironment(obstacles, enemy) {
