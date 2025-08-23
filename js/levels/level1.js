@@ -468,11 +468,6 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
     white,
     black,
     enemies,
-    backgrounds,
-    obstacles,
-    level,
-    boss,
-    exit,
     keyboard,
   } = gameObjects
 

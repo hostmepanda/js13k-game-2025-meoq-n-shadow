@@ -10,5 +10,8 @@ export function gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canv
     case GAME_STATE.LEVEL1:
       updateLevel1(gameObjects[GAME_STATE.LEVEL1], {GameState, PlayerState}, {canvas, context}, deltaTime, Sprite)
       break
+    case GAME_STATE.LEVEL2:
+      updateLevel1(gameObjects[GAME_STATE.LEVEL2], {GameState, PlayerState}, {canvas, context}, deltaTime, Sprite)
+      break
   }
 }
