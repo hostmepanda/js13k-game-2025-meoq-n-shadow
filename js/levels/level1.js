@@ -663,7 +663,6 @@ function checkEnvironmentCollisions(player, obstacles, deltaTime) {
           player.y = obstacle.y - player.height;
           player.onGround = true;
           player.isJumping = false
-          player.velocityY = GRAVITY_DOWN;
         } else if (
           player.isJumping &&
           player.y + player.height >= obstacle.y + obstacle.height &&
