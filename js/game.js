@@ -1,20 +1,30 @@
 // TODO: import from kontra.min.mjs to reduce size before bundling for prod
 import { init, Sprite } from './engine/kontra.mjs'
 
-import {gameLoopUpdateMethod} from './gameHelpers/update'
-import {gameLoopRenderMethod} from './gameHelpers/render'
-import {level1Init} from './levels/level1'
-import {gameObjects} from './states/objects'
-import {PlayerState} from './states/player'
-import {GameState} from './states/game'
-import {initMainMenu} from './menus/main'
+import {GAME_STATE, GameState} from './states/game'
 import {GameLoop} from './gameHelpers/loop'
+import {PlayerState} from './states/player'
+import {gameLoopRenderMethod} from './gameHelpers/render'
+import {gameLoopUpdateMethod} from './gameHelpers/update'
+import {gameObjects} from './states/objects'
+import {initMainMenu} from './menus/main'
+import {level1Init} from './levels/level1'
+import {level2Init} from './levels/level2'
 
 (() => {
   const { canvas, context } = init();
 
   initMainMenu(gameObjects)
-  level1Init(gameObjects, {PlayerState, GameState}, Sprite, { canvas, context})
+  level1Init(
+    {PlayerState, GameState, gameObjects, selectedLevel: GAME_STATE.LEVEL1},
+    {Sprite, canvas},
+  )
+  level2Init(
+    {PlayerState, GameState, gameObjects, selectedLevel: GAME_STATE.LEVEL2},
+    {Sprite, canvas},
+  )
+  // level3Init(gameObjects, {PlayerState, GameState}, { Sprite, canvas}, { selectedLevel: GAME_STATE.LEVEL1 })
+  // level4Init(gameObjects, {PlayerState, GameState}, { Sprite, canvas}, { selectedLevel: GAME_STATE.LEVEL1 })
 
 
   new GameLoop({

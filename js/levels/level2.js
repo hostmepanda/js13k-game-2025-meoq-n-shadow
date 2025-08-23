@@ -1,19 +1,22 @@
 import {CANVAS, GAME_STATE, updateCamera} from '../states/game'
-import {initKeyboardControls} from '../gameHelpers/keyboard'
-import {LEVEL_MAPS} from './maps'
-import {parseLevel} from '../gameHelpers/levelParser'
 
-export function level1Init({ gameObjects, PlayerState, GameState, selectedLevel }, { Sprite, canvas}) {
+import {initKeyboardControls} from '../gameHelpers/keyboard'
+import {parseLevel} from '../gameHelpers/levelParser'
+import {LEVEL_MAPS} from './maps'
+
+export function level2Init({gameObjects, PlayerState, GameState}, {Sprite, canvas}) {
+  const selectedLevel = GAME_STATE.LEVEL2
+
   const levelState = {
     level: {
       floorLine: CANVAS.height - 20,
-      levelWidth: canvas.width * 7,
-      levelHeight: canvas.height,
+      levelWidth: CANVAS.width * 7,
+      levelHeight: CANVAS.height,
     },
   }
 
   parseLevel({
-    levelMap: LEVEL_MAPS.level1,
+    levelMap: LEVEL_MAPS.level2,
     gameObjects: gameObjects[selectedLevel],
     Sprite,
   })
@@ -51,13 +54,29 @@ export function level1Init({ gameObjects, PlayerState, GameState, selectedLevel 
 
   gameObjects[selectedLevel].keyboard = initKeyboardControls()
   gameObjects[selectedLevel].level = levelState.level
+
+  for (let i = 0; i < 7; i++) {
+    // Пропускаем первый экран для разнообразия
+    if (i % 2 === 0) {
+      gameObjects[selectedLevel].collectables.push({
+        x: canvas.width * i + canvas.width / 2, // По центру каждого второго экрана
+        y: canvas.height - 60, // Немного выше пола
+        width: 15,
+        height: 15,
+        collected: false,
+        color: 'blue', // Синий квадратик
+        type: 'sizeFood', // Тип: еда для увеличения размера
+      })
+    }
+  }
+
 }
 
-export function renderLevel1(gameObjects, { PlayerState, GameState }, {canvas, context}) {
+export function renderLevel2(gameObjects, { PlayerState, GameState }, {canvas, context}) {
   const {
     white,
     black,
-  } = gameObjects[GAME_STATE.LEVEL1]
+  } = gameObjects[GAME_STATE.LEVEL2]
   function renderWithCamera(context, camera, drawFunction) {
     context.save()
 
@@ -94,35 +113,35 @@ export function renderLevel1(gameObjects, { PlayerState, GameState }, {canvas, c
     ctx.fillStyle = 'brown'
     ctx.fillRect(0, canvas.height - 20, canvas.width * 7, 20)
 
-    if (gameObjects[GAME_STATE.LEVEL1].backgrounds.length > 0) {
-      gameObjects[GAME_STATE.LEVEL1].backgrounds.forEach(background => {
+    if (gameObjects[GAME_STATE.LEVEL2].backgrounds.length > 0) {
+      gameObjects[GAME_STATE.LEVEL2].backgrounds.forEach(background => {
         background.render()
       })
     }
 
-    if (gameObjects[GAME_STATE.LEVEL1].obstacles.length > 0) {
-      gameObjects[GAME_STATE.LEVEL1].obstacles.forEach(background => {
+    if (gameObjects[GAME_STATE.LEVEL2].obstacles.length > 0) {
+      gameObjects[GAME_STATE.LEVEL2].obstacles.forEach(background => {
         background.render()
       })
     }
 
-    if (gameObjects[GAME_STATE.LEVEL1].collectables.length > 0) {
-      renderFoodItems(context, gameObjects[GAME_STATE.LEVEL1].collectables)
-      gameObjects[GAME_STATE.LEVEL1].collectables.forEach(collectable => {collectable?.render?.()})
+    if (gameObjects[GAME_STATE.LEVEL2].collectables.length > 0) {
+      renderFoodItems(context, gameObjects[GAME_STATE.LEVEL2].collectables)
+      gameObjects[GAME_STATE.LEVEL2].collectables.forEach(collectable => {collectable?.render?.()})
     }
 
-    if (gameObjects[GAME_STATE.LEVEL1].boss) {
-      gameObjects[GAME_STATE.LEVEL1].boss.render()
+    if (gameObjects[GAME_STATE.LEVEL2].boss) {
+      gameObjects[GAME_STATE.LEVEL2].boss.render()
     }
 
-    if (gameObjects[GAME_STATE.LEVEL1].enemies.length > 0) {
-      gameObjects[GAME_STATE.LEVEL1].enemies.forEach(enemy => {
+    if (gameObjects[GAME_STATE.LEVEL2].enemies.length > 0) {
+      gameObjects[GAME_STATE.LEVEL2].enemies.forEach(enemy => {
         enemy?.render?.()
       })
     }
 
-    if (gameObjects[GAME_STATE.LEVEL1].effects.length > 0) {
-      gameObjects[GAME_STATE.LEVEL1].enemies.forEach(effect => {
+    if (gameObjects[GAME_STATE.LEVEL2].effects.length > 0) {
+      gameObjects[GAME_STATE.LEVEL2].enemies.forEach(effect => {
         effect?.render?.()
       })
     }
@@ -150,7 +169,7 @@ export function renderLevel1(gameObjects, { PlayerState, GameState }, {canvas, c
   })
 
   // Интерфейс поверх всего (без смещения камеры)
-  renderUI(context, {PlayerState, white: gameObjects[GAME_STATE.LEVEL1].white, black: gameObjects[GAME_STATE.LEVEL1].black});
+  renderUI(context, {PlayerState, white: gameObjects[GAME_STATE.LEVEL2].white, black: gameObjects[GAME_STATE.LEVE2].black});
 }
 
 /**
