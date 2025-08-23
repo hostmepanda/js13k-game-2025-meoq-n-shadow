@@ -5,7 +5,7 @@ import {renderMainMenu} from '../menus/main'
 export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, canvas, context) {
   switch (GameState.currentState) {
     case GAME_STATE.MENU:
-      renderMainMenu(canvas, context)
+      renderMainMenu(canvas, context, { GameState })
       break
     case GAME_STATE.LEVEL1:
       renderLevel1(gameObjects, {GameState, PlayerState}, { canvas, context })

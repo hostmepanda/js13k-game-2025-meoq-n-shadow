@@ -1,8 +1,10 @@
+import {GameState} from '../states/game'
+
 export class GameLoop {
   constructor({ update, render }) {
     this.lastTime = 0;
-    this.update = update;
-    this.render = render;
+    this.update = update
+    this.render = render
   }
 
   loop = (timestamp) => {
@@ -14,8 +16,8 @@ export class GameLoop {
     const cappedDelta = Math.min(deltaTime, 0.1);
 
     // Передаем deltaTime в функцию обновления
-    this.update(cappedDelta);
-    this.render();
+    this.update(cappedDelta)
+    this.render()
 
     requestAnimationFrame(this.loop);
   }

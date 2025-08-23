@@ -1,8 +1,11 @@
 import {CANVAS, GAME_STATE, GameState, updateCamera} from '../states/game'
 import {initKeyboardControls} from '../gameHelpers/keyboard'
-import {collides} from '../engine/kontra.mjs'
 
 const parseToColorMapper = {
+  // white cat
+  'M': 'white',
+  // black cat
+  'S': 'black',
   // W = wall
   'W': 'brown',
   // F = floor
@@ -30,31 +33,33 @@ const parseToColorMapper = {
   // X = breakable wall
   'X': 'gray',
   // P = poop
-  'P': 'brown'
+  'P': 'brown',
+  // # = level exit
+  '#': 'yellow',
 }
 
 const level1 = [
   // 39 F one screen width
-  "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
-  "W.....................................................................................................................................................................................................................................................W",
-  "W.......................E.............................................................................................................................................................................................................................W",
-  "W.............................................B.......................................................................................................................................................................................................W",
-  "W.........................................................................................................w...........................................................................................................................................W",
-  "W.........................................................................................................w...........................................................................................................................................W",
-  "W......................P..................................................................................w...........................................................................................................................................W",
-  "W.........................................................................................................w...........................................................................................................................................W",
-  "W........................................................................P................................W...........................................................................................................................................W",
-  "W.............FFFFFFF.....F.FF..FF....F.FF......FF...........FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.............................................FFFF...........................................................................................W",
-  "W......FF....................................WW...........................................................W.............................................W.............................................................................................W",
-  "W......FF..................FF................WW...........................................................W.......................................FFFFFFW.............................................................................................W",
-  "W......FF..................WW................WW...........................................................W.............................................W.............................................................................................W",
-  "W......FFOOOO..............WW..............FF.............................X...............................W.............................................W.............................................................................................W",
-  "W......FF.........FF.......WW.............................................X...............................W.............................................W.............................................................................................W",
-  "W......FF..................WW.............................................X...............................W.............................................W.............................................................................................W",
-  "W......................FFFFWW.............................................X...............................WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW............W.............................................................................................W",
-  "W......................WWWWWW.............................................X..............................XX.............................................W.............................................................................................W",
-  "W............c.....c.FFWWWWWW.............................................X..........XXXXXXXXXXXXXXXXXXXXXX.............................................W.............................................................................................W",
-  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+  "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+  "W......................................................................................................................................................................................................................................................................................W",
+  "W.......................E..............................................................................................................................................................................................................................................................W",
+  "W.............................................B........................................................................................................................................................................................................................................W",
+  "W.........................................................................................................w............................................................................................................................................................................W",
+  "W.........................................................................................................w............................................................................................................................................................................W",
+  "W......................P..................................................................................w............................................................................................................................................................................W",
+  "W.........................................................................................................w............................................................................................................................................................................W",
+  "W........................................................................P................................W............................................................................................................................................................................W",
+  "W.............FFFFFFF.....F.FF..FF....F.FF......FF...........FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.............................................FFFF............................................................................................................................W",
+  "W......FF....................................WW...........................................................W.............................................W..............................................................................................................................W",
+  "W......FF..................FF................WW...........................................................W.......................................FFFFFFW..............................................................................................................................W",
+  "W......FF..................WW................WW...........................................................W.............................................W..............................................................................................................................W",
+  "W......FFOOOO..............WW..............FF.............................X...............................W.............................................W..............................................................................................................................W",
+  "W......FF.........FF.......WW.............................................X...............................W.............................................W..............................................................................................................................W",
+  "W......FF..................WW.............................................X...............................W.............................................W..............................................................................................................................W",
+  "W........M.S...........FFFFWW.............................................X...............................WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW............W..............................................................................................................................W",
+  "W##..............................................................................................................................................................................................................................................................................##....W",
+  "W##..............................................................................................................................................................................................................................................................................##....W",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 ];
 
 function parseLevel(levelMap, gameObjects, Sprite, tileSize = 20) {
@@ -73,7 +78,68 @@ function parseLevel(levelMap, gameObjects, Sprite, tileSize = 20) {
         type: ch
       };
 
-      if (['W','F','C'].includes(ch)) {
+      if (ch === 'M') {
+        gameObjects.white = Sprite({
+          x: x * tileSize,
+          y: y * tileSize,
+          width: 40,
+          height: 40,
+          color: 'white',
+          // Добавляем физические свойства
+          velocityY: 0,
+          isJumping: true,
+          jumpForce: -550, // Отрицательное значение, т.к. ось Y направлена вниз
+          moveSpeed: 200,
+          onGround: false,
+          alpha: 1.0, // для прозрачности
+          originalWidth: 40,
+          originalHeight: 40,
+          sizeMultiplier: 1,
+          facingRight: true,
+          isMoving: false,
+          attackDamage: 10, // урон от атаки
+          health: 100,
+          lives: 10,
+          damageInvulnerabilityLeft: 0,
+        })
+      }
+
+      if (ch === 'S') {
+        gameObjects.black = Sprite({
+          x: x * tileSize,
+          y: y * tileSize,
+          width: 40,
+          height: 40,
+          color: 'black',
+          // Добавляем физические свойства
+          velocityY: 0,
+          isJumping: true,
+          jumpForce: -550, // Отрицательное значение, т.к. ось Y направлена вниз
+          onGround: false,
+          alpha: 1.0, // для прозрачности
+          moveSpeed: 200,
+          originalWidth: 40,
+          originalHeight: 40,
+          sizeMultiplier: 1,
+          // Добавляем свойства для атаки
+          isAttacking: false,
+          attackDuration: 0.03, // миллисекунды
+          attackTimer: 0,
+          attackRange: 60, // дальность атаки
+          attackDamage: 10, // урон от атаки
+          facingRight: true,
+          // Свойства для cooldown
+          attackCooldown: 0.5, // миллисекунды (время перезарядки)
+          attackCooldownTimer: 0, // текущий таймер перезарядки
+          canAttack: true, // флаг, может ли кот атаковать
+          isMoving: false,
+          health: 100,
+          lives: 10,
+          damageInvulnerabilityLeft: 0,
+        })
+      }
+
+      if (['W','F','C', '#'].includes(ch)) {
         cfg.collides = true
         gameObjects.obstacles.push(Sprite(cfg));
       }
@@ -196,62 +262,6 @@ export function level1Init(gameObjects, {PlayerState, GameState}, Sprite, {canva
     maxY: levelState.level.levelHeight - CANVAS.height,
   }
 
-  gameObjects[GAME_STATE.LEVEL1].white = Sprite({
-    x: 20,
-    y: CANVAS.height - 4 * 40,
-    width: 40,
-    height: 40,
-    color: 'white',
-    // Добавляем физические свойства
-    velocityY: 0,
-    isJumping: true,
-    jumpForce: -550, // Отрицательное значение, т.к. ось Y направлена вниз
-    moveSpeed: 200,
-    onGround: false,
-    alpha: 1.0, // для прозрачности
-    originalWidth: 40,
-    originalHeight: 40,
-    sizeMultiplier: 1,
-    facingRight: true,
-    isMoving: false,
-    attackDamage: 10, // урон от атаки
-    health: 100,
-    lives: 10,
-    damageInvulnerabilityLeft: 0,
-  })
-  gameObjects[GAME_STATE.LEVEL1].black = Sprite({
-    x: 40,
-    y: CANVAS.height - 4 * 40,
-    width: 40,
-    height: 40,
-    color: 'black',
-    // Добавляем физические свойства
-    velocityY: 0,
-    isJumping: true,
-    jumpForce: -550, // Отрицательное значение, т.к. ось Y направлена вниз
-    onGround: false,
-    alpha: 1.0, // для прозрачности
-    moveSpeed: 200,
-    originalWidth: 40,
-    originalHeight: 40,
-    sizeMultiplier: 1,
-    // Добавляем свойства для атаки
-    isAttacking: false,
-    attackDuration: 0.03, // миллисекунды
-    attackTimer: 0,
-    attackRange: 60, // дальность атаки
-    attackDamage: 10, // урон от атаки
-    facingRight: true,
-    // Свойства для cooldown
-    attackCooldown: 0.5, // миллисекунды (время перезарядки)
-    attackCooldownTimer: 0, // текущий таймер перезарядки
-    canAttack: true, // флаг, может ли кот атаковать
-    isMoving: false,
-    health: 100,
-    lives: 10,
-    damageInvulnerabilityLeft: 0,
-  })
-
 // Инициализация состояния игрока
   PlayerState.activeCharacter = 'white' // По умолчанию активен белый персонаж
 
@@ -296,12 +306,11 @@ export function level1Init(gameObjects, {PlayerState, GameState}, Sprite, {canva
 
 }
 
-export function renderLevel1(gameObjects, {PlayerState}, {canvas, context}) {
+export function renderLevel1(gameObjects, { PlayerState, GameState }, {canvas, context}) {
   const {
     white,
     black,
   } = gameObjects[GAME_STATE.LEVEL1]
-
   function renderWithCamera(context, camera, drawFunction) {
     context.save()
 
@@ -498,8 +507,8 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   updateCharacterPhysics(black, deltaTime)
   checkEnemyCollisions(white, gameObjects)
   checkEnemyCollisions(black, gameObjects)
-  checkEnvironmentCollisions(white, gameObjects.obstacles);
-  checkEnvironmentCollisions(black, gameObjects.obstacles);
+  checkEnvironmentCollisions(white, gameObjects.obstacles, deltaTime, GameState);
+  checkEnvironmentCollisions(black, gameObjects.obstacles, deltaTime, GameState);
 
   enemies.forEach((enemy) => {
     enemy.update(deltaTime)
@@ -654,7 +663,7 @@ function checkEnemyCollisions(player, gameObjects, deltaTime) {
   player.damageInvulnerabilityLeft = player.damageInvulnerabilityLeft <= 0 ? 0 : player.damageInvulnerabilityLeft - 10
 }
 
-function checkEnvironmentCollisions(player, obstacles, deltaTime) {
+function checkEnvironmentCollisions(player, obstacles, deltaTime, GameState) {
   const collidingObstacles = obstacles.filter(({ collides }) => collides);
   collidingObstacles.forEach(obstacle => {
     if (isCollided(player, obstacle)) {
@@ -684,6 +693,15 @@ function checkEnvironmentCollisions(player, obstacles, deltaTime) {
       if (player.y <= 10) {
         player.y = 10;
         player.velocityY = -10 * deltaTime;
+      }
+      if (obstacle.type === '#') {
+        const currentLevelIndex = Object.values(GAME_STATE).findIndex(value => value === GameState.currentState)
+        const nextLevelKey = Object.keys(GAME_STATE)?.[currentLevelIndex + 1]
+        if (!GAME_STATE?.[nextLevelKey]) {
+          GameState.currentState = player.activeCharacter === 'white' ? GAME_STATE.VICTORYWHITE : GAME_STATE.VICTORYBLACK
+        } else {
+          GameState.currentState = GAME_STATE?.[nextLevelKey]
+        }
       }
     }
   })
