@@ -106,6 +106,11 @@ export function parseLevel({ levelMap, gameObjects, Sprite, tileSize = 20}) {
         gameObjects.obstacles.push(Sprite(cfg));
       }
 
+      if (['A'].includes(ch)) {
+        cfg.collected = false
+        gameObjects.collectables.push(Sprite(cfg));
+      }
+
       if (['E','X','B'].includes(ch)) {
         cfg.isDead = false
         cfg.isAlive = true

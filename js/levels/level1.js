@@ -1,8 +1,8 @@
 import {GAME_STATE, updateCamera} from '../states/game'
 import {renderBackground, renderUI, renderWithCamera} from '../gameHelpers/utils'
 import {updateBlackCatAttack, updateCharacterPhysics} from '../gameHelpers/charactersUtils'
-import {checkEnemyCollisions, checkEnemyCollisionWithEnvironment} from '../gameHelpers/enemiesUtils'
-import {checkEnvironmentCollisions, checkFoodCollision} from '../gameHelpers/itemsUtils'
+import {checkEnemyCollisions, checkEnemyCollisionWithEnvironment, createPoop} from '../gameHelpers/enemiesUtils'
+import {checkEnvironmentCollisions, checkFoodCollision, renderFoodItems} from '../gameHelpers/itemsUtils'
 
 export function renderLevel1(gameObjects, { PlayerState, GameState }, {canvas, context}) {
   const {
@@ -187,4 +187,5 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
   white.alpha = PlayerState.activeCharacter === 'white' ? 1.0 : 0.7
   black.alpha = PlayerState.activeCharacter === 'black' ? 1.0 : 0.7
   gameObjects.enemies = gameObjects.enemies.filter(({ isDead }) => !isDead )
+  gameObjects.collectables = gameObjects.collectables.filter(({ collected }) => !collected )
 }

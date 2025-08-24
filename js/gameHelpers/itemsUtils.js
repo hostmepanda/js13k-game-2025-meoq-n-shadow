@@ -23,7 +23,9 @@ export function checkFoodCollision(character, foodItems) {
     const food = foodItems[i]
 
     // Пропускаем уже собранную еду
-    if (food.collected) continue
+    if (food.collected) {
+      continue
+    }
 
     // Проверяем столкновение с едой
     if (character.x < food.x + food.width &&
@@ -35,7 +37,7 @@ export function checkFoodCollision(character, foodItems) {
       food.collected = true
 
       // Применяем эффект в зависимости от типа еды
-      if (food.type === 'sizeFood' && character.color === 'white') {
+      if (food.type === 'A' && character.color === 'white') {
         // Увеличиваем размер белого кота
         increaseCatSize(character)
       }
