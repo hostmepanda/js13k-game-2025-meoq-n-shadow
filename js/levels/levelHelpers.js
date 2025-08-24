@@ -16,10 +16,6 @@ export function levelInit(selectedLevel) {
         levelHeight: canvas.height,
       },
     }
-    console.log({
-      selectedLevel,
-      gameObjects,
-    })
     parseLevel({
       levelMap: LEVEL_MAPS[selectedLevel],
       gameObjects: gameObjects[selectedLevel],
@@ -65,12 +61,10 @@ export function levelInit(selectedLevel) {
 export function levelRender(selectedLevel) {
   return function (gameObjects, { PlayerState, GameState }, {canvas, context}) {
     const {white, black,} = gameObjects[selectedLevel]
-
     context.clearRect(0, 0, canvas.width, canvas.height)
 
     renderBackground(context, canvas)
     renderWithCamera(context, GameState.camera, (ctx) => {
-
       if (gameObjects[selectedLevel].backgrounds.length > 0) {
         gameObjects[selectedLevel].backgrounds.forEach(background => {
           background.render()
@@ -99,7 +93,7 @@ export function levelRender(selectedLevel) {
       }
 
       if (gameObjects[selectedLevel].effects.length > 0) {
-        gameObjects[selectedLevel].enemies.forEach(effect => {
+        gameObjects[selectedLevel].effects.forEach(effect => {
           effect?.render?.()
         })
       }
@@ -124,7 +118,7 @@ export function levelRender(selectedLevel) {
       }
     })
 
-    renderUI(context, {PlayerState, white: gameObjects[selectedLevel].white, black: gameObjects[GAME_STATE.LEVEL1].black});
+    renderUI(context, {PlayerState, white: gameObjects[selectedLevel].white, black: gameObjects[selectedLevel].black});
   }
 }
 
@@ -239,5 +233,8 @@ export function updateLevel(selectedLevel) {
     black.alpha = PlayerState.activeCharacter === 'black' ? 1.0 : 0.7
     gameObjects.enemies = gameObjects.enemies.filter(({ isDead }) => !isDead )
     gameObjects.collectables = gameObjects.collectables.filter(({ collected }) => !collected )
+    if (GameState.nextLevel !== GameState.currentState) {
+      GameState.currentState = GameState.nextLevel
+    }
   }
 }

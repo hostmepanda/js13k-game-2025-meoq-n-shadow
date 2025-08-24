@@ -17,6 +17,7 @@ export const CANVAS = {
 
 export const GameState = {
   currentState: GAME_STATE.LEVEL1,
+  nextLevel: GAME_STATE.LEVEL1,
   camera: {
     x: 0, // Начальная позиция камеры по X
     y: 0, // Начальная позиция камеры по Y

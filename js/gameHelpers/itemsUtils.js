@@ -86,11 +86,10 @@ export function checkEnvironmentCollisions(player, obstacles, deltaTime, GameSta
       if (obstacle.type === '#') {
         const currentLevelIndex = Object.values(GAME_STATE).findIndex(value => value === GameState.currentState)
         const nextLevelKey = Object.keys(GAME_STATE)?.[currentLevelIndex + 1]
-        console.log({nextLevelKey})
         if (!GAME_STATE?.[nextLevelKey]) {
-          GameState.currentState = player.activeCharacter === 'white' ? GAME_STATE.VICTORYWHITE : GAME_STATE.VICTORYBLACK
+          GameState.nextLevel = player.activeCharacter === 'white' ? GAME_STATE.VICTORYWHITE : GAME_STATE.VICTORYBLACK
         } else {
-          GameState.currentState = GAME_STATE?.[nextLevelKey]
+          GameState.nextLevel = GAME_STATE?.[nextLevelKey]
         }
       }
     }
