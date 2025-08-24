@@ -15,6 +15,7 @@ import {level2Init} from './levels/level2'
   const { canvas, context } = init();
 
   initMainMenu(gameObjects)
+
   level1Init(
     {PlayerState, GameState, gameObjects, selectedLevel: GAME_STATE.LEVEL1},
     {Sprite, canvas},
