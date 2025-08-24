@@ -1,6 +1,6 @@
 import {GAME_STATE} from '../states/game'
 import {updateMainMenu} from '../menus/main'
-import {updateLevel1} from '../levels/level1'
+import {updateLevel} from '../levels/levelHelpers'
 
 export function gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canvas, context, deltaTime, Sprite) {
   switch (GameState.currentState) {
@@ -8,10 +8,10 @@ export function gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canv
       updateMainMenu(gameObjects[GAME_STATE.MENU], {GameState, PlayerState}, canvas)
       break
     case GAME_STATE.LEVEL1:
-      updateLevel1(gameObjects[GAME_STATE.LEVEL1], {GameState, PlayerState}, {canvas, context}, deltaTime, Sprite)
-      break
     case GAME_STATE.LEVEL2:
-      updateLevel1(gameObjects[GAME_STATE.LEVEL2], {GameState, PlayerState}, {canvas, context}, deltaTime, Sprite)
+    case GAME_STATE.LEVEL3:
+    case GAME_STATE.LEVEL4:
+      updateLevel(GameState.currentState)(gameObjects[GameState.currentState], {GameState, PlayerState}, {canvas, context}, deltaTime, Sprite)
       break
   }
 }

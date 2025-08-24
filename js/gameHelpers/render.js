@@ -1,6 +1,6 @@
 import {GAME_STATE} from '../states/game'
 import {renderMainMenu} from '../menus/main'
-import {levelRender} from '../levels/utils'
+import {levelRender} from '../levels/levelHelpers'
 
 export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, canvas, context) {
   switch (GameState.currentState) {

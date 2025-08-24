@@ -8,15 +8,15 @@ import {gameLoopRenderMethod} from './gameHelpers/render'
 import {gameLoopUpdateMethod} from './gameHelpers/update'
 import {gameObjects} from './states/objects'
 import {initMainMenu} from './menus/main'
-import {levelInit} from './levels/utils'
+import {levelInit} from './levels/levelHelpers'
 
 (() => {
   const { canvas, context } = init();
   const levels = [
     GAME_STATE.LEVEL1,
-    // GAME_STATE.LEVEL2,
-    // GAME_STATE.LEVEL3,
-    // GAME_STATE.LEVEL4,
+    GAME_STATE.LEVEL2,
+    GAME_STATE.LEVEL3,
+    GAME_STATE.LEVEL4,
   ]
 
   initMainMenu(gameObjects)
