@@ -7,11 +7,17 @@ import {PlayerState} from './states/player'
 import {gameLoopRenderMethod} from './gameHelpers/render'
 import {gameLoopUpdateMethod} from './gameHelpers/update'
 import {gameObjects} from './states/objects'
-import {initMainMenu} from './menus/main'
 import {levelInit} from './levels/levelHelpers'
+import {initMenuScreen} from './menus/helpers'
 
 (() => {
   const { canvas, context } = init();
+  const menuScreens = [
+    GAME_STATE.MENU,
+    GAME_STATE.GAMEOVER,
+    GAME_STATE.VICTORYBLACK,
+    GAME_STATE.VICTORYWHITE,
+  ]
   const levels = [
     GAME_STATE.LEVEL1,
     GAME_STATE.LEVEL2,
@@ -19,15 +25,13 @@ import {levelInit} from './levels/levelHelpers'
     GAME_STATE.LEVEL4,
   ]
 
-  initMainMenu(gameObjects)
+  menuScreens.forEach(screenName => initMenuScreen(screenName)(gameObjects))
 
-  levels.forEach(level => {
-      const levelInitHandler = levelInit(level)
-      levelInitHandler(
-        {PlayerState, GameState, gameObjects},
-        {Sprite, canvas},
-      )
-    },
+  levels.forEach(level =>
+    levelInit(level)(
+      {PlayerState, GameState, gameObjects},
+      {Sprite, canvas},
+    ),
   )
 
   new GameLoop({

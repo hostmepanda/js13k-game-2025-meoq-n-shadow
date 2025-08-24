@@ -1,17 +1,23 @@
 import {GAME_STATE} from './game'
 
 export const gameObjects = {
-  [GAME_STATE.MENU]: {
+  ...Object.fromEntries([
+    GAME_STATE.MENU,
+    GAME_STATE.GAMEOVER,
+    GAME_STATE.VICTORYBLACK,
+    GAME_STATE.VICTORYWHITE,
+  ].map((menuKey) => [menuKey, {
     input: {
       space: false,
     },
-  },
+  }])),
   ...Object.fromEntries([
     GAME_STATE.LEVEL1,
     GAME_STATE.LEVEL2,
     GAME_STATE.LEVEL3,
     GAME_STATE.LEVEL4,
-  ].map((levelKey) => ([levelKey, {
+  ].map((levelKey) => ([
+    levelKey, {
       black: null,
       white: null,
       exit: null,
@@ -23,6 +29,6 @@ export const gameObjects = {
       collectables: [],
       enemies: [],
       effects: [],
-    }]
-  ))),
-};
+    },
+  ]))),
+}

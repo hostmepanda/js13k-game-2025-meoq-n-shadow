@@ -1,6 +1,6 @@
 import {GAME_STATE} from '../states/game'
 
-export function initMainMenu(gameObjects) {
+export function initMenu(gameObjects) {
   const handleSpaceClick = (event) => {
     if (event.code === 'Space') {
       gameObjects[GAME_STATE.MENU].input.space = true
