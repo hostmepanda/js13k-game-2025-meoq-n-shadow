@@ -2,6 +2,10 @@ export const GRAVITY_UP = 1200   // Гравитация при движении
 export const GRAVITY_DOWN = 1500 // Гравитация при падении
 export const MAX_FALL_SPEED = 800 // Максимальная скорость падения
 
+// Константы для физики
+export const MOVE_SPEED = 200    // пикселей в секунду
+export const JUMP_FORCE = -550   // Начальная скорость прыжка
+
 export function isCollided(a, b) {
   return a.x < b.x + b.width &&
     a.x + a.width > b.x &&

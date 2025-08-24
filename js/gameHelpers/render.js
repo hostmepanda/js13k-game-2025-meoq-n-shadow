@@ -1,6 +1,6 @@
 import {GAME_STATE} from '../states/game'
-import {renderLevel1} from '../levels/level1'
 import {renderMainMenu} from '../menus/main'
+import {levelRender} from '../levels/utils'
 
 export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, canvas, context) {
   switch (GameState.currentState) {
@@ -8,7 +8,10 @@ export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, ca
       renderMainMenu(canvas, context, { GameState })
       break
     case GAME_STATE.LEVEL1:
-      renderLevel1(gameObjects, {GameState, PlayerState}, { canvas, context })
+    case GAME_STATE.LEVEL2:
+    case GAME_STATE.LEVEL3:
+    case GAME_STATE.LEVEL4:
+      levelRender(GameState.currentState)(gameObjects, {GameState, PlayerState}, { canvas, context })
       break
   }
 }

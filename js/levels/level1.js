@@ -1,75 +1,7 @@
-import {GAME_STATE, updateCamera} from '../states/game'
-import {renderBackground, renderUI, renderWithCamera} from '../gameHelpers/utils'
+import {updateCamera} from '../states/game'
 import {updateBlackCatAttack, updateCharacterPhysics} from '../gameHelpers/charactersUtils'
 import {checkEnemyCollisions, checkEnemyCollisionWithEnvironment, createPoop} from '../gameHelpers/enemiesUtils'
-import {checkEnvironmentCollisions, checkFoodCollision, renderFoodItems} from '../gameHelpers/itemsUtils'
-
-export function renderLevel1(gameObjects, { PlayerState, GameState }, {canvas, context}) {
-  const {
-    white,
-    black,
-  } = gameObjects[GAME_STATE.LEVEL1]
-  // Очищаем весь холст
-  context.clearRect(0, 0, canvas.width, canvas.height)
-
-  renderBackground(context, canvas)
-  renderWithCamera(context, GameState.camera, (ctx) => {
-
-    if (gameObjects[GAME_STATE.LEVEL1].backgrounds.length > 0) {
-      gameObjects[GAME_STATE.LEVEL1].backgrounds.forEach(background => {
-        background.render()
-      })
-    }
-
-    if (gameObjects[GAME_STATE.LEVEL1].obstacles.length > 0) {
-      gameObjects[GAME_STATE.LEVEL1].obstacles.forEach(background => {
-        background.render()
-      })
-    }
-
-    if (gameObjects[GAME_STATE.LEVEL1].collectables.length > 0) {
-      renderFoodItems(context, gameObjects[GAME_STATE.LEVEL1].collectables)
-      gameObjects[GAME_STATE.LEVEL1].collectables.forEach(collectable => {collectable?.render?.()})
-    }
-
-    if (gameObjects[GAME_STATE.LEVEL1].boss) {
-      gameObjects[GAME_STATE.LEVEL1].boss.render()
-    }
-
-    if (gameObjects[GAME_STATE.LEVEL1].enemies.length > 0) {
-      gameObjects[GAME_STATE.LEVEL1].enemies.forEach(enemy => {
-        enemy?.render?.()
-      })
-    }
-
-    if (gameObjects[GAME_STATE.LEVEL1].effects.length > 0) {
-      gameObjects[GAME_STATE.LEVEL1].enemies.forEach(effect => {
-        effect?.render?.()
-      })
-    }
-
-    white.render()
-    black.render()
-
-    // Если кот атакует, добавляем визуализацию атаки
-    if (black.isAttacking) {
-      context.fillStyle = 'rgba(255, 0, 0, 0.5)'; // Красное свечение
-
-      // Направление атаки зависит от свойства facingRight
-      if (black.facingRight) {
-        // Атака вправо
-        const attackX = black.x + black.width;
-        context.fillRect(attackX, black.y, black.attackRange, black.height);
-      } else {
-        // Атака влево
-        const attackX = black.x - black.attackRange;
-        context.fillRect(attackX, black.y, black.attackRange, black.height);
-      }
-    }
-  })
-
-  renderUI(context, {PlayerState, white: gameObjects[GAME_STATE.LEVEL1].white, black: gameObjects[GAME_STATE.LEVEL1].black});
-}
+import {checkEnvironmentCollisions, checkFoodCollision} from '../gameHelpers/itemsUtils'
 
 export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, context}, deltaTime, Sprite) {
   const {
@@ -79,7 +11,6 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
     keyboard,
   } = gameObjects
 
-  // Проверяем наличие объектов
   if (!white || !black) {
     console.error('Персонажи не определены!')
     return
@@ -99,19 +30,13 @@ export function updateLevel1(gameObjects, {GameState, PlayerState}, {canvas, con
     }
   }
 
-  // Константы для физики
-  const MOVE_SPEED = 200    // пикселей в секунду
-  const JUMP_FORCE = -550   // Начальная скорость прыжка
-
   const activeCharacter = PlayerState.activeCharacter === 'white' ? white : black
-
-  // Обновляем физику для обоих персонажей
-  updateCharacterPhysics(white, deltaTime)
-  updateCharacterPhysics(black, deltaTime)
-  checkEnemyCollisions(white, gameObjects)
-  checkEnemyCollisions(black, gameObjects)
-  checkEnvironmentCollisions(white, gameObjects.obstacles, deltaTime, GameState);
-  checkEnvironmentCollisions(black, gameObjects.obstacles, deltaTime, GameState);
+  const cats = [white, black]
+  cats.forEach((player) => {
+    updateCharacterPhysics(player, deltaTime)
+    checkEnemyCollisions(player, gameObjects)
+    checkEnvironmentCollisions(player, gameObjects.obstacles, deltaTime, GameState);
+  })
 
   enemies.forEach((enemy) => {
     enemy.update(deltaTime)
