@@ -8,25 +8,27 @@ import {gameLoopRenderMethod} from './gameHelpers/render'
 import {gameLoopUpdateMethod} from './gameHelpers/update'
 import {gameObjects} from './states/objects'
 import {initMainMenu} from './menus/main'
-import {level1Init} from './levels/level1'
-import {level2Init} from './levels/level2'
+import {levelInit} from './levels/utils'
 
 (() => {
   const { canvas, context } = init();
+  const levels = [
+    GAME_STATE.LEVEL1,
+    // GAME_STATE.LEVEL2,
+    // GAME_STATE.LEVEL3,
+    // GAME_STATE.LEVEL4,
+  ]
 
   initMainMenu(gameObjects)
 
-  level1Init(
-    {PlayerState, GameState, gameObjects, selectedLevel: GAME_STATE.LEVEL1},
-    {Sprite, canvas},
+  levels.forEach(level => {
+      const levelInitHandler = levelInit(level)
+      levelInitHandler(
+        {PlayerState, GameState, gameObjects},
+        {Sprite, canvas},
+      )
+    },
   )
-  level2Init(
-    {PlayerState, GameState, gameObjects, selectedLevel: GAME_STATE.LEVEL2},
-    {Sprite, canvas},
-  )
-  // level3Init(gameObjects, {PlayerState, GameState}, { Sprite, canvas}, { selectedLevel: GAME_STATE.LEVEL1 })
-  // level4Init(gameObjects, {PlayerState, GameState}, { Sprite, canvas}, { selectedLevel: GAME_STATE.LEVEL1 })
-
 
   new GameLoop({
     update: (deltaTime) => gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canvas, context, deltaTime, Sprite),
