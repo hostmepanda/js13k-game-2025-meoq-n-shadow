@@ -3,9 +3,10 @@ import {updateMainMenu} from '../menus/main'
 import {updateLevel} from '../levels/levelHelpers'
 
 export function gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canvas, context, deltaTime, Sprite) {
+  console.log(GameState.currentState)
   switch (GameState.currentState) {
     case GAME_STATE.MENU:
-      updateMainMenu(gameObjects[GAME_STATE.MENU], {GameState, PlayerState}, canvas)
+      updateMainMenu({ gameObjects: gameObjects[GAME_STATE.MENU], GameState, PlayerState}, {canvas})
       break
     case GAME_STATE.LEVEL1:
     case GAME_STATE.LEVEL2:

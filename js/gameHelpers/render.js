@@ -3,9 +3,10 @@ import {renderMainMenu} from '../menus/main'
 import {levelRender} from '../levels/levelHelpers'
 
 export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, canvas, context) {
+
   switch (GameState.currentState) {
     case GAME_STATE.MENU:
-      renderMainMenu(canvas, context, { GameState })
+      renderMainMenu(canvas, context)
       break
     case GAME_STATE.LEVEL1:
     case GAME_STATE.LEVEL2:

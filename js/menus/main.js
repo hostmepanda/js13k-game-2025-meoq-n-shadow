@@ -26,9 +26,11 @@ export function renderMainMenu(canvas, context) {
   context.fillText('Hit space to start', canvas.width / 2 - 200, canvas.height / 2 + 30);
 }
 
-export function updateMainMenu(gameObjects, GameState, canvas) {
+export function updateMainMenu({gameObjects, GameState}) {
   if (gameObjects.input.space) {
     gameObjects.input.space = false;
     GameState.currentState = GAME_STATE.LEVEL1;
+    GameState.nextLevel = GAME_STATE.LEVEL1;
+    console.log(GameState)
   }
 }
