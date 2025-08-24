@@ -31,6 +31,5 @@ export function updateMainMenu({gameObjects, GameState}) {
     gameObjects.input.space = false;
     GameState.currentState = GAME_STATE.LEVEL1;
     GameState.nextLevel = GAME_STATE.LEVEL1;
-    console.log(GameState)
   }
 }

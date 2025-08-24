@@ -15,3 +15,13 @@ export function initMenuScreen(selectedScreen) {
     })
   }
 }
+
+export function updateMenuScreen(redirectScreen) {
+  return function ({ gameObjects, GameState }) {
+    if (gameObjects.input.space) {
+      gameObjects.input.space = false;
+      GameState.currentState = redirectScreen;
+      GameState.nextLevel = redirectScreen;
+    }
+  }
+}

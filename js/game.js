@@ -12,20 +12,12 @@ import {initMenuScreen} from './menus/helpers'
 
 (() => {
   const { canvas, context } = init();
-  const menuScreens = [
-    GAME_STATE.MENU,
-    GAME_STATE.GAMEOVER,
-    GAME_STATE.VICTORYBLACK,
-    GAME_STATE.VICTORYWHITE,
-  ]
   const levels = [
     GAME_STATE.LEVEL1,
     GAME_STATE.LEVEL2,
     GAME_STATE.LEVEL3,
     GAME_STATE.LEVEL4,
   ]
-
-  menuScreens.forEach(screenName => initMenuScreen(screenName)(gameObjects))
 
   levels.forEach(level =>
     levelInit(level)(

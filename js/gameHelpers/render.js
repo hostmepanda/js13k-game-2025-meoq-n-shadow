@@ -6,7 +6,6 @@ import {renderVictoryBlack} from '../menus/victroryBlack'
 import {renderVictoryWhite} from '../menus/victoryWhite'
 
 export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, canvas, context) {
-
   switch (GameState.currentState) {
     case GAME_STATE.MENU:
       renderMainMenu(canvas, context)
