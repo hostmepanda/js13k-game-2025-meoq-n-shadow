@@ -1,4 +1,4 @@
-export const parseToColorMapper = {
+const parseToColorMapper = {
   '#': 'yellow', /* # = level exit */
   'A': 'blue', /* fish */
   'B': 'purple', /* B = boss */

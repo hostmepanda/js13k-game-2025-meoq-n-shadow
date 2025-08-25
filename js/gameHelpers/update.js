@@ -12,7 +12,6 @@ export function gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canv
     case GAME_STATE.LEVEL2:
     case GAME_STATE.LEVEL3:
     case GAME_STATE.LEVEL4:
-      console.log(gameObjects[GameState.currentState].white.x, gameObjects[GameState.currentState].white.y)
       updateLevel(GameState.currentState)({ gameObjects, GameState, PlayerState}, {canvas, context}, deltaTime, Sprite)
       break
     case GAME_STATE.GAMEOVER:
