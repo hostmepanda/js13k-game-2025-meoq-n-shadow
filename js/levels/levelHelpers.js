@@ -242,7 +242,8 @@ export function updateLevel(selectedLevel) {
 }
 
 function loadLevel(targetLevel, { GameState, gameObjects, PlayerState}, {Sprite, canvas, context}) {
-
+  // TODO: cler previous state of level
+  // maybe transit to only one level object and init level here
 
   GameState.currentState = targetLevel
 }

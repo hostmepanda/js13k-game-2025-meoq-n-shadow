@@ -35,6 +35,7 @@ export function updateCamera(gameState, activeCharacter) {
 }
 
 export function setLevels(states, drawHelpers) {
+  // TODO: move to loadLevel
   const levels = [GAME_STATE.LEVEL1, GAME_STATE.LEVEL2, GAME_STATE.LEVEL3, GAME_STATE.LEVEL4]
   levels.forEach(level => levelInit(level)(states, drawHelpers))
 }
