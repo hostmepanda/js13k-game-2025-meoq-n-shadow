@@ -1,4 +1,4 @@
-import {GAME_STATE} from './game'
+import {GAME_STATE} from '../consts'
 
 export const gameObjects = {
   ...Object.fromEntries([

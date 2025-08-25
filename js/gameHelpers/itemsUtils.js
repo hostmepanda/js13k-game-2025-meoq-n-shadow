@@ -1,6 +1,6 @@
-import {GAME_STATE} from '../states/game'
 import {GRAVITY_DOWN, isCollided} from './utils'
 import {increaseCatSize} from './charactersUtils'
+import {GAME_STATE} from '../consts'
 
 export function renderFoodItems(context, foodItems) {
   foodItems.forEach(food => {

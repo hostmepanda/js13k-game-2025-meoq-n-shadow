@@ -1,4 +1,4 @@
-import {GAME_STATE} from '../states/game'
+import {GAME_STATE} from '../consts'
 
 export const LEVEL_MAPS = {
   [GAME_STATE.LEVEL1]: [

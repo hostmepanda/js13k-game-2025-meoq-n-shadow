@@ -1,19 +1,5 @@
-export const GAME_STATE = {
-  MENU: 'm',
-  LEVEL1: 'l1',
-  LEVEL2: 'l2',
-  LEVEL3: 'l3',
-  LEVEL4: 'l4',
-  GAMEOVER: 'go',
-  VICTORYWHITE: 'vw',
-  VICTORYBLACK: 'vb',
-}
-
-export const CANVAS = {
-  width: 800,
-  height: 400,
-}
-
+import {levelInit} from '../levels/levelHelpers'
+import {CANVAS, GAME_STATE} from '../consts'
 
 export const GameState = {
   currentState: GAME_STATE.MENU,
@@ -33,7 +19,6 @@ export const GameState = {
   }
 }
 
-
 // Функция для обновления положения камеры
 export function updateCamera(gameState, activeCharacter) {
   // Центрируем камеру на активном персонаже
@@ -47,4 +32,9 @@ export function updateCamera(gameState, activeCharacter) {
     gameState.camera.levelBounds.minX,
     Math.min(gameState.camera.x, gameState.camera.levelBounds.maxX)
   );
+}
+
+export function setLevels(states, drawHelpers) {
+  const levels = [GAME_STATE.LEVEL1, GAME_STATE.LEVEL2, GAME_STATE.LEVEL3, GAME_STATE.LEVEL4]
+  levels.forEach(level => levelInit(level)(states, drawHelpers))
 }
