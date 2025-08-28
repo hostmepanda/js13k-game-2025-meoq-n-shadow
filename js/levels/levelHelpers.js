@@ -2,7 +2,7 @@ import {updateCamera} from '../states/game'
 import {parseLevel} from '../gameHelpers/levelParser'
 import {initKeyboardControls} from '../gameHelpers/keyboard'
 import {LEVEL_MAPS} from './maps'
-import {renderBackground, renderUI, renderWithCamera} from '../gameHelpers/utils'
+import {JUMP_FORCE, MOVE_SPEED, renderBackground, renderUI, renderWithCamera} from '../gameHelpers/utils'
 import {checkEnvironmentCollisions, checkFoodCollision, renderFoodItems} from '../gameHelpers/itemsUtils'
 import {updateBlackCatAttack, updateCharacterPhysics} from '../gameHelpers/charactersUtils'
 import {checkEnemyCollisions, checkEnemyCollisionWithEnvironment, createPoop} from '../gameHelpers/enemiesUtils'
@@ -156,7 +156,7 @@ export function updateLevel(selectedLevel) {
     const cats = [white, black]
     cats.forEach((player) => {
       updateCharacterPhysics(player, deltaTime)
-      checkEnemyCollisions(player, levelObjects)
+      checkEnemyCollisions(player, levelObjects.enemies)
       checkEnvironmentCollisions(player, levelObjects.obstacles, deltaTime, GameState);
     })
 

@@ -112,18 +112,158 @@ export function parseLevel({ levelMap, gameObjects, Sprite, tileSize = 20}) {
       }
 
       if (['E','X','B'].includes(ch)) {
+        cfg.canDie = true
         cfg.isDead = false
         cfg.isAlive = true
         cfg.enemy = true
         cfg.isMonster = true
         cfg.health = 100
-        cfg.canDie = true
-        cfg.collisionDamage = 10
+        cfg.collisionDamage = 50
+        if (ch === 'B') {
+          cfg.health = 500
+          // Добавляем физические свойства, похожие на других персонажей
+          cfg.velocityY = 0
+          cfg.velocityX = 0
+          cfg.isJumping = false
+          cfg.jumpForce = -350 // Меньше, чем у игрока
+          cfg.moveSpeed = 100 // Медленнее игрока
+          cfg.onGround = true
+          cfg.facingRight = false
+
+          // Запоминаем начальную позицию
+          cfg.spawnX = x * tileSize
+          cfg.spawnY = y * tileSize
+
+          // Границы перемещения (10 тайлов в каждую сторону)
+          cfg.boundaryLeft = cfg.spawnX - 10 * tileSize
+          cfg.boundaryRight = cfg.spawnX + 10 * tileSize
+
+          // Таймеры для принятия решений
+          cfg.decisionTimer = 0
+          cfg.decisionInterval = 2 // секунды между сменой поведения
+
+          cfg.update = function(deltaTime) {
+            if (!this.isAlive) return;
+
+            // Гравитация
+            if (!this.onGround) {
+              this.velocityY += 1500 * deltaTime; // Сила гравитации
+            }
+
+            // Обновляем таймер принятия решений
+            this.decisionTimer -= deltaTime;
+            if (this.decisionTimer <= 0) {
+              // Время принять новое решение
+              this.decisionTimer = this.decisionInterval;
+
+              // Случайное решение: 0 - стоять, 1 - идти влево, 2 - идти вправо, 3 - прыгнуть
+              const decision = Math.floor(Math.random() * 4);
+
+              if (decision === 0) {
+                // Стоять на месте
+                this.velocityX = 0;
+              } else if (decision === 1) {
+                // Идти влево
+                this.velocityX = -this.moveSpeed;
+                this.facingRight = false;
+              } else if (decision === 2) {
+                // Идти вправо
+                this.velocityX = this.moveSpeed;
+                this.facingRight = true;
+              } else if (decision === 3 && this.onGround) {
+                // Прыгнуть, если на земле
+                this.velocityY = this.jumpForce;
+                this.onGround = false;
+              }
+            }
+
+            // Проверяем границы
+            if (this.x < this.boundaryLeft) {
+              this.x = this.boundaryLeft;
+              this.velocityX = this.moveSpeed; // Разворачиваемся, если достигли левой границы
+              this.facingRight = true;
+            } else if (this.x > this.boundaryRight) {
+              this.x = this.boundaryRight;
+              this.velocityX = -this.moveSpeed; // Разворачиваемся, если достигли правой границы
+              this.facingRight = false;
+            }
+
+            // Применяем движение
+            this.x += this.velocityX * deltaTime;
+            this.y += this.velocityY * deltaTime;
+
+            // Здесь нужна будет проверка коллизий с землей и препятствиями
+            // Примерно так:
+            // const wasOnGround = this.onGround;
+            // this.onGround = false; // Сбрасываем и проверяем заново
+            //
+            // // Проверка коллизий с препятствиями
+            // gameObjects.obstacles.forEach(obstacle => {
+            //   if (obstacle.collides && collides(this, obstacle)) {
+            //     // Коллизия с землей (снизу)
+            //     if (this.velocityY > 0 && this.y + this.height > obstacle.y && this.y < obstacle.y) {
+            //       this.onGround = true;
+            //       this.velocityY = 0;
+            //       this.y = obstacle.y - this.height;
+            //     }
+            //   }
+            // });
+          }
+        }
         if (ch === 'X') {
           cfg.isMonster = false
           cfg.collides = true
           cfg.health = 12
           cfg.breakable = true
+        }
+        if (ch === 'E') {
+          cfg.update = function (deltaTime) {
+            if (!this.isAlive) {
+              console.log('Какашка убита!')
+              this.isMonster = false
+              this.isAlive = true
+              this.transformAt = Date.now() + 5000
+              this.velocityX = 0
+              this.velocityY = 0
+              this.onGround = false
+              this.jumpTimer = 0
+              this.health = 100
+            }
+
+            const now = Date.now()
+            if (!this.isMonster) {
+              if (now >= this.transformAt) {
+                this.isMonster = true
+                const growFactor = 1.2
+                this.width *= growFactor
+                this.height *= growFactor
+                this.velocityX = this.direction === 'left' ? -50 : 50
+                console.log('Какашка превратилась в монстра!')
+              }
+            }
+            if (this.isMonster) {
+              this.jumpTimer -= deltaTime
+              if (this.onGround && this.jumpTimer <= 0) {
+                if (Math.random() < 0.02) {
+                  this.velocityY = -350 - Math.random() * 150 // Случайная сила прыжка
+                  this.onGround = false
+                  this.jumpTimer = 1 + Math.random() * 2 // Задержка между прыжками
+                }
+                if (Math.random() < 0.01) {
+                  this.direction = this.direction === 'left' ? 'right' : 'left'
+                  this.velocityX *= -1
+                }
+              }
+            }
+
+            if (!this.onGround) {
+              this.velocityY += 980 * deltaTime
+            }
+
+            this.y += this.velocityY * deltaTime
+            this.x += this.velocityX * deltaTime
+            this.onGround = false
+          }
         }
         gameObjects.enemies.push(Sprite(cfg));
       }

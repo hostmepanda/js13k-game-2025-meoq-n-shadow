@@ -149,17 +149,17 @@ export function createPoop(character, gameObjects, Sprite) {
   return false // Не удалось покакать (размер слишком мал)
 }
 
-export function checkEnemyCollisions(player, gameObjects, deltaTime) {
-  gameObjects.enemies.forEach((enemy, index) => {
+export function checkEnemyCollisions(player, enemies) {
+  enemies.forEach((enemy, index) => {
     if (isCollided(player, enemy)) {
       if (enemy.type === 'X') {
         if (player.color === 'white') {
           const canBreak = player.sizeMultiplier * player.attackDamage >= enemy.health
           console.log('canBreak: ', canBreak, player.sizeMultiplier, player.attackDamage, enemy.health)
           if (canBreak) {
-            gameObjects.enemies[index].health = 0
-            gameObjects.enemies[index].isAlive = false
-            gameObjects.enemies[index].isDead = enemy.canDie
+            enemies[index].health = 0
+            enemies[index].isAlive = false
+            enemies[index].isDead = enemy.canDie
           } else {
             if (player.facingRight) {
               player.x = enemy.x - player.width
