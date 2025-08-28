@@ -121,7 +121,7 @@ export function parseLevel({ levelMap, gameObjects, Sprite, tileSize = 20}) {
         cfg.collisionDamage = 50
         if (ch === 'B') {
           cfg.health = 500
-          // Добавляем физические свойства, похожие на других персонажей
+          cfg.collisionDamage = 25
           cfg.velocityY = 0
           cfg.velocityX = 0
           cfg.isJumping = false

@@ -174,8 +174,8 @@ export function checkEnemyCollisions(player, enemies) {
             player.x = enemy.x + enemy.width;
           }
         }
-      } else if (enemy.type === 'E' || enemy.type === 'P') {
-        if (enemy.type === 'P' && enemy.isMonster) {
+      } else if (enemy.type === 'E' || enemy.type === 'P' || enemy.type === 'B') {
+        if (['P','B'].includes(enemy.type) && enemy.isMonster) {
           if (player.damageInvulnerabilityLeft <= 0) {
             player.health -= enemy?.collisionDamage ?? 1
             player.damageInvulnerabilityLeft = 1000
