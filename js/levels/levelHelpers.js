@@ -73,8 +73,10 @@ export function levelRender(selectedLevel) {
       }
 
       if (gameObjects[selectedLevel].obstacles.length > 0) {
-        gameObjects[selectedLevel].obstacles.forEach(background => {
-          background.render()
+        gameObjects[selectedLevel].obstacles
+        .filter(obstacle => obstacle.isVisible)
+        .forEach(obstacle => {
+          obstacle.render()
         })
       }
 
@@ -88,7 +90,8 @@ export function levelRender(selectedLevel) {
       }
 
       if (gameObjects[selectedLevel].enemies.length > 0) {
-        gameObjects[selectedLevel].enemies.forEach(enemy => {
+        gameObjects[selectedLevel].enemies
+        .forEach(enemy => {
           enemy?.render?.()
         })
       }

@@ -1,3 +1,5 @@
+import {GRAVITY_DOWN} from './utils'
+
 const parseToColorMapper = {
   '#': 'yellow', /* # = level exit */
   'A': 'blue', /* fish */
@@ -16,7 +18,8 @@ const parseToColorMapper = {
   'W': 'brown', /* W = wall */
   'X': 'gray', /* X = breakable wall */
   'c': 'sienna', /* c = chair */
-  'f': 'green', /* f = flower */
+  'Q': 'green', /* Q = flower */
+  'f': 'darkgreen', // f - invisible when boss is alive
 }
 
 export function parseLevel({ levelMap, gameObjects, Sprite, tileSize = 20}) {
@@ -32,7 +35,8 @@ export function parseLevel({ levelMap, gameObjects, Sprite, tileSize = 20}) {
         width: tileSize,
         height: tileSize,
         color: parseToColorMapper?.[ch] ?? "gray",
-        type: ch
+        type: ch,
+        isVisible: true,
       };
 
       if (ch === 'M') {
@@ -96,7 +100,10 @@ export function parseLevel({ levelMap, gameObjects, Sprite, tileSize = 20}) {
         })
       }
 
-      if (['W','F','C', '#'].includes(ch)) {
+      if (['W','F','C', '#', 'f'].includes(ch)) {
+        if (ch === 'f') {
+          cfg.isVisible = false
+        }
         cfg.collides = true
         gameObjects.obstacles.push(Sprite(cfg));
       }
@@ -120,11 +127,11 @@ export function parseLevel({ levelMap, gameObjects, Sprite, tileSize = 20}) {
         cfg.health = 100
         cfg.collisionDamage = 50
         if (ch === 'B') {
-          cfg.health = 500
+          cfg.health = 10 // 200
           cfg.collisionDamage = 25
           cfg.velocityY = 0
           cfg.velocityX = 0
-          cfg.isJumping = false
+          cfg.isJumping = true
           cfg.jumpForce = -350 // Меньше, чем у игрока
           cfg.moveSpeed = 100 // Медленнее игрока
           cfg.onGround = true

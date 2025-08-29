@@ -71,8 +71,15 @@ export function updateBlackCatAttack(character, gameObjects, delta) {
         enemy.hitEffect = true;
         enemy.hitTimer = 200 // длительность эффекта
         if (enemy.health <= 0) {
-          gameObjects.enemies[index].isAlive = false
-          gameObjects.enemies[index].isDead = enemy.canDie
+          enemy.isAlive = false
+          enemy.isDead = enemy.canDie
+        }
+        if (enemy.isDead && enemy.type === 'B') {
+          gameObjects.obstacles.forEach(obstacle => {
+            if (obstacle.type === 'f') {
+              obstacle.isVisible = true
+            }
+          })
         }
       }
     });

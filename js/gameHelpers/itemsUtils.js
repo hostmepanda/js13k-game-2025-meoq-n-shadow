@@ -56,7 +56,7 @@ export function checkEnvironmentCollisions(player, obstacles, deltaTime, GameSta
   const collidingObstacles = obstacles.filter(({ collides }) => collides);
   collidingObstacles.forEach(obstacle => {
     if (isCollided(player, obstacle)) {
-      if (obstacle.type === 'F') {
+      if (['F', 'f'].includes(obstacle.type)) {
         if (player.y + player.height >= obstacle.y && player.y <= obstacle.y) {
           player.y = obstacle.y - player.height;
           player.onGround = true;
