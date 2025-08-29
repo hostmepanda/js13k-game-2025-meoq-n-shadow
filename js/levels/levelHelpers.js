@@ -160,7 +160,7 @@ export function updateLevel(selectedLevel) {
     cats.forEach((player) => {
       updateCharacterPhysics(player, deltaTime)
       checkEnemyCollisions(player, levelObjects.enemies)
-      checkEnvironmentCollisions(player, levelObjects.obstacles, deltaTime, GameState);
+      checkEnvironmentCollisions(player, levelObjects.obstacles.filter(({ isVisible }) => isVisible), deltaTime, GameState);
     })
 
     enemies.forEach((enemy) => {
