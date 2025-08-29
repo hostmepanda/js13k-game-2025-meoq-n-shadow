@@ -6,7 +6,7 @@ import {JUMP_FORCE, MOVE_SPEED, renderBackground, renderUI, renderWithCamera} fr
 import {checkEnvironmentCollisions, checkFoodCollision, renderFoodItems} from '../gameHelpers/itemsUtils'
 import {updateBlackCatAttack, updateCharacterPhysics} from '../gameHelpers/charactersUtils'
 import {checkEnemyCollisions, checkEnemyCollisionWithEnvironment, createPoop} from '../gameHelpers/enemiesUtils'
-import {CANVAS} from '../consts'
+import {CANVAS, GAME_STATE} from '../consts'
 
 export function levelInit(selectedLevel) {
   return function ({ gameObjects, PlayerState, GameState }, { Sprite, canvas}) {
@@ -173,9 +173,10 @@ export function updateLevel(selectedLevel) {
 
     const activeCharacter = PlayerState.activeCharacter === 'white' ? white : black
     const cats = [white, black]
+
     cats.forEach((player) => {
       updateCharacterPhysics(player, deltaTime)
-      checkEnemyCollisions(player, levelObjects.enemies)
+      checkEnemyCollisions(player, levelObjects.enemies, { PlayerState, GameState })
       checkEnvironmentCollisions(player, levelObjects.obstacles.filter(({ isVisible }) => isVisible), deltaTime, GameState);
     })
 
@@ -254,6 +255,10 @@ export function updateLevel(selectedLevel) {
     black.alpha = PlayerState.activeCharacter === 'black' ? 1.0 : 0.7
     levelObjects.enemies = levelObjects.enemies.filter(({ isDead }) => !isDead )
     levelObjects.collectables = levelObjects.collectables.filter(({ collected }) => !collected )
+    if (!white.isAlive || !black.isAlive) {
+      GameState.nextLevel = GAME_STATE.GAMEOVER
+    }
+
     if (GameState.nextLevel !== GameState.currentState) {
       loadLevel(GameState.nextLevel, { GameState, gameObjects, PlayerState}, {Sprite, canvas, context})
     }
@@ -263,7 +268,7 @@ export function updateLevel(selectedLevel) {
 function loadLevel(targetLevel, { GameState, gameObjects, PlayerState}, {Sprite, canvas, context}) {
   // TODO: cler previous state of level
   // maybe transit to only one level object and init level here
-
+  console.log('--Target level: ', targetLevel)
   GameState.currentState = targetLevel
 }
 

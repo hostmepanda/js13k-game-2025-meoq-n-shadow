@@ -1,4 +1,5 @@
 import {isCollided} from './utils'
+import {GAME_STATE} from '../consts'
 
 export function checkEnemyCollisionWithEnvironment(obstacles, enemy) {
   obstacles.forEach(obstacle => {
@@ -179,6 +180,14 @@ export function checkEnemyCollisions(player, enemies) {
           if (player.damageInvulnerabilityLeft <= 0) {
             player.health -= enemy?.collisionDamage ?? 1
             player.damageInvulnerabilityLeft = 1000
+            if (player.health <= 0) {
+              if (player.lives > 0) {
+                player.lives = player.lives - 1
+                player.health = 100
+              } else {
+                player.isAlive = false
+              }
+            }
           }
         }
       }

@@ -59,8 +59,8 @@ export function parseLevel({ levelMap, gameObjects, Sprite, tileSize = 20}) {
           facingRight: true,
           isMoving: false,
           attackDamage: 10, // урон от атаки
-          health: 100,
-          lives: 10,
+          health: 1,
+          lives: 0,
           damageInvulnerabilityLeft: 0,
         })
       }

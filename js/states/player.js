@@ -1,7 +1,7 @@
 export const PlayerState = {
   activeCat: 'white',
   white:{
-    lives: 10,
+    lives: 0,
     size: 1, // max 5
   },
   black:{
