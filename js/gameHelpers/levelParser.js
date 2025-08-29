@@ -1,4 +1,4 @@
-import {GRAVITY_DOWN} from './utils'
+import {createDefaultLevel} from '../levels/levelHelpers'
 
 const parseToColorMapper = {
   '#': 'yellow', /* # = level exit */
@@ -22,7 +22,7 @@ const parseToColorMapper = {
   'f': 'darkgreen', // f - invisible when boss is alive
 }
 
-export function parseLevel({ levelMap, gameObjects, Sprite, tileSize = 20}) {
+export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
   levelMap.forEach((row, y) => {
     [...row].forEach((ch, x) => {
       if (ch === ".") {
@@ -348,4 +348,6 @@ export function parseLevel({ levelMap, gameObjects, Sprite, tileSize = 20}) {
       }
     });
   });
+
+  return gameObjects
 }

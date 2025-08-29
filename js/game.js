@@ -8,12 +8,16 @@ import {gameLoopRenderMethod} from './gameHelpers/render'
 import {gameLoopUpdateMethod} from './gameHelpers/update'
 import {gameObjects} from './states/objects'
 
-(() => {
+function startGame() {
   const { canvas, context } = init();
+
   setLevels({ gameObjects, PlayerState, GameState }, { Sprite, canvas})
-  new GameLoop({
+
+  const gameLoop = new GameLoop({
     update: (deltaTime) => gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canvas, context, deltaTime, Sprite),
     render: () => gameLoopRenderMethod(gameObjects, {GameState, PlayerState}, canvas, context),
   })
-  .start();
-})()
+
+  gameLoop.start();
+}
+startGame()

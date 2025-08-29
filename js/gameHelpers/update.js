@@ -5,20 +5,33 @@ import {GAME_STATE} from '../consts'
 export function gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canvas, context, deltaTime, Sprite) {
   switch (GameState.currentState) {
     case GAME_STATE.MENU:
-      initMenuScreen(GameState.currentState)(gameObjects)
-      updateMenuScreen(GAME_STATE.LEVEL1,{ Sprite, canvas })({ gameObjects: gameObjects[GAME_STATE.MENU], GameState, PlayerState})
+      initMenuScreen({selectedScreen: GameState.currentState, gameStates: {gameObjects} })
+      updateMenuScreen({
+        redirectScreen: GAME_STATE.LEVEL1,
+        gameStates: {gameObjects: gameObjects[GAME_STATE.MENU], GameState, PlayerState},
+        kontra: {Sprite, canvas}
+      })
       break
     case GAME_STATE.LEVEL1:
     case GAME_STATE.LEVEL2:
     case GAME_STATE.LEVEL3:
     case GAME_STATE.LEVEL4:
-      updateLevel(GameState.currentState)({ gameObjects, GameState, PlayerState}, {canvas, context}, deltaTime, Sprite)
+      updateLevel(
+        {
+          selectedLevel: GameState.currentState,
+          gameStates: {gameObjects, GameState, PlayerState},
+          kontra: {canvas, context, deltaTime, Sprite},
+        })
       break
     case GAME_STATE.GAMEOVER:
     case GAME_STATE.VICTORYBLACK:
     case GAME_STATE.VICTORYWHITE:
-      initMenuScreen(GameState.currentState)(gameObjects)
-      updateMenuScreen(GAME_STATE.MENU,{ Sprite, canvas })({ gameObjects: gameObjects[GameState.currentState], GameState, PlayerState})
+      initMenuScreen({selectedScreen: GameState.currentState, gameStates: {gameObjects} })
+      updateMenuScreen({
+        redirectScreen: GAME_STATE.MENU,
+        gameStates: {gameObjects: gameObjects[GameState.currentState], GameState, PlayerState},
+        kontra: {Sprite, canvas}
+      })
       break
   }
 }

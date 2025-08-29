@@ -1,4 +1,5 @@
 import {GAME_STATE} from '../consts'
+import {createDefaultLevel} from '../levels/levelHelpers'
 
 export const gameObjects = {
   ...Object.fromEntries([
@@ -17,18 +18,6 @@ export const gameObjects = {
     GAME_STATE.LEVEL3,
     GAME_STATE.LEVEL4,
   ].map((levelKey) => ([
-    levelKey, {
-      black: null,
-      white: null,
-      exit: null,
-      start: null,
-      keyboard: {},
-      backgrounds: [],
-      level: {},
-      obstacles: [],
-      collectables: [],
-      enemies: [],
-      effects: [],
-    },
+    levelKey, createDefaultLevel(),
   ]))),
 }

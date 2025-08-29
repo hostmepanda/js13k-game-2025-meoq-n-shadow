@@ -4,6 +4,7 @@ import {renderGameOver} from '../menus/gameOver'
 import {renderVictoryBlack} from '../menus/victroryBlack'
 import {renderVictoryWhite} from '../menus/victoryWhite'
 import {GAME_STATE} from '../consts'
+import kontra from '../engine/kontra.mjs'
 
 export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, canvas, context) {
   switch (GameState.currentState) {
@@ -14,7 +15,11 @@ export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, ca
     case GAME_STATE.LEVEL2:
     case GAME_STATE.LEVEL3:
     case GAME_STATE.LEVEL4:
-      levelRender(GameState.currentState)(gameObjects, {GameState, PlayerState}, { canvas, context })
+      levelRender({
+        selectedLevel: GameState.currentState,
+        gameData: {gameObjects, GameState, PlayerState},
+        kontra: {canvas, context},
+      })
       break
     case GAME_STATE.GAMEOVER:
       renderGameOver(canvas, context)

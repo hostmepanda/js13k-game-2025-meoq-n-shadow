@@ -2,8 +2,8 @@ import {levelInit} from '../levels/levelHelpers'
 import {CANVAS, GAME_STATE} from '../consts'
 
 export const GameState = {
-  currentState: GAME_STATE.LEVEL1,
-  nextLevel: GAME_STATE.LEVEL1,
+  currentState: GAME_STATE.MENU,
+  nextLevel: GAME_STATE.MENU,
   camera: {
     x: 0, // Начальная позиция камеры по X
     y: 0, // Начальная позиция камеры по Y
@@ -37,5 +37,5 @@ export function updateCamera(gameState, activeCharacter) {
 export function setLevels(states, drawHelpers) {
   // TODO: move to loadLevel
   const levels = [GAME_STATE.LEVEL1, GAME_STATE.LEVEL2, GAME_STATE.LEVEL3, GAME_STATE.LEVEL4]
-  levels.forEach(level => levelInit(level)(states, drawHelpers))
+  levels.forEach(level => levelInit({ selectedLevel: level, gameStates: states, kontra: drawHelpers }))
 }
