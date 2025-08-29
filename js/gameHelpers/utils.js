@@ -1,3 +1,5 @@
+import {GAME_STATE} from '../consts'
+
 export const GRAVITY_UP = 1200   // Гравитация при движении вверх
 export const GRAVITY_DOWN = 1500 // Гравитация при падении
 export const MAX_FALL_SPEED = 800 // Максимальная скорость падения
@@ -34,6 +36,18 @@ export function renderBackground(context, canvas) {
   context.fillStyle = gradient
   context.fillRect(0, 0, canvas.width, canvas.height)
 }
+function renderLevelName(levelNumber) {
+  if (levelNumber === GAME_STATE.LEVEL1) {
+    return 'HOME'
+  } else if (levelNumber === GAME_STATE.LEVEL2) {
+    return 'CITY'
+  } else if (levelNumber === GAME_STATE.LEVEL3) {
+    return 'SEWER'
+  } else if (levelNumber === GAME_STATE.LEVEL4) {
+    return 'RAT\'S CAVE'
+  }
+}
+
 export function renderUI(context, playerState) {
   // Сохраняем текущее состояние контекста
   context.save();
@@ -69,7 +83,7 @@ export function renderUI(context, playerState) {
   const levelX = 20;
   const centerY = uiHeight / 2;
   context.fillStyle = '#FF8C00'; // Оранжевый для уровня
-  context.fillText(`LEVEL: ${playerState.currentLevel || 1}`, levelX, centerY);
+  context.fillText(`LEVEL: ${renderLevelName(playerState.currentLevel) || 'SECRET'}`, levelX, centerY);
 
   // Отображаем информацию о котах
   const cats = playerState.cats || [];
