@@ -11,3 +11,7 @@ TODO:
 - [] fix start over mechanics
 - [] add music and sounds
 - [] add effects
+
+Progress
+29-08-2025
+![img.png](img.png)
