@@ -122,7 +122,23 @@ export function levelRender(selectedLevel) {
       }
     })
 
-    renderUI(context, {PlayerState, white: gameObjects[selectedLevel].white, black: gameObjects[selectedLevel].black});
+    renderUI(context, {
+      currentLevel: GameState.currentState,
+      cats: [
+        {
+          name: "Meoq",
+          health: gameObjects[selectedLevel].white.health,
+          lives: PlayerState.white.lives,
+          isActive: PlayerState.activeCharacter === 'white',
+        },
+        {
+          name: "Shadow",
+          health: gameObjects[selectedLevel].black.health,
+          lives: PlayerState.black.lives,
+          isActive: PlayerState.activeCharacter === 'black',
+        }
+      ],
+    });
   }
 }
 

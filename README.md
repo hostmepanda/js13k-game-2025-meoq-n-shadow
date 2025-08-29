@@ -10,3 +10,4 @@ TODO:
 - [] fix collision
 - [] fix start over mechanics
 - [] add music and sounds
+- [] add effects
