@@ -1,4 +1,3 @@
-import {createDefaultLevel} from '../levels/levelHelpers'
 import {GRAVITY_DOWN} from './utils'
 
 const parseToColorMapper = {

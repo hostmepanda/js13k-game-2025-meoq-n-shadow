@@ -4,8 +4,8 @@ TODO:
 - [X] Cats death and game over screens
 - [X] fix start over mechanics
 - [X] fix collision
+- [X] Boss firing
 - [] Fix collision for enemies
-- [] Boss firing
 - [] +2 types of enemy: shooting and flying?
 - [] parallax background
 - [] cut scenes
