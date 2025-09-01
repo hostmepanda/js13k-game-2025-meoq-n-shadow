@@ -1,4 +1,4 @@
-import {levelInit} from '../levels/levelHelpers'
+import {createDefaultLevel, createLevel} from '../levels/levelHelpers'
 import {CANVAS, GAME_STATE} from '../consts'
 
 export const GameState = {
@@ -16,7 +16,10 @@ export const GameState = {
       minY: 0,
       maxY: 0
     }
-  }
+  },
+  input: {
+    space: false,
+  },
 }
 
 // Функция для обновления положения камеры
@@ -34,8 +37,19 @@ export function updateCamera(gameState, activeCharacter) {
   );
 }
 
-export function setLevels(states, drawHelpers) {
-  // TODO: move to loadLevel
-  const levels = [GAME_STATE.LEVEL1, GAME_STATE.LEVEL2, GAME_STATE.LEVEL3, GAME_STATE.LEVEL4]
-  levels.forEach(level => levelInit({ selectedLevel: level, gameStates: states, kontra: drawHelpers }))
+export function loadLevel(targetLevel, states, drawHelpers) {
+  if (![GAME_STATE.LEVEL1, GAME_STATE.LEVEL2, GAME_STATE.LEVEL3, GAME_STATE.LEVEL4].includes(targetLevel)) {
+    return
+  }
+  if (targetLevel !== GAME_STATE.LEVEL1) {
+    states.gameObjects.backgrounds.length = 0
+    states.gameObjects.obstacles.length = 0
+    states.gameObjects.collectables.length = 0
+    states.gameObjects.enemies.length = 0
+    states.gameObjects.effects.length = 0
+    states.gameObjects.white = null
+    states.gameObjects.black = null
+  }
+  states.gameObjects = createDefaultLevel()
+  return createLevel({ selectedLevel: targetLevel, gameStates: states, kontra: drawHelpers })
 }

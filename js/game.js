@@ -1,17 +1,21 @@
 // TODO: import from kontra.min.mjs to reduce size before bundling for prod
 import { init, Sprite } from './engine/kontra.mjs'
 
-import {GameState, setLevels} from './states/game'
+import {GameState as defaultGameState, loadLevel} from './states/game'
 import {GameLoop} from './gameHelpers/loop'
-import {PlayerState} from './states/player'
+import {PlayerState as defaultPlayerState } from './states/player'
 import {gameLoopRenderMethod} from './gameHelpers/render'
 import {gameLoopUpdateMethod} from './gameHelpers/update'
-import {gameObjects} from './states/objects'
+import {GAME_STATE} from './consts'
 
 function startGame() {
   const { canvas, context } = init();
 
-  setLevels({ gameObjects, PlayerState, GameState }, { Sprite, canvas})
+  const {
+    gameObjects,
+    GameState,
+    PlayerState,
+  } = loadLevel(GAME_STATE.LEVEL1, { gameObjects: {}, PlayerState: defaultPlayerState, GameState: defaultGameState }, { Sprite, canvas})
 
   const gameLoop = new GameLoop({
     update: (deltaTime) => gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canvas, context, deltaTime, Sprite),

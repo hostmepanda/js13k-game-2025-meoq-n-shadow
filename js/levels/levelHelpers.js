@@ -9,9 +9,9 @@ import {checkEnemyCollisions, checkEnemyCollisionWithEnvironment, createPoop} fr
 import {CANVAS, GAME_STATE} from '../consts'
 import {PlayerState as DefaultPlayerState} from '../states/player'
 
-export function levelInit({selectedLevel, gameStates, kontra}) {
+export function createLevel({ selectedLevel, gameStates, kontra}) {
   const {Sprite, canvas} = kontra
-  const { gameObjects, PlayerState, GameState } = gameStates
+  const { PlayerState, GameState } = gameStates
   const levelState = {
     level: {
       levelWidth: canvas.width * 7,
@@ -19,10 +19,10 @@ export function levelInit({selectedLevel, gameStates, kontra}) {
     },
   }
 
-  gameObjects[selectedLevel] = Object.assign(
-    {},
+  Object.assign(
+    gameStates.gameObjects,
     parseLevel({
-      gameObjects: createDefaultLevel(),
+      gameObjects: gameStates.gameObjects,
       levelMap: LEVEL_MAPS[selectedLevel],
       Sprite,
     }),
@@ -36,11 +36,9 @@ export function levelInit({selectedLevel, gameStates, kontra}) {
   }
 
   Object.assign(PlayerState, DefaultPlayerState)
-  // Инициализируем backgrounds, если его еще нет
-  gameObjects[selectedLevel].backgrounds = gameObjects[selectedLevel].backgrounds || {}
 
   // Создаем объект фона с градиентом заката
-  gameObjects[selectedLevel].backgrounds.sunset = {
+  gameStates.gameObjects.backgrounds.sunset = {
     render: function (ctx) {
       // Создаем градиент от верха к низу
       const gradient = ctx.createLinearGradient(0, 0, 0, CANVAS.height)
@@ -57,72 +55,70 @@ export function levelInit({selectedLevel, gameStates, kontra}) {
     },
   }
 
-  gameObjects[selectedLevel].keyboard = initKeyboardControls()
-  gameObjects[selectedLevel].level = levelState.level
+  gameStates.gameObjects.keyboard = initKeyboardControls()
+  gameStates.gameObjects.level = levelState.level
+
+  return {
+    gameObjects: gameStates.gameObjects,
+    PlayerState,
+    GameState,
+  }
 }
 
-export function levelRender({selectedLevel, gameData, kontra}) {
+export function levelRender({ gameData, kontra}) {
   const {PlayerState, GameState, gameObjects } = gameData
   const { canvas, context} = kontra
-
-  const {white, black,} = gameObjects[selectedLevel]
-
   context.clearRect(0, 0, canvas.width, canvas.height)
 
   renderBackground(context, canvas)
   renderWithCamera(context, GameState.camera, (ctx) => {
-    if (gameObjects[selectedLevel].backgrounds.length > 0) {
-      gameObjects[selectedLevel].backgrounds.forEach(background => {
+    if (gameObjects.backgrounds.length > 0) {
+      gameObjects.backgrounds.forEach(background => {
         background.render()
       })
     }
 
-    if (gameObjects[selectedLevel].obstacles.length > 0) {
-      gameObjects[selectedLevel].obstacles
+    if (gameObjects.obstacles.length > 0) {
+      gameObjects.obstacles
       .filter(obstacle => obstacle.isVisible)
       .forEach(obstacle => {
         obstacle.render()
       })
     }
 
-    if (gameObjects[selectedLevel].collectables.length > 0) {
-      renderFoodItems(context, gameObjects[selectedLevel].collectables)
-      gameObjects[selectedLevel].collectables.forEach(collectable => {collectable?.render?.()})
+    if (gameObjects.collectables.length > 0) {
+      renderFoodItems(context, gameObjects.collectables)
+      gameObjects.collectables.forEach(collectable => {collectable?.render?.()})
     }
 
-    if (gameObjects[selectedLevel].boss) {
-      gameObjects[selectedLevel].boss.render()
-    }
-
-    if (gameObjects[selectedLevel].enemies.length > 0) {
-      gameObjects[selectedLevel].enemies
+    if (gameObjects.enemies.length > 0) {
+      gameObjects.enemies
       .forEach(enemy => {
         enemy?.render?.()
       })
     }
 
-    if (gameObjects[selectedLevel].effects.length > 0) {
-      gameObjects[selectedLevel].effects.forEach(effect => {
+    if (gameObjects.effects.length > 0) {
+      gameObjects.effects.forEach(effect => {
         effect?.render?.()
       })
     }
-
-    white.render()
-    black.render()
+    gameObjects.white.render()
+    gameObjects.black.render()
 
     // Если кот атакует, добавляем визуализацию атаки
-    if (black.isAttacking) {
+    if (gameObjects.black.isAttacking) {
       context.fillStyle = 'rgba(255, 0, 0, 0.5)'; // Красное свечение
 
       // Направление атаки зависит от свойства facingRight
-      if (black.facingRight) {
+      if (gameObjects.black.facingRight) {
         // Атака вправо
-        const attackX = black.x + black.width;
-        context.fillRect(attackX, black.y, black.attackRange, black.height);
+        const attackX = gameObjects.black.x + gameObjects.black.width;
+        context.fillRect(attackX, gameObjects.black.y, gameObjects.black.attackRange, gameObjects.black.height);
       } else {
         // Атака влево
-        const attackX = black.x - black.attackRange;
-        context.fillRect(attackX, black.y, black.attackRange, black.height);
+        const attackX = gameObjects.black.x - gameObjects.black.attackRange;
+        context.fillRect(attackX, gameObjects.black.y, gameObjects.black.attackRange, gameObjects.black.height);
       }
     }
   })
@@ -132,13 +128,13 @@ export function levelRender({selectedLevel, gameData, kontra}) {
     cats: [
       {
         name: "Meoq",
-        health: gameObjects[selectedLevel].white.health,
+        health: gameObjects.white.health,
         lives: PlayerState.white.lives,
         isActive: PlayerState.activeCharacter === 'white',
       },
       {
         name: "Shadow",
-        health: gameObjects[selectedLevel].black.health,
+        health: gameObjects.black.health,
         lives: PlayerState.black.lives,
         isActive: PlayerState.activeCharacter === 'black',
       }
@@ -146,18 +142,12 @@ export function levelRender({selectedLevel, gameData, kontra}) {
   });
 }
 
-export function updateLevel({selectedLevel, gameStates, kontra}) {
+export function updateLevel({gameStates, kontra}) {
   const { gameObjects, GameState, PlayerState} = gameStates
   const { Sprite, canvas, context, deltaTime } = kontra
-  const {
-    white,
-    black,
-    enemies,
-    keyboard,
-  } = gameObjects[selectedLevel]
-  const levelObjects = gameObjects[selectedLevel]
+  const {keyboard} = gameObjects
 
-  if (!white || !black) {
+  if (!gameObjects.white || !gameObjects.black) {
     console.error('Персонажи не определены!')
     return
   }
@@ -176,27 +166,27 @@ export function updateLevel({selectedLevel, gameStates, kontra}) {
     }
   }
 
-  const activeCharacter = PlayerState.activeCharacter === 'white' ? white : black
-  const cats = [white, black]
+  const activeCharacter = PlayerState.activeCharacter === 'white' ? gameObjects.white : gameObjects.black
+  const cats = [gameObjects.white, gameObjects.black]
 
   cats.forEach((player) => {
     updateCharacterPhysics(player, deltaTime)
-    checkEnemyCollisions(player, levelObjects.enemies, { PlayerState, GameState })
-    checkEnvironmentCollisions(player, levelObjects.obstacles.filter(({ isVisible }) => isVisible), deltaTime, GameState);
+    checkEnemyCollisions(player, gameObjects.enemies, { PlayerState, GameState })
+    checkEnvironmentCollisions(player, gameObjects.obstacles.filter(({ isVisible }) => isVisible), deltaTime, GameState);
   })
 
-  enemies.forEach((enemy) => {
+  gameObjects.enemies.forEach((enemy) => {
     enemy.update(deltaTime)
     checkEnemyCollisionWithEnvironment(
       [
-        ...levelObjects.obstacles.filter(({ collides }) => collides),
-        ...levelObjects.enemies.filter(({ collides }) => collides),
+        ...gameObjects.obstacles.filter(({ collides }) => collides),
+        ...gameObjects.enemies.filter(({ collides }) => collides),
       ],
       enemy,
     )
   })
 
-  updateBlackCatAttack(activeCharacter, levelObjects, deltaTime)
+  updateBlackCatAttack(activeCharacter, gameObjects, deltaTime)
 
   // Управление активным персонажем
   if (keyboard.isKeyPressed('KeyW') && activeCharacter.onGround) {
@@ -225,7 +215,7 @@ export function updateLevel({selectedLevel, gameStates, kontra}) {
 
   if (keyboard.isKeyPressed('Space') && !activeCharacter.poopCooldown) {
     if (PlayerState.activeCharacter === 'white') {
-      if (createPoop(activeCharacter, levelObjects, Sprite)) {
+      if (createPoop(activeCharacter, gameObjects, Sprite)) {
         // Устанавливаем задержку на какание, чтобы не спамить
         activeCharacter.poopCooldown = true
 
@@ -247,32 +237,31 @@ export function updateLevel({selectedLevel, gameStates, kontra}) {
   }
 
   // Проверка столкновений с едой для белого кота
-  checkFoodCollision(white, levelObjects.collectables)
+  checkFoodCollision(gameObjects.white, gameObjects.collectables)
 
   // Ограничиваем движение персонажей границами уровня
-  white.x = Math.max(0, Math.min(white.x, canvas.width * 7 - white.width))
-  black.x = Math.max(0, Math.min(black.x, canvas.width * 7 - black.width))
+  gameObjects.white.x = Math.max(0, Math.min(gameObjects.white.x, canvas.width * 7 - gameObjects.white.width))
+  gameObjects.black.x = Math.max(0, Math.min(gameObjects.black.x, canvas.width * 7 - gameObjects.black.width))
 
   updateCamera(GameState, activeCharacter)
 
   // Визуальное обозначение активного персонажа
-  white.alpha = PlayerState.activeCharacter === 'white' ? 1.0 : 0.7
-  black.alpha = PlayerState.activeCharacter === 'black' ? 1.0 : 0.7
-  levelObjects.enemies = levelObjects.enemies.filter(({ isDead }) => !isDead )
-  levelObjects.collectables = levelObjects.collectables.filter(({ collected }) => !collected )
-  if (!white.isAlive || !black.isAlive) {
+  gameObjects.white.alpha = PlayerState.activeCharacter === 'white' ? 1.0 : 0.7
+  gameObjects.black.alpha = PlayerState.activeCharacter === 'black' ? 1.0 : 0.7
+  gameObjects.enemies = gameObjects.enemies.filter(({ isDead }) => !isDead )
+  gameObjects.collectables = gameObjects.collectables.filter(({ collected }) => !collected )
+  if (!gameObjects.white.isAlive || !gameObjects.black.isAlive) {
     GameState.nextLevel = GAME_STATE.GAMEOVER
   }
 
   if (GameState.nextLevel !== GameState.currentState) {
-    loadLevel(GameState.nextLevel, { GameState, gameObjects, PlayerState}, {Sprite, canvas, context})
+    switchLevel(GameState.nextLevel, { GameState, gameObjects, PlayerState}, {Sprite, canvas, context})
   }
 }
 
-function loadLevel(targetLevel, { GameState, gameObjects, PlayerState}, {Sprite, canvas, context}) {
+function switchLevel(targetLevel, { GameState, gameObjects, PlayerState}, {Sprite, canvas, context}) {
   // TODO: cler previous state of level
   // maybe transit to only one level object and init level here
-  console.log('--Target level: ', targetLevel)
   GameState.currentState = targetLevel
 }
 

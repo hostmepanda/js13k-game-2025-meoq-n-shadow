@@ -1,18 +1,16 @@
-import {GAME_STATE} from '../consts'
-import {setLevels} from '../states/game'
+import {loadLevel} from '../states/game'
 
-export function initMenuScreen({selectedScreen, gameStates }) {
-  const { gameObjects } = gameStates;
+export function initMenuScreen(gameState) {
   const handleSpaceClick = (event) => {
     if (event.code === 'Space') {
-      gameObjects[selectedScreen].input.space = true
+      gameState.input.space = true
     }
   }
   document.addEventListener('keydown', handleSpaceClick)
 
   document.addEventListener('keyup', (event) => {
     if (event.code === 'Space') {
-      gameObjects[selectedScreen].input.space = false
+      gameState.input.space = false
       document.removeEventListener('keydown', handleSpaceClick)
     }
   })
@@ -21,8 +19,8 @@ export function initMenuScreen({selectedScreen, gameStates }) {
 export function updateMenuScreen({ redirectScreen, gameStates, kontra }) {
   const { gameObjects, GameState, PlayerState } = gameStates;
   const { Sprite, canvas } = kontra;
-  if (gameObjects.input.space) {
-    gameObjects.input.space = false;
+  if (GameState.input.space) {
+    GameState.input.space = false;
 
     Object.assign(PlayerState, {
       activeCat: 'white',
@@ -30,12 +28,7 @@ export function updateMenuScreen({ redirectScreen, gameStates, kontra }) {
       black:{lives: 10, size: 1},
     })
 
-    // Чистим старые уровни
-    ;[GAME_STATE.LEVEL1, GAME_STATE.LEVEL2, GAME_STATE.LEVEL3, GAME_STATE.LEVEL4].forEach(level => {
-      delete gameObjects[level]
-    })
-
-    setLevels({ gameObjects, PlayerState, GameState }, { Sprite, canvas})
+    loadLevel({ gameObjects, PlayerState, GameState }, { Sprite, canvas})
 
     GameState.currentState = redirectScreen;
     GameState.nextLevel = redirectScreen;
