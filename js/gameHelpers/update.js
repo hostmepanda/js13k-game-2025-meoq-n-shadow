@@ -1,8 +1,7 @@
 import {updateLevel} from '../levels/levelHelpers'
 import {initMenuScreen, updateMenuScreen} from '../menus/helpers'
 import {GAME_STATE} from '../consts'
-import {GameState as defaultGameState, loadLevel} from '../states/game'
-import {PlayerState as defaultPlayerState} from '../states/player'
+import {loadLevel} from '../states/game'
 
 export function gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canvas, context, deltaTime, Sprite, collides) {
   switch (GameState.currentState) {

@@ -14,7 +14,7 @@ export function createLevel({ selectedLevel, gameStates, kontra}) {
 
   const levelState = {
     level: {
-      levelWidth: canvas.width * 7,
+      levelWidth: canvas.width * 5,
       levelHeight: canvas.height,
     },
   }
@@ -163,7 +163,6 @@ export function updateLevel({gameStates, kontra}) {
     if (!PlayerState.lastShiftTime || Date.now() - PlayerState.lastShiftTime > 300) {
       PlayerState.activeCharacter = PlayerState.activeCharacter === 'white' ? 'black' : 'white'
       PlayerState.lastShiftTime = Date.now()
-      console.log(`Переключились на ${PlayerState.activeCharacter} персонажа`)
     }
   }
 
@@ -201,8 +200,6 @@ export function updateLevel({gameStates, kontra}) {
     activeCharacter.velocityY = activeCharacter.jumpForce || JUMP_FORCE
     activeCharacter.isJumping = true
     activeCharacter.onGround = false
-
-    console.log(`${PlayerState.activeCharacter} прыгает!`)
   }
   const currentMoveSpeed = activeCharacter.moveSpeed || MOVE_SPEED
 

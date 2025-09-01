@@ -1,5 +1,4 @@
 import {isCollided} from './utils'
-import {GAME_STATE} from '../consts'
 
 export function checkEnemyCollisionWithEnvironment(obstacles, enemy) {
   obstacles.forEach(obstacle => {
@@ -96,7 +95,6 @@ export function createPoop(character, gameObjects, Sprite) {
       isDead: false,
       update(deltaTime) {
         if (!this.isAlive) {
-          console.log('Какашка убита!')
           this.isMonster = false
           this.isAlive = true
           this.transformAt = Date.now() + 5000
@@ -143,7 +141,6 @@ export function createPoop(character, gameObjects, Sprite) {
       },
     });
     gameObjects.enemies.push(poop);
-    console.log('Кот покакал! Размер уменьшился до', character.sizeMultiplier.toFixed(2))
     return true // Успешно покакал
   }
 
@@ -156,7 +153,6 @@ export function checkEnemyCollisions(player, enemies, states) {
       if (enemy.type === 'X') {
         if (player.color === 'white') {
           const canBreak = player.sizeMultiplier * player.attackDamage >= enemy.health
-          console.log('canBreak: ', canBreak, player.sizeMultiplier, player.attackDamage, enemy.health)
           if (canBreak) {
             enemies[index].health = 0
             enemies[index].isAlive = false

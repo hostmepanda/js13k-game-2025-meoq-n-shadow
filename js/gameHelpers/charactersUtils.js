@@ -37,10 +37,6 @@ export function increaseCatSize(character) {
     // При размере 1 -> 100% скорости
     // При размере 4 -> примерно 45% скорости
     character.moveSpeed = BASE_MOVE_SPEED * (1 / (1 + (character.sizeMultiplier - 1) * 0.4))
-
-
-    console.log(`Кот увеличился! Новый множитель: ${character.sizeMultiplier}`)
-    console.log(`Новая сила прыжка: ${character.jumpForce}, Новая скорость: ${character.moveSpeed}`)
   }
 }
 

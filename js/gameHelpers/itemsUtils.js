@@ -1,4 +1,3 @@
-import {GRAVITY_DOWN, isCollided} from './utils'
 import {increaseCatSize} from './charactersUtils'
 import {GAME_STATE} from '../consts'
 
@@ -41,9 +40,6 @@ export function checkFoodCollision(character, foodItems) {
         // Увеличиваем размер белого кота
         increaseCatSize(character)
       }
-
-      // Можно добавить звуковой эффект или анимацию здесь
-      console.log('Еда собрана!')
 
       return true
     }

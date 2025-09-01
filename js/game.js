@@ -1,5 +1,4 @@
-// TODO: import from kontra.min.mjs to reduce size before bundling for prod
-import { init, Sprite, collides } from './engine/kontra.mjs'
+import { init, Sprite, collides } from './engine/kontra.min.mjs'
 
 import {GameState as defaultGameState, loadLevel} from './states/game'
 import {GameLoop} from './gameHelpers/loop'

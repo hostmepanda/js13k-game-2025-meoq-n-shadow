@@ -281,7 +281,6 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
         if (ch === 'E') {
           cfg.update = function (deltaTime) {
             if (!this.isAlive) {
-              console.log('Какашка убита!')
               this.isMonster = false
               this.isAlive = true
               this.transformAt = Date.now() + 5000
@@ -354,7 +353,6 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
           isDead: false,
           update(deltaTime) {
             if (!this.isAlive) {
-              console.log('Какашка убита!')
               this.isMonster = false
               this.isAlive = true
               this.transformAt = Date.now() + 5000
