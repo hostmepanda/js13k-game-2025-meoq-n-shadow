@@ -1,4 +1,5 @@
 import {createDefaultLevel} from '../levels/levelHelpers'
+import {GRAVITY_DOWN} from './utils'
 
 const parseToColorMapper = {
   '#': 'yellow', /* # = level exit */
@@ -125,13 +126,13 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
         cfg.health = 100
         cfg.collisionDamage = 50
         if (ch === 'B') {
-          cfg.health = 10 // 200
+          cfg.health = 2 // 200
           cfg.collisionDamage = 25
           cfg.velocityY = 0
           cfg.velocityX = 0
           cfg.isJumping = true
           cfg.jumpForce = -350 // Меньше, чем у игрока
-          cfg.moveSpeed = 100 // Медленнее игрока
+          cfg.moveSpeed = 300
           cfg.onGround = true
           cfg.facingRight = false
 
@@ -140,19 +141,28 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
           cfg.spawnY = y * tileSize
 
           // Границы перемещения (10 тайлов в каждую сторону)
-          cfg.boundaryLeft = cfg.spawnX - 10 * tileSize
-          cfg.boundaryRight = cfg.spawnX + 10 * tileSize
+          cfg.boundaryLeft = cfg.spawnX - 12 * tileSize
+          cfg.boundaryRight = cfg.spawnX + 12 * tileSize
 
           // Таймеры для принятия решений
           cfg.decisionTimer = 0
-          cfg.decisionInterval = 2 // секунды между сменой поведения
+          cfg.decisionInterval = 1 // секунды между сменой поведения
+
+          cfg.trashItems = []; // массив для хранения мусора
+          cfg.maxTrashItems = 2; // максимальное количество мусора
+          cfg.trashCooldown = 5; // секунды между созданием мусора
+          cfg.trashTimer = 0; // таймер для отсчета
+          cfg.trashLifespan = 10; // время жизни мусора в секундах
+          cfg.trashDamage = 20; // урон от столкновения с мусором
+          cfg.trashWidth = tileSize / 2; // размер мусора
+          cfg.trashHeight = tileSize / 2;
 
           cfg.update = function(deltaTime) {
             if (!this.isAlive) return;
 
             // Гравитация
             if (!this.onGround) {
-              this.velocityY += 1500 * deltaTime; // Сила гравитации
+              this.velocityY += GRAVITY_DOWN * deltaTime; // Сила гравитации
             }
 
             // Обновляем таймер принятия решений
@@ -197,23 +207,71 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
             this.x += this.velocityX * deltaTime;
             this.y += this.velocityY * deltaTime;
 
+            // Логика создания мусора
+            this.trashTimer += deltaTime;
+            if (this.trashTimer >= this.trashCooldown && this.trashItems.length < this.maxTrashItems) {
+              // Создаем новый мусор
+              this.trashItems.push(Sprite({
+                x: this.x + this.width / 2 - this.trashWidth / 2, // центрируем относительно босса
+                y: this.y + this.height - this.trashHeight, // внизу босса
+                width: this.trashWidth,
+                height: this.trashHeight,
+                timeLeft: this.trashLifespan, // время жизни в секундах
+                canDie: true,
+                isDead: false,
+                isAlive: true,
+                enemy: true,
+                isMonster: true,
+                health: 50,
+                collisionDamage: 15,
+                isVisible: true,
+                type: 'B'
+              }));
+
+              this.trashTimer = 0; // сбрасываем таймер
+            }
+
+            // Обновляем все существующие мусоры
+            for (let i = this.trashItems.length - 1; i >= 0; i--) {
+              const trash = this.trashItems[i];
+              trash.timeLeft -= deltaTime;
+
+              // Удаляем мусор, если его время истекло
+              if (trash.timeLeft <= 0) {
+                this.trashItems.splice(i, 1);
+              }
+            }
+
             // Здесь нужна будет проверка коллизий с землей и препятствиями
-            // Примерно так:
-            // const wasOnGround = this.onGround;
-            // this.onGround = false; // Сбрасываем и проверяем заново
-            //
-            // // Проверка коллизий с препятствиями
-            // gameObjects.obstacles.forEach(obstacle => {
-            //   if (obstacle.collides && collides(this, obstacle)) {
-            //     // Коллизия с землей (снизу)
-            //     if (this.velocityY > 0 && this.y + this.height > obstacle.y && this.y < obstacle.y) {
-            //       this.onGround = true;
-            //       this.velocityY = 0;
-            //       this.y = obstacle.y - this.height;
-            //     }
-            //   }
-            // });
-          }
+            // ...
+          };
+
+          cfg.renderTrash = function(ctx) {
+            for (const trash of this.trashItems) {
+              // Отрисовка мусора (простой квадрат)
+              this.context.fillStyle = 'rgba(150, 75, 0, 0.8)'; // коричневый с прозрачностью
+              this.context.fillRect(trash.x, trash.y, trash.width, trash.height);
+
+              // Можно добавить детали, чтобы он выглядел как мусор
+              this.fillStyle = 'rgba(100, 50, 0, 0.9)';
+              const segments = 3;
+              const segWidth = trash.width / segments;
+              const segHeight = trash.height / segments;
+
+              for (let i = 0; i < segments; i++) {
+                for (let j = 0; j < segments; j++) {
+                  if ((i + j) % 2 === 0) {
+                    this.context.fillRect(
+                      trash.x + i * segWidth,
+                      trash.y + j * segHeight,
+                      segWidth,
+                      segHeight
+                    );
+                  }
+                }
+              }
+            }
+          };
         }
         if (ch === 'X') {
           cfg.isMonster = false

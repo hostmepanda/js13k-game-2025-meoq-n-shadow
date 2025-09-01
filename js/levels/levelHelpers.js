@@ -93,6 +93,9 @@ export function levelRender({ gameData, kontra}) {
       gameObjects.enemies
       .forEach(enemy => {
         enemy?.render?.()
+        if (enemy.type === 'B') {
+          enemy.renderTrash()
+        }
       })
     }
 
@@ -166,10 +169,17 @@ export function updateLevel({gameStates, kontra}) {
 
   const activeCharacter = PlayerState.activeCharacter === 'white' ? gameObjects.white : gameObjects.black
   const cats = [gameObjects.white, gameObjects.black]
-
+  const boss = gameObjects.enemies?.find(({ type }) => type === 'B')
   cats.forEach((player) => {
     updateCharacterPhysics(player, deltaTime)
-    checkEnemyCollisions(player, gameObjects.enemies, { PlayerState, GameState })
+    checkEnemyCollisions(
+      player,
+      [
+        ...gameObjects.enemies,
+        ...(boss?.isAlive ? boss.trashItems: []),
+      ],
+      { PlayerState, GameState },
+    )
     checkEnvironmentCollisions(player, gameObjects.obstacles.filter(({ isVisible, collides }) => isVisible && collides), deltaTime, GameState, collides);
   })
 
