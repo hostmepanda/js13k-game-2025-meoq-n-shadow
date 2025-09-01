@@ -23,10 +23,10 @@ export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, ca
       renderGameOver(canvas, context)
       break
     case GAME_STATE.VICTORYBLACK:
-      renderVictoryWhite(canvas, context)
+      renderVictoryBlack(canvas, context)
       break
     case GAME_STATE.VICTORYWHITE:
-      renderVictoryBlack(canvas, context)
+      renderVictoryWhite(canvas, context)
       break
   }
 }

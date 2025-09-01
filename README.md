@@ -1,7 +1,7 @@
 pixel kit and packs are taken from itch.io
 
 TODO:
-- [] Cats death and game over screens
+- [X] Cats death and game over screens
 - [] Boss firing
 - [] +2 types of enemy: shooting and flying?
 - [] parallax background

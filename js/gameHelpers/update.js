@@ -48,7 +48,7 @@ export function gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canv
       gameObjects.enemies = []
       gameObjects.effects = []
 
-      const updatedStates = loadLevel(GAME_STATE.LEVEL1, { gameObjects: {}, PlayerState: defaultPlayerState, GameState: defaultGameState }, { Sprite, canvas})
+      const updatedStates = loadLevel(GAME_STATE.LEVEL1, { gameObjects: {} }, { Sprite, canvas})
 
       Object.assign(gameObjects, updatedStates.gameObjects)
       Object.assign(PlayerState, updatedStates.PlayerState)

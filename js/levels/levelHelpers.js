@@ -1,4 +1,4 @@
-import {updateCamera} from '../states/game'
+import {loadLevel, updateCamera} from '../states/game'
 import {parseLevel} from '../gameHelpers/levelParser'
 import {initKeyboardControls} from '../gameHelpers/keyboard'
 import {LEVEL_MAPS} from './maps'
@@ -11,7 +11,7 @@ import {PlayerState as DefaultPlayerState} from '../states/player'
 
 export function createLevel({ selectedLevel, gameStates, kontra}) {
   const {Sprite, canvas} = kontra
-  const { PlayerState, GameState } = gameStates
+
   const levelState = {
     level: {
       levelWidth: canvas.width * 7,
@@ -28,28 +28,26 @@ export function createLevel({ selectedLevel, gameStates, kontra}) {
     }),
   )
 
-  GameState.camera.levelBounds = {
-    minX: 0,
-    maxX: levelState.level.levelWidth - CANVAS.width,
-    minY: 0,
-    maxY: levelState.level.levelHeight - CANVAS.height,
+  if (gameStates?.GameState) {
+    gameStates.GameState.camera.levelBounds = {
+      minX: 0,
+      maxX: levelState.level.levelWidth - CANVAS.width,
+      minY: 0,
+      maxY: levelState.level.levelHeight - CANVAS.height,
+    }
   }
 
-  Object.assign(PlayerState, DefaultPlayerState)
+  if (gameStates?.PlayerState) {
+    Object.assign(gameStates.PlayerState, DefaultPlayerState)
+  }
 
-  // Создаем объект фона с градиентом заката
   gameStates.gameObjects.backgrounds.sunset = {
     render: function (ctx) {
-      // Создаем градиент от верха к низу
       const gradient = ctx.createLinearGradient(0, 0, 0, CANVAS.height)
-
-      // Добавляем цвета заката (темно-синий -> фиолетовый -> оранжевый -> желтый)
       gradient.addColorStop(0, '#1a2b56')    // Темно-синий (верх неба)
       gradient.addColorStop(0.4, '#864d9e')  // Фиолетовый
       gradient.addColorStop(0.7, '#dd5e5e')  // Оранжево-красный
       gradient.addColorStop(0.9, '#f9d423')  // Желтый (у горизонта)
-
-      // Заполняем фон градиентом
       ctx.fillStyle = gradient
       ctx.fillRect(0, 0, CANVAS.width, CANVAS.height)
     },
@@ -60,8 +58,8 @@ export function createLevel({ selectedLevel, gameStates, kontra}) {
 
   return {
     gameObjects: gameStates.gameObjects,
-    PlayerState,
-    GameState,
+    PlayerState: gameStates.PlayerState,
+    GameState: gameStates.GameState,
   }
 }
 
@@ -260,8 +258,16 @@ export function updateLevel({gameStates, kontra}) {
 }
 
 function switchLevel(targetLevel, { GameState, gameObjects, PlayerState}, {Sprite, canvas, context}) {
-  // TODO: cler previous state of level
-  // maybe transit to only one level object and init level here
+  if ([
+    GAME_STATE.LEVEL1,
+    GAME_STATE.LEVEL2,
+    GAME_STATE.LEVEL3,
+    GAME_STATE.LEVEL4,
+  ].includes(targetLevel)) {
+    const updatedLevel = loadLevel(targetLevel, { gameObjects }, {Sprite, canvas, context})
+    Object.assign(gameObjects, updatedLevel.gameObjects)
+  }
+
   GameState.currentState = targetLevel
 }
 
