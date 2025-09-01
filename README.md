@@ -8,7 +8,7 @@ TODO:
 - [] cut scenes
 - [] designs
 - [] fix collision
-- [] fix start over mechanics
+- [X] fix start over mechanics
 - [] add music and sounds
 - [] add effects
 
