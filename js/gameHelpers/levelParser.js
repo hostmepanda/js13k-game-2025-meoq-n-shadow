@@ -49,7 +49,7 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
           // Добавляем физические свойства
           velocityY: 0,
           isJumping: true,
-          jumpForce: -550, // Отрицательное значение, т.к. ось Y направлена вниз
+          jumpForce: -450, // Отрицательное значение, т.к. ось Y направлена вниз
           moveSpeed: 200,
           onGround: false,
           alpha: 1.0, // для прозрачности
@@ -59,8 +59,7 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
           facingRight: true,
           isMoving: false,
           attackDamage: 10, // урон от атаки
-          health: 1,
-          lives: 0,
+          health: 100,
           damageInvulnerabilityLeft: 0,
         })
       }
@@ -95,7 +94,6 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
           canAttack: true, // флаг, может ли кот атаковать
           isMoving: false,
           health: 100,
-          lives: 10,
           damageInvulnerabilityLeft: 0,
         })
       }

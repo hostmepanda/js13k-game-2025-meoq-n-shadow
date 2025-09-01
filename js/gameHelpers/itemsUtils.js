@@ -87,7 +87,7 @@ export function checkEnvironmentCollisions(player, obstacles, deltaTime, GameSta
       } else {
         // снизу (удар головой)
         player.y = obstacle.y + obstacle.height;
-        player.velocityY = GRAVITY_DOWN; // или GRAVITY_DOWN, если хочешь отскок
+        player.velocityY = 0; // или GRAVITY_DOWN, если хочешь отскок
       }
     }
 

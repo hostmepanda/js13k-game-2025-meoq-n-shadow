@@ -24,7 +24,7 @@ export function updateMenuScreen({ redirectScreen, gameStates, kontra }) {
 
     Object.assign(PlayerState, {
       activeCat: 'white',
-      white:{lives: 0, size: 1},
+      white:{lives: 10, size: 1},
       black:{lives: 10, size: 1},
     })
 

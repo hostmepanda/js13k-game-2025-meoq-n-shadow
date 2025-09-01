@@ -4,6 +4,7 @@ TODO:
 - [X] Cats death and game over screens
 - [X] fix start over mechanics
 - [X] fix collision
+- [] Fix collision for enemies
 - [] Boss firing
 - [] +2 types of enemy: shooting and flying?
 - [] parallax background
@@ -11,6 +12,7 @@ TODO:
 - [] designs
 - [] add music and sounds
 - [] add effects
+- [] cleanup all logs
 
 Progress
 29-08-2025

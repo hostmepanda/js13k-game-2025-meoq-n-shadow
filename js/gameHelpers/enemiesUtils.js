@@ -150,7 +150,7 @@ export function createPoop(character, gameObjects, Sprite) {
   return false // Не удалось покакать (размер слишком мал)
 }
 
-export function checkEnemyCollisions(player, enemies) {
+export function checkEnemyCollisions(player, enemies, states) {
   enemies.forEach((enemy, index) => {
     if (isCollided(player, enemy)) {
       if (enemy.type === 'X') {
@@ -181,8 +181,8 @@ export function checkEnemyCollisions(player, enemies) {
             player.health -= enemy?.collisionDamage ?? 1
             player.damageInvulnerabilityLeft = 1000
             if (player.health <= 0) {
-              if (player.lives > 0) {
-                player.lives = player.lives - 1
+              if (states.PlayerState[player.color].lives > 0) {
+                states.PlayerState[player.color].lives = states.PlayerState[player.color].lives - 1
                 player.health = 100
               } else {
                 player.isAlive = false
