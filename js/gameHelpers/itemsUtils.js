@@ -55,7 +55,6 @@ export function checkFoodCollision(character, foodItems) {
 export function checkEnvironmentCollisions(player, obstacles, deltaTime, GameState, collides) {
   player.onGround = false;
   obstacles
-  .filter(({ collides }) => collides)
   .forEach(obstacle => {
     if (!collides(player, obstacle)) return;
 

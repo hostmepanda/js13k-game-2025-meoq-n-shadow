@@ -167,15 +167,11 @@ export function updateLevel({gameStates, kontra}) {
   const activeCharacter = PlayerState.activeCharacter === 'white' ? gameObjects.white : gameObjects.black
   const cats = [gameObjects.white, gameObjects.black]
 
-  // cats.forEach((player) => {
-  //   updateCharacterPhysics(player, deltaTime)
-  //   checkEnemyCollisions(player, gameObjects.enemies, { PlayerState, GameState })
-  //   checkEnvironmentCollisions(player, gameObjects.obstacles.filter(({ isVisible }) => isVisible), deltaTime, GameState);
-  // })
-
-  updateCharacterPhysics(gameObjects.white, deltaTime)
-  checkEnemyCollisions(gameObjects.white, gameObjects.enemies, {PlayerState, GameState})
-  checkEnvironmentCollisions(gameObjects.white, gameObjects.obstacles.filter(({isVisible}) => isVisible), deltaTime, GameState, collides)
+  cats.forEach((player) => {
+    updateCharacterPhysics(player, deltaTime)
+    checkEnemyCollisions(player, gameObjects.enemies, { PlayerState, GameState })
+    checkEnvironmentCollisions(player, gameObjects.obstacles.filter(({ isVisible, collides }) => isVisible && collides), deltaTime, GameState, collides);
+  })
 
   gameObjects.enemies.forEach((enemy) => {
     enemy.update(deltaTime)
