@@ -52,46 +52,66 @@ export function checkFoodCollision(character, foodItems) {
   return false
 }
 
-export function checkEnvironmentCollisions(player, obstacles, deltaTime, GameState) {
-  const collidingObstacles = obstacles.filter(({ collides }) => collides);
-  collidingObstacles.forEach(obstacle => {
-    if (isCollided(player, obstacle)) {
-      if (['F', 'f'].includes(obstacle.type)) {
-        if (player.y + player.height >= obstacle.y && player.y <= obstacle.y) {
-          player.y = obstacle.y - player.height;
-          player.onGround = true;
-          player.isJumping = false
-        } else if (
-          player.isJumping &&
-          player.y + player.height >= obstacle.y + obstacle.height &&
-          player.y <= obstacle.y + obstacle.height
-        ) {
-          player.y = obstacle.y + obstacle.height
-          player.velocityY = GRAVITY_DOWN;
-        }
-      }
+export function checkEnvironmentCollisions(player, obstacles, deltaTime, GameState, collides) {
+  player.onGround = false;
+  obstacles
+  .filter(({ collides }) => collides)
+  .forEach(obstacle => {
+    if (!collides(player, obstacle)) return;
 
-      if (obstacle.type === 'W') {
-        if (player.facingRight) {
-          player.x = obstacle.x - player.width
-        } else {
-          player.x = obstacle.x + obstacle.width;
-        }
-      }
+    // вычисляем перекрытия
+    const overlapX = Math.min(
+      player.x + player.width - obstacle.x,
+      obstacle.x + obstacle.width - player.x
+    );
+    const overlapY = Math.min(
+      player.y + player.height - obstacle.y,
+      obstacle.y + obstacle.height - player.y
+    );
 
-      if (player.y <= 10) {
-        player.y = 10;
-        player.velocityY = -10 * deltaTime;
+    if (overlapX < overlapY) {
+      // горизонтальная коллизия
+      if (player.x < obstacle.x) {
+        player.x = obstacle.x - player.width;
+      } else {
+        player.x = obstacle.x + obstacle.width;
       }
-      if (obstacle.type === '#') {
-        const currentLevelIndex = Object.values(GAME_STATE).findIndex(value => value === GameState.currentState)
-        const nextLevelKey = Object.keys(GAME_STATE)?.[currentLevelIndex + 1]
-        if (GAME_STATE?.[nextLevelKey] === GAME_STATE.GAMEOVER) {
-          GameState.nextLevel = player.color === 'white' ? GAME_STATE.VICTORYWHITE : GAME_STATE.VICTORYBLACK
-        } else {
-          GameState.nextLevel = GAME_STATE?.[nextLevelKey]
-        }
+      player.velocityX = 0;
+    } else {
+      // вертикальная коллизия
+      if (player.y < obstacle.y) {
+        // сверху
+        player.y = obstacle.y - player.height;
+        player.velocityY = 0;
+        player.onGround = true;
+        player.isJumping = false;
+      } else {
+        // снизу (удар головой)
+        player.y = obstacle.y + obstacle.height;
+        player.velocityY = GRAVITY_DOWN; // или GRAVITY_DOWN, если хочешь отскок
       }
     }
-  })
+
+    // Дополнительные типы тайлов
+    if (obstacle.type === '#') {
+      const currentLevelIndex = Object.values(GAME_STATE).findIndex(
+        value => value === GameState.currentState
+      );
+      const nextLevelKey = Object.keys(GAME_STATE)?.[currentLevelIndex + 1];
+      if (GAME_STATE?.[nextLevelKey] === GAME_STATE.GAMEOVER) {
+        GameState.nextLevel =
+          player.color === 'white'
+            ? GAME_STATE.VICTORYWHITE
+            : GAME_STATE.VICTORYBLACK;
+      } else {
+        GameState.nextLevel = GAME_STATE?.[nextLevelKey];
+      }
+    }
+  });
+
+  // ограничение по верхней границе карты
+  if (player.y <= 10) {
+    player.y = 10;
+    player.velocityY = -10 * deltaTime;
+  }
 }

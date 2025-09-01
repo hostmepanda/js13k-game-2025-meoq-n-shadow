@@ -4,7 +4,7 @@ import {GAME_STATE} from '../consts'
 import {GameState as defaultGameState, loadLevel} from '../states/game'
 import {PlayerState as defaultPlayerState} from '../states/player'
 
-export function gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canvas, context, deltaTime, Sprite) {
+export function gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canvas, context, deltaTime, Sprite, collides) {
   switch (GameState.currentState) {
     case GAME_STATE.LEVEL1:
     case GAME_STATE.LEVEL2:
@@ -13,7 +13,7 @@ export function gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canv
       updateLevel(
         {
           gameStates: {gameObjects, GameState, PlayerState},
-          kontra: {canvas, context, deltaTime, Sprite},
+          kontra: {canvas, context, deltaTime, Sprite, collides},
         })
       break
     case GAME_STATE.MENU:

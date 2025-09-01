@@ -2,13 +2,13 @@ pixel kit and packs are taken from itch.io
 
 TODO:
 - [X] Cats death and game over screens
+- [X] fix start over mechanics
+- [X] fix collision
 - [] Boss firing
 - [] +2 types of enemy: shooting and flying?
 - [] parallax background
 - [] cut scenes
 - [] designs
-- [] fix collision
-- [X] fix start over mechanics
 - [] add music and sounds
 - [] add effects
 
