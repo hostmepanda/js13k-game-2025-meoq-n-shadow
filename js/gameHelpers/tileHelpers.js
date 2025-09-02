@@ -17,17 +17,15 @@ export function renderWoodConcreteFloor(context, width, height, x, y, options = 
 
   context.save();
 
-  // Создаем простой псевдослучайный генератор на основе позиции блока
-  const seed = (x * 10000 + y);
-  let seedValue = seed;
-  const random = function () {
-    let x = Math.sin(seedValue++) * 10000;
-    return x - Math.floor(x);
-  };
+  // Используем только координаты для выбора из предопределенных вариантов
+  // Это делает код очень компактным
+  const pattern = (x + y) % 4;  // 0, 1, 2 или 3
 
-  // Верхняя часть - деревянный пол
-  const woodHeight = 7 + Math.floor(random() * 3); // 7-10 пикселей для деревянной части
-  const dryWallThickness = 7; // Толщина гипсокартонной стены
+  // Высота деревянной части и количество досок зависят от шаблона
+  const woodHeight = 7 + (pattern & 3);  // 7, 8, 9 или 10
+  const boardCount = 2 + (pattern % 3);  // 2, 3 или 4
+  const dryWallThickness = 7;
+
 
   // Сначала заполняем весь блок бетонным цветом (как фон)
   context.fillStyle = concreteColor;
@@ -55,7 +53,6 @@ export function renderWoodConcreteFloor(context, width, height, x, y, options = 
     context.strokeStyle = 'rgba(100, 70, 40, 0.5)';
     context.lineWidth = 1;
 
-    const boardCount = 2 + Math.floor(random() * 3); // 2-4 доски
     const boardWidth = (width - 2) / boardCount;
 
     for (let i = 1; i < boardCount; i++) {
@@ -71,28 +68,28 @@ export function renderWoodConcreteFloor(context, width, height, x, y, options = 
     context.fillRect(width - dryWallThickness, 0, dryWallThickness, height);
 
     // Добавим текстуру гипсокартона (небольшие точки)
-    addDryWallTexture(context, width - dryWallThickness, 0, dryWallThickness, height, random);
+    addDryWallTexture(context, width - dryWallThickness, 0, dryWallThickness, height);
   } else if (type === 'W') {
     // Вертикальная гипсокартонная стена слева
     context.fillStyle = dryWallColor;
     context.fillRect(0, 0, dryWallThickness, height);
 
     // Добавим текстуру гипсокартона
-    addDryWallTexture(context, 0, 0, dryWallThickness, height, random);
+    addDryWallTexture(context, 0, 0, dryWallThickness, height);
   } else if (type === 'm') {
     // Горизонтальная гипсокартонная стена снизу
     context.fillStyle = dryWallColor;
     context.fillRect(0, height - dryWallThickness, width, dryWallThickness);
 
     // Добавим текстуру гипсокартона
-    addDryWallTexture(context, 0, height - dryWallThickness, width, dryWallThickness, random);
+    addDryWallTexture(context, 0, height - dryWallThickness, width, dryWallThickness);
   } else if (type === 'w') {
     // Горизонтальная гипсокартонная стена сверху
     context.fillStyle = dryWallColor;
     context.fillRect(0, 0, width, dryWallThickness);
 
     // Добавим текстуру гипсокартона
-    addDryWallTexture(context, 0, 0, width, dryWallThickness, random);
+    addDryWallTexture(context, 0, 0, width, dryWallThickness);
   } else if (type === 'n') {
     // Горизонтальная гипсокартонная стена сверху и снизу
     context.fillStyle = dryWallColor;
@@ -100,8 +97,8 @@ export function renderWoodConcreteFloor(context, width, height, x, y, options = 
     context.fillRect(0, height - dryWallThickness, width, dryWallThickness); // Нижняя стена
 
     // Добавим текстуру гипсокартона
-    addDryWallTexture(context, 0, 0, width, dryWallThickness, random);
-    addDryWallTexture(context, 0, height - dryWallThickness, width, dryWallThickness, random);
+    addDryWallTexture(context, 0, 0, width, dryWallThickness);
+    addDryWallTexture(context, 0, height - dryWallThickness, width, dryWallThickness);
   } else if (type === 'N') {
     // Вертикальная гипсокартонная стена слева и справа
     context.fillStyle = dryWallColor;
@@ -109,8 +106,8 @@ export function renderWoodConcreteFloor(context, width, height, x, y, options = 
     context.fillRect(width - dryWallThickness, 0, dryWallThickness, height); // Правая стена
 
     // Добавим текстуру гипсокартона
-    addDryWallTexture(context, 0, 0, dryWallThickness, height, random);
-    addDryWallTexture(context, width - dryWallThickness, 0, dryWallThickness, height, random);
+    addDryWallTexture(context, 0, 0, dryWallThickness, height);
+    addDryWallTexture(context, width - dryWallThickness, 0, dryWallThickness, height);
   }
 
   // Добавляем рамку слева и справа для бетонной основы
@@ -119,13 +116,13 @@ export function renderWoodConcreteFloor(context, width, height, x, y, options = 
 
   // Добавляем несколько частиц в бетоне
   for (let i = 0; i < 50; i++) {
-    const particleX = 2 + random() * (width - 4); // Отступ 2px от краев
-    const particleY = (type === 'F' || type === 'f' ? woodHeight : dryWallThickness) + 2 + random() * (height - (type === 'F' || type === 'f' ? woodHeight : dryWallThickness) - 4);
-    const size = 0.5 + random() * 0.5;
+    const particleX = 2 + boardCount * (width - 4); // Отступ 2px от краев
+    const particleY = (type === 'F' || type === 'f' ? woodHeight : dryWallThickness) + 2 + boardCount * (height - (type === 'F' || type === 'f' ? woodHeight : dryWallThickness) - 4);
+    const size = 0.5 + boardCount * 0.5;
 
-    context.fillStyle = `rgba(${120 + Math.floor(random() * 50)}, ${
-      120 + Math.floor(random() * 50)}, ${
-      120 + Math.floor(random() * 50)}, 0.3)`;
+    context.fillStyle = `rgba(${120 + Math.floor(boardCount * 50)}, ${
+      120 + Math.floor(boardCount * 50)}, ${
+      120 + Math.floor(boardCount * 50)}, 0.3)`;
 
     context.beginPath();
     context.rect(particleX, particleY, size, size);
@@ -136,11 +133,11 @@ export function renderWoodConcreteFloor(context, width, height, x, y, options = 
   context.strokeStyle = 'rgba(100, 100, 100, 0.2)';
   context.lineWidth = 0.5;
 
-  const crackCount = Math.floor(random() * 3); // 0-2 трещины
+  const crackCount = Math.floor(boardCount * 3); // 0-2 трещины
 
   for (let i = 0; i < crackCount; i++) {
-    const startX = 5 + random() * (width - 10);
-    const startY = (type === 'F' || type === 'f' ? woodHeight : dryWallThickness) + 5 + random() * ((height - (type === 'F' || type === 'f' ? woodHeight : dryWallThickness)) / 2 - 5);
+    const startX = 5 + boardCount * (width - 10);
+    const startY = (type === 'F' || type === 'f' ? woodHeight : dryWallThickness) + 5 + boardCount * ((height - (type === 'F' || type === 'f' ? woodHeight : dryWallThickness)) / 2 - 5);
 
     context.beginPath();
     context.moveTo(startX, startY);
@@ -148,11 +145,11 @@ export function renderWoodConcreteFloor(context, width, height, x, y, options = 
     let currentX = startX;
     let currentY = startY;
 
-    const segments = 2 + Math.floor(random() * 3);
+    const segments = 2 + Math.floor(boardCount * 3);
 
     for (let j = 0; j < segments; j++) {
-      const deltaX = -3 + random() * 6;
-      const deltaY = 3 + random() * 6;
+      const deltaX = -3 + boardCount * 6;
+      const deltaY = 3 + boardCount * 6;
 
       currentX += deltaX;
       currentY += deltaY;
@@ -172,32 +169,34 @@ export function renderWoodConcreteFloor(context, width, height, x, y, options = 
 /**
  * Вспомогательная функция для добавления текстуры гипсокартона
  */
-function addDryWallTexture(context, x, y, width, height, random) {
-  // Добавляем небольшие дефекты/точки на гипсокартоне
-  for (let i = 0; i < width * height / 50; i++) {
-    const pointX = x + random() * width;
-    const pointY = y + random() * height;
+function addDryWallTexture(context, x, y, width, height, seed) {
+  // Генерируем точки на основе координат
+  const h = ((x + 67) * (y + 97)) % 256;
 
-    context.fillStyle = `rgba(150, 150, 150, ${0.1 + random() * 0.1})`;
+  // Вместо случайного числа точек - фиксированное количество,
+  // но с разными позициями для разных тайлов
+  for (let i = 0; i < 5; i++) {
+    const pointX = x + ((h * (i+1)) % width);
+    const pointY = y + ((h * (i+7)) % height);
+
+    context.fillStyle = 'rgba(150, 150, 150, 0.15)';
     context.beginPath();
-    context.arc(pointX, pointY, 0.3 + random() * 0.3, 0, Math.PI * 2);
+    context.arc(pointX, pointY, 0.4, 0, Math.PI * 2);
     context.fill();
   }
 
-  // Добавляем линию стыка гипсокартонных листов (если размер достаточно большой)
+  // Линия стыка гипсокартона
   if (width > 20 || height > 20) {
     context.strokeStyle = 'rgba(200, 200, 200, 0.5)';
     context.lineWidth = 0.5;
 
     if (width > height) {
-      // Горизонтальная линия стыка
       const lineY = y + height / 2;
       context.beginPath();
       context.moveTo(x, lineY);
       context.lineTo(x + width, lineY);
       context.stroke();
     } else {
-      // Вертикальная линия стыка
       const lineX = x + width / 2;
       context.beginPath();
       context.moveTo(lineX, y);
