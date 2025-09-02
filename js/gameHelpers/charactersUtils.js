@@ -71,8 +71,11 @@ export function updateBlackCatAttack(character, gameObjects, delta) {
           enemy.isDead = enemy.canDie
         }
         if (enemy.isDead && enemy.type === 'B') {
-          gameObjects.obstacles.forEach(obstacle => {
-            if (obstacle.type === 'f') {
+          [
+            ...gameObjects.obstacles,
+            ...gameObjects.collectables,
+          ].forEach(obstacle => {
+            if (['f','a'].includes(obstacle.type)) {
               obstacle.isVisible = true
             }
           })

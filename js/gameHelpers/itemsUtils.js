@@ -36,7 +36,7 @@ export function checkFoodCollision(character, foodItems) {
       food.collected = true
 
       // Применяем эффект в зависимости от типа еды
-      if (food.type === 'A' && character.color === 'white') {
+      if (['A','a'].includes(food.type) && character.color === 'white') {
         // Увеличиваем размер белого кота
         increaseCatSize(character)
       }
@@ -52,7 +52,9 @@ export function checkEnvironmentCollisions(player, obstacles, deltaTime, GameSta
   player.onGround = false;
   obstacles
   .forEach(obstacle => {
-    if (!collides(player, obstacle)) return;
+    if (!collides(player, obstacle)) {
+      return
+    }
 
     // вычисляем перекрытия
     const overlapX = Math.min(

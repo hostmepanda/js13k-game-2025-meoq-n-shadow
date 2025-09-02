@@ -86,7 +86,9 @@ export function levelRender({ gameData, kontra}) {
 
     if (gameObjects.collectables.length > 0) {
       renderFoodItems(context, gameObjects.collectables)
-      gameObjects.collectables.forEach(collectable => {collectable?.render?.()})
+      gameObjects.collectables
+      .filter(({ isVisible }) => isVisible)
+      .forEach(collectable => {collectable?.render?.()})
     }
 
     if (gameObjects.enemies.length > 0) {
@@ -179,7 +181,13 @@ export function updateLevel({gameStates, kontra}) {
       ],
       { PlayerState, GameState },
     )
-    checkEnvironmentCollisions(player, gameObjects.obstacles.filter(({ isVisible, collides }) => isVisible && collides), deltaTime, GameState, collides);
+    checkEnvironmentCollisions(
+      player,
+      [
+        ...gameObjects.obstacles.filter(({ isVisible, collides }) => isVisible && collides),
+        ...gameObjects.enemies.filter(({ isVisible, collides }) => isVisible && collides),
+        ]
+      , deltaTime, GameState, collides);
   })
 
   gameObjects.enemies.forEach((enemy) => {

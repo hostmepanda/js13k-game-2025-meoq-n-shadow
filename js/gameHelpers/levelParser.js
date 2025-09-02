@@ -118,8 +118,9 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
         gameObjects.obstacles.push(Sprite(cfg));
       }
 
-      if (['A'].includes(ch)) {
+      if (['A', 'a'].includes(ch)) {
         cfg.collected = false
+        cfg.isVisible = ch === 'A'
         cfg.color = 'rgba(0, 0, 0, 0)'
         cfg.render = function () {
           renderCollectibleFish(this.context, this.width, this.height, {

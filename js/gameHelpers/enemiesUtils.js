@@ -157,18 +157,6 @@ export function checkEnemyCollisions(player, enemies, states) {
             enemies[index].health = 0
             enemies[index].isAlive = false
             enemies[index].isDead = enemy.canDie
-          } else {
-            if (player.facingRight) {
-              player.x = enemy.x - player.width
-            } else {
-              player.x = enemy.x + enemy.width;
-            }
-          }
-        } else {
-          if (player.facingRight) {
-            player.x = enemy.x - player.width
-          } else {
-            player.x = enemy.x + enemy.width;
           }
         }
       } else if (enemy.type === 'E' || enemy.type === 'P' || enemy.type === 'B') {
