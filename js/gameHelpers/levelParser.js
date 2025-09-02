@@ -1,5 +1,6 @@
 import {GRAVITY_DOWN} from './utils'
 import {renderWoodConcreteFloor} from './tileHelpers'
+import {renderCollectibleFish} from './collectableHelpers'
 
 const parseToColorMapper = {
   '#': 'yellow', /* # = level exit */
@@ -119,6 +120,13 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
 
       if (['A'].includes(ch)) {
         cfg.collected = false
+        cfg.color = 'rgba(0, 0, 0, 0)'
+        cfg.render = function () {
+          renderCollectibleFish(this.context, this.width, this.height, {
+            fishColor: 'rgb(255, 210, 40)',
+            glowColor: 'rgba(255, 210, 40, 0.3)'
+          });
+        }
         gameObjects.collectables.push(Sprite(cfg));
       }
 
