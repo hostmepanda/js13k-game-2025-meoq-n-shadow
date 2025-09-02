@@ -115,22 +115,48 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
               return x - Math.floor(x);
             };
 
+            // Определяем основные цвета
+            const woodColor = "rgb(170, 120, 70)";
+            const concreteColor = "rgb(180, 180, 180)";
+
             // Верхняя часть - деревянный пол
             const woodHeight = 7 + Math.floor(random() * 3); // 7-10 пикселей для деревянной части
 
-            // Рисуем деревянную часть
-            this.context.fillStyle = "rgb(170, 120, 70)"; // Основной цвет дерева
+            // Сначала заполняем весь блок бетонным цветом (как фон)
+            this.context.fillStyle = concreteColor;
+            this.context.fillRect(0, 0, this.width, this.height);
+
+            // Затем заполняем верхнюю часть деревянным цветом
+            this.context.fillStyle = woodColor;
             this.context.fillRect(0, 0, this.width, woodHeight);
+
+            // Добавляем рамку слева и справа, которая будет иметь два цвета
+            // Верхняя часть - цвет дерева
+            this.context.fillStyle = woodColor;
+            this.context.fillRect(0, 0, 1, woodHeight); // Левая сторона
+            this.context.fillRect(this.width - 1, 0, 1, woodHeight); // Правая сторона
+
+            // Нижняя часть боковых рамок - цвет бетона
+            this.context.fillStyle = concreteColor;
+            this.context.fillRect(0, woodHeight, 1, this.height - woodHeight); // Левая сторона
+            this.context.fillRect(this.width - 1, woodHeight, 1, this.height - woodHeight); // Правая сторона
+
+            // Верхняя и нижняя рамки
+            this.context.fillStyle = woodColor;
+            this.context.fillRect(0, 0, this.width, 1); // Верхняя рамка
+
+            this.context.fillStyle = concreteColor;
+            this.context.fillRect(0, this.height - 1, this.width, 1); // Нижняя рамка
 
             // Добавляем текстуру дерева (горизонтальные волокна)
             this.context.strokeStyle = "rgba(120, 80, 40, 0.3)";
             this.context.lineWidth = 1;
 
             // Горизонтальные линии для имитации деревянных волокон
-            for (let i = 1; i < woodHeight; i += 2) {
+            for (let i = 2; i < woodHeight - 1; i += 2) {
               this.context.beginPath();
-              this.context.moveTo(0, i);
-              this.context.lineTo(this.width, i);
+              this.context.moveTo(1, i);
+              this.context.lineTo(this.width - 1, i);
               this.context.stroke();
             }
 
@@ -139,29 +165,23 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
             this.context.lineWidth = 1;
 
             const boardCount = 2 + Math.floor(random() * 3); // 2-4 доски
-            const boardWidth = this.width / boardCount;
+            const boardWidth = (this.width - 2) / boardCount;
 
             for (let i = 1; i < boardCount; i++) {
-              const x = i * boardWidth;
+              const x = i * boardWidth + 1; // +1 для учета отступа
               this.context.beginPath();
-              this.context.moveTo(x, 0);
-              this.context.lineTo(x, woodHeight);
+              this.context.moveTo(x, 1);
+              this.context.lineTo(x, woodHeight - 1);
               this.context.stroke();
             }
 
-            // Нижняя часть - бетон
-            this.context.fillStyle = "rgb(180, 180, 180)"; // Серый цвет бетона
-            this.context.fillRect(0, woodHeight, this.width, this.height - woodHeight);
-
             // Добавляем текстуру бетона (случайные точки и маленькие пятна)
-            // Используем максимальный размер пятна 1.5px и гарантируем, что они не выходят за границы
-            const maxSpotSize = 1.5;
+            const maxSpotSize = 1;
 
             for (let i = 0; i < 50; i++) {
-              // Гарантируем, что точки не выходят за границы
-              const x = maxSpotSize + random() * (this.width - maxSpotSize * 2);
-              const y = woodHeight + random() * (this.height - woodHeight - maxSpotSize * 2);
-              const size = 0.5 + random() * 1;
+              const x = 2 + random() * (this.width - 4); // Отступ 2px от краев
+              const y = woodHeight + 2 + random() * (this.height - woodHeight - 4);
+              const size = 0.5 + random() * 0.5;
 
               this.context.fillStyle = `rgba(${120 + Math.floor(random() * 50)}, ${
                 120 + Math.floor(random() * 50)}, ${
@@ -179,30 +199,27 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
             const crackCount = Math.floor(random() * 3); // 0-2 трещины
 
             for (let i = 0; i < crackCount; i++) {
-              // Надежный способ убедиться, что трещины не выходят за границы
-              const startX = 5 + random() * (this.width - 10); // отступ 5px от краев
+              const startX = 5 + random() * (this.width - 10);
               const startY = woodHeight + 5 + random() * ((this.height - woodHeight) / 2 - 5);
 
               this.context.beginPath();
               this.context.moveTo(startX, startY);
 
-              // Создаем зигзагообразную линию для трещины
               let currentX = startX;
               let currentY = startY;
 
-              const segments = 2 + Math.floor(random() * 3); // Немного уменьшили количество сегментов
+              const segments = 2 + Math.floor(random() * 3);
 
               for (let j = 0; j < segments; j++) {
-                // Меньшие смещения для уменьшения риска выхода за границы
                 const deltaX = -3 + random() * 6;
                 const deltaY = 3 + random() * 6;
 
                 currentX += deltaX;
                 currentY += deltaY;
 
-                // Жесткое ограничение, чтобы быть уверенным, что не выходим за границы
-                currentX = Math.max(1, Math.min(this.width - 1, currentX));
-                currentY = Math.max(woodHeight + 1, Math.min(this.height - 1, currentY));
+                // Ограничиваем координаты с учетом отступа 2px от края
+                currentX = Math.max(2, Math.min(this.width - 2, currentX));
+                currentY = Math.max(woodHeight + 2, Math.min(this.height - 2, currentY));
 
                 this.context.lineTo(currentX, currentY);
               }
@@ -211,11 +228,11 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
             }
 
             // Линия раздела между деревом и бетоном
-            this.context.strokeStyle = "rgba(0, 0, 0, 0.2)";
+            this.context.strokeStyle = "rgba(100, 100, 100, 0.4)";
             this.context.lineWidth = 1;
             this.context.beginPath();
-            this.context.moveTo(0, woodHeight);
-            this.context.lineTo(this.width, woodHeight);
+            this.context.moveTo(1, woodHeight);
+            this.context.lineTo(this.width - 1, woodHeight);
             this.context.stroke();
 
             this.context.restore();
