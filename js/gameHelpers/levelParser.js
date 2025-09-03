@@ -47,7 +47,7 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
           x: x * tileSize,
           y: y * tileSize,
           width: 40,
-          height: 40,
+          height: 31,
           color: 'white',
           // Добавляем физические свойства
           velocityY: 0,
@@ -57,13 +57,39 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
           onGround: false,
           alpha: 1.0, // для прозрачности
           originalWidth: 40,
-          originalHeight: 40,
+          originalHeight: 31,
           sizeMultiplier: 1,
           facingRight: true,
           isMoving: false,
           attackDamage: 10, // урон от атаки
           health: 100,
           damageInvulnerabilityLeft: 0,
+          frame: 0,
+          framesLength: 4,
+          dt: 0,
+          update(dt) {
+            this.dt += dt;
+            if (this.dt > 0.07) {   // каждые 0.3 сек смена кадра
+              this.frame = (this.frame + 1) % this.framesLength;
+              this.dt = 0;
+            }
+          },
+          render() {
+            renderCatSideView(this.context, {
+              flipX: !this.facingRight,
+              frameIndex: this.frame,
+              scale: 2,
+              colors: [
+                'rgba(0,0,0,0)',
+                '#000000',
+                '#ececec',
+                '#cfcfcf',
+                '#7a7a7a',
+                '#ecdcc9',
+                '#f26060',
+              ]
+            })
+          },
         })
       }
 
@@ -98,9 +124,32 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
           isMoving: false,
           health: 100,
           damageInvulnerabilityLeft: 0,
-          render: function () {
-            renderCatSideView(this.context, 2, { flipX: !this.facingRight })
-          }
+          frame: 0,
+          framesLength: 4,
+          dt: 0,
+          update(dt) {
+            this.dt += dt;
+            if (this.dt > 0.07) {   // каждые 0.3 сек смена кадра
+              this.frame = (this.frame + 1) % this.framesLength;
+              this.dt = 0;
+            }
+          },
+          render() {
+            renderCatSideView(this.context, {
+              flipX: !this.facingRight,
+              frameIndex: this.frame,
+              scale: 2,
+              colors: [
+                'rgba(0,0,0,0)',
+                '#000000',
+                '#a2998d',
+                '#5c5751',
+                '#413f3a',
+                '#ecdcc9',
+                '#f26060',
+              ]
+            })
+          },
         })
       }
 

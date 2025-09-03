@@ -169,6 +169,7 @@ export function updateLevel({gameStates, kontra}) {
   const cats = [gameObjects.white, gameObjects.black]
   const boss = gameObjects.enemies?.find(({ type }) => type === 'B')
   cats.forEach((player) => {
+    player.update(deltaTime)
     updateCharacterPhysics(player, deltaTime)
     checkEnemyCollisions(
       player,
