@@ -251,8 +251,9 @@ export function renderTable(context, width, height, options = {}) {
 // Рисуем торшер
 export function renderLamp(context, width, height, options = {}) {
   const {
-    shadeColor = '#FFD700', // абажур (жёлтый)
-    standColor = '#333'
+    shadeColor = '#FFD700', // абажур
+    standColor = '#333',
+    addGlow = true
   } = options;
 
   context.save();
@@ -261,7 +262,22 @@ export function renderLamp(context, width, height, options = {}) {
   const lampHeight = height * 0.8;
   const standWidth = width * 0.05;
 
-  // Ножка
+  // === СВЕЧЕНИЕ ===
+  if (addGlow) {
+    const glowGradient = context.createRadialGradient(
+      0, -lampHeight / 2 + (height * 0.15), 5,
+      0, -lampHeight / 2 + (height * 0.15), width
+    );
+    glowGradient.addColorStop(0, 'rgba(255, 255, 200, 0.6)');
+    glowGradient.addColorStop(1, 'rgba(255, 255, 200, 0)');
+
+    context.fillStyle = glowGradient;
+    context.beginPath();
+    context.ellipse(0, -lampHeight / 2 + (height * 0.2), width * 0.9, height * 0.7, 0, 0, Math.PI * 2);
+    context.fill();
+  }
+
+  // === НОЖКА ===
   context.fillStyle = standColor;
   context.beginPath();
   context.rect(-standWidth / 2, -lampHeight / 2, standWidth, lampHeight);
@@ -270,7 +286,7 @@ export function renderLamp(context, width, height, options = {}) {
   context.lineWidth = 2;
   context.stroke();
 
-  // Абажур
+  // === АБАЖУР ===
   const shadeWidth = width * 0.6;
   const shadeHeight = height * 0.3;
   context.fillStyle = shadeColor;
@@ -353,7 +369,7 @@ export function renderPalmTree(context, width, height, options = {}) {
   const {
     potColor = '#8B0000',
     trunkColor = '#8B5A2B',
-    leafColor = '#228B22'
+    leafColors = ['#7ada7a','#ffe335','#f6ffa7','#fb6c37','#228B22','#229B22']
   } = options;
 
   context.save();
@@ -384,9 +400,10 @@ export function renderPalmTree(context, width, height, options = {}) {
   context.stroke();
 
   // Листья (несколько направлений)
-  context.fillStyle = leafColor;
   const leafAngles = [-60, -30, 0, 30, 60, 90]; // углы в градусах
-  leafAngles.forEach(angle => {
+  leafAngles.forEach((angle, index) => {
+    context.fillStyle = leafColors[index];
+
     const rad = angle * Math.PI / 180;
     context.save();
     context.translate(0, height / 2 - potHeight - trunkHeight -5); // верх ствола

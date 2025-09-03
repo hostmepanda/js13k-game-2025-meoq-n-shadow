@@ -33,7 +33,7 @@ export const LEVEL_MAPS = {
     "N...FF...........FFfffN..................................FFFFffff...............f.........................ffffffffffffff.............................mmmmmmmmmmmmmmm..........NN.........N.............N",
     "N.....................X.....................................FFFFFffff...........fFFFFFFFFFFF............................fffffffffffffXXXXX........a..A..............XXXXfffffffffffffffffN.............N",
     "N.....................XXX.......A....................................ffff.......f...................................................XXXXXXffffffff.................a.....................N.............N",
-    "N.......B.......Q.....XXX............D.......d.....QQ.......D............fffffff.......dd....dd..................................d..X.............ffffffffffffff......d............Q.....N.............N",
+    "N.......B.......Q.....XXX...........DdD.......d.....QQ.......D............fffffff.......Dd....dD..................................d..X.............ffffffffffffff......d............Q.....N.............N",
     "WFFFFFFFFFFFFFFFFFFFFFFFXXXXFXXFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF....FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF....FFF...FFFF............FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF........N",
     "WmmmmmmmmmmmmmmmmmmmmmmXXXXXXXXmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm....mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm....mmm...mmmm...............mmmmmmmmmmmmmmmmmmmmmmmmmmmmN........N",
     "N............................ff..........................................................................................................................................................N.............N",
@@ -43,7 +43,7 @@ export const LEVEL_MAPS = {
     "N..........................................................................................................................................ff........................W...................N.............N",
     "N..........F...............ff................................................................................................................ff..................mmmmW...................Nffffffffff...N",
     "N..........M.............................................................................................................................................................................N...........##N",
-    "N...Q.D....MDDd..............d...............Dd.Q.....................DdDD.........Qd.........................dD.D......................Dd....QD....................................DD...N......D....##N",
+    "N...Q.D....M.D.DQ...d........d...............Dd.Q.....................DdDD.........Qd.........................dD.D......................Dd....QD....................................DD...N......D....##N",
     "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
   ],
   [GAME_STATE.LEVEL2]: [
