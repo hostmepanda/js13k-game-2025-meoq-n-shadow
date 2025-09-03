@@ -116,51 +116,15 @@ export function renderWoodConcreteFloor(context, width, height, x, y, options = 
 
   // Добавляем несколько частиц в бетоне
   for (let i = 0; i < 50; i++) {
-    const particleX = 2 + boardCount * (width - 4); // Отступ 2px от краев
-    const particleY = (type === 'F' || type === 'f' ? woodHeight : dryWallThickness) + 2 + boardCount * (height - (type === 'F' || type === 'f' ? woodHeight : dryWallThickness) - 4);
+    const particleX = 2 + boardCount * (width - 17); // Отступ 2px от краев
+    const particleY = (type === 'F' || type === 'f' ? woodHeight : dryWallThickness) + 2 + boardCount * (height - (type === 'F' || type === 'f' ? woodHeight : dryWallThickness) - 4) - 20;
     const size = 0.5 + boardCount * 0.5;
 
-    context.fillStyle = `rgba(${120 + Math.floor(boardCount * 50)}, ${
-      120 + Math.floor(boardCount * 50)}, ${
-      120 + Math.floor(boardCount * 50)}, 0.3)`;
+    context.fillStyle = `rgba(110, 110, 110, 0.68)`;
 
     context.beginPath();
-    context.rect(particleX, particleY, size, size);
+    context.rect(particleX, particleY, 1.2, 1.2);
     context.fill();
-  }
-
-  // Добавляем несколько трещин в бетоне
-  context.strokeStyle = 'rgba(100, 100, 100, 0.2)';
-  context.lineWidth = 0.5;
-
-  const crackCount = Math.floor(boardCount * 3); // 0-2 трещины
-
-  for (let i = 0; i < crackCount; i++) {
-    const startX = 5 + boardCount * (width - 10);
-    const startY = (type === 'F' || type === 'f' ? woodHeight : dryWallThickness) + 5 + boardCount * ((height - (type === 'F' || type === 'f' ? woodHeight : dryWallThickness)) / 2 - 5);
-
-    context.beginPath();
-    context.moveTo(startX, startY);
-
-    let currentX = startX;
-    let currentY = startY;
-
-    const segments = 2 + Math.floor(boardCount * 3);
-
-    for (let j = 0; j < segments; j++) {
-      const deltaX = -3 + boardCount * 6;
-      const deltaY = 3 + boardCount * 6;
-
-      currentX += deltaX;
-      currentY += deltaY;
-
-      // Ограничиваем координаты для отступа от края
-      currentX = Math.max(2, Math.min(width - 2, currentX));
-      currentY = Math.max((type === 'F' || type === 'f' ? woodHeight : dryWallThickness) + 2, Math.min(height - 2, currentY));
-
-      context.lineTo(currentX, currentY);
-    }
-    context.stroke();
   }
 
   context.restore();
@@ -169,7 +133,7 @@ export function renderWoodConcreteFloor(context, width, height, x, y, options = 
 /**
  * Вспомогательная функция для добавления текстуры гипсокартона
  */
-function addDryWallTexture(context, x, y, width, height, seed) {
+function addDryWallTexture(context, x, y, width, height) {
   // Генерируем точки на основе координат
   const h = ((x + 67) * (y + 97)) % 256;
 

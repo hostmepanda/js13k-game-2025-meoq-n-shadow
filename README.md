@@ -5,9 +5,10 @@ TODO:
 - [X] fix start over mechanics
 - [X] fix collision
 - [X] Boss firing
+- [X] parallax background
+- [] cleanup artefacts
 - [] Fix collision for enemies
 - [] +2 types of enemy: shooting and flying?
-- [] parallax background
 - [] cut scenes
 - [] designs
 - [] add music and sounds

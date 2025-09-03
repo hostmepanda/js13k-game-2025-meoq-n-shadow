@@ -107,7 +107,15 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
         cfg.collides = true
         if (['W','M','m','N','w','F','f'].includes(ch)) {
           cfg.render = function () {
-            renderWoodConcreteFloor(this.context, this.width, this.height, this.x, this.y, {type: this.type})
+            // if (ch === 'U') {
+            //   this.context.save();
+            //   this.context.translate(this.width/2, this.height/2);
+            //   this.context.rotate(Math.PI / 2); // 90 градусов
+            //   renderWoodConcreteFloor(this.context, this.width, this.height, this.x, this.y, {type: 'm'});
+            //   this.context.restore();
+            // } else {
+              renderWoodConcreteFloor(this.context, this.width, this.height, this.x, this.y, {type: this.type})
+            // }
           }
         }
         gameObjects.obstacles.push(Sprite(cfg));
