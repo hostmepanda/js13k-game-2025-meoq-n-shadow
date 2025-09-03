@@ -1,6 +1,7 @@
 import {GRAVITY_DOWN} from './utils'
 import {renderLamp, renderPalmTree, renderPottedTree, renderTable, renderWoodConcreteFloor} from './tileHelpers'
 import {renderCollectibleFish} from './collectableHelpers'
+import {renderCatSideView} from './catHelpers'
 
 const parseToColorMapper = {
   '#': 'yellow', /* # = level exit */
@@ -71,8 +72,8 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
           x: x * tileSize,
           y: y * tileSize,
           width: 40,
-          height: 40,
-          color: 'black',
+          height: 31,
+          color: 'rgba(0,0,0,0)',
           // Добавляем физические свойства
           velocityY: 0,
           isJumping: true,
@@ -97,6 +98,9 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
           isMoving: false,
           health: 100,
           damageInvulnerabilityLeft: 0,
+          render: function () {
+            renderCatSideView(this.context, 2, { flipX: !this.facingRight })
+          }
         })
       }
 
