@@ -226,24 +226,36 @@ export function renderTable(context, width, height, options = {}) {
   context.rect(-tableWidth / 2, -tableHeight / 2, tableWidth, tableHeight);
   context.fill();
   context.strokeStyle = 'black';
-  context.lineWidth = 2;
+  context.lineWidth = 1;
   context.stroke();
 
   // Ножки
   const legWidth = tableWidth * 0.1;
   const legHeight = height * 0.4;
   context.fillStyle = legColor;
-  [-1, 1].forEach(side => {
-    context.beginPath();
-    context.rect(
-      side * (tableWidth / 2 - legWidth / 2),
-      tableHeight / 2,
-      legWidth,
-      legHeight
-    );
-    context.fill();
-    context.stroke();
-  });
+
+  context.beginPath();
+  context.rect(
+    1 * (tableWidth / 2 - legWidth / 2 - 2),
+    tableHeight / 2,
+    legWidth,
+    legHeight
+  );
+  context.fill();
+  context.lineWidth = 1;
+  context.stroke();
+
+  context.beginPath();
+  context.rect(
+    -1 * (tableWidth / 2 - legWidth / 2 + 1),
+    tableHeight / 2,
+    legWidth,
+    legHeight
+  );
+  context.fill();
+  context.lineWidth = 1
+  context.stroke();
+
 
   context.restore();
 }
