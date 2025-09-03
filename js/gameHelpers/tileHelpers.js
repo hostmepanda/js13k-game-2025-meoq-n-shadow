@@ -205,3 +205,199 @@ function addDryWallTexture(context, x, y, width, height, seed) {
     }
   }
 }
+
+
+// Рисуем стол
+export function renderTable(context, width, height, options = {}) {
+  const {
+    tableColor = '#8B4513', // коричневый
+    legColor = '#5C3317'
+  } = options;
+
+  context.save();
+  context.translate(width / 2, height / 2);
+
+  const tableWidth = width * 0.8;
+  const tableHeight = height * 0.2;
+
+  // Столешница
+  context.fillStyle = tableColor;
+  context.beginPath();
+  context.rect(-tableWidth / 2, -tableHeight / 2, tableWidth, tableHeight);
+  context.fill();
+  context.strokeStyle = 'black';
+  context.lineWidth = 2;
+  context.stroke();
+
+  // Ножки
+  const legWidth = tableWidth * 0.1;
+  const legHeight = height * 0.4;
+  context.fillStyle = legColor;
+  [-1, 1].forEach(side => {
+    context.beginPath();
+    context.rect(
+      side * (tableWidth / 2 - legWidth / 2),
+      tableHeight / 2,
+      legWidth,
+      legHeight
+    );
+    context.fill();
+    context.stroke();
+  });
+
+  context.restore();
+}
+
+// Рисуем торшер
+export function renderLamp(context, width, height, options = {}) {
+  const {
+    shadeColor = '#FFD700', // абажур (жёлтый)
+    standColor = '#333'
+  } = options;
+
+  context.save();
+  context.translate(width / 2, height / 2);
+
+  const lampHeight = height * 0.8;
+  const standWidth = width * 0.05;
+
+  // Ножка
+  context.fillStyle = standColor;
+  context.beginPath();
+  context.rect(-standWidth / 2, -lampHeight / 2, standWidth, lampHeight);
+  context.fill();
+  context.strokeStyle = 'rgb(246,255,167)';
+  context.lineWidth = 2;
+  context.stroke();
+
+  // Абажур
+  const shadeWidth = width * 0.6;
+  const shadeHeight = height * 0.3;
+  context.fillStyle = shadeColor;
+  context.beginPath();
+  context.moveTo(-shadeWidth / 2, -lampHeight / 2);
+  context.lineTo(shadeWidth / 2, -lampHeight / 2);
+  context.lineTo(shadeWidth * 0.4, -lampHeight / 2 + shadeHeight);
+  context.lineTo(-shadeWidth * 0.4, -lampHeight / 2 + shadeHeight);
+  context.closePath();
+  context.fill();
+  context.stroke();
+
+  context.restore();
+}
+
+// Рисуем дерево в горшке
+export function renderPottedTree(context, width, height, options = {}) {
+  const {
+    potColor = '#bc8000',
+    trunkColor = '#654321',
+    foliageColor = '#228B22'
+  } = options;
+
+  context.save();
+  context.translate(width / 2, height / 2);
+
+  const potHeight = height * 0.2;
+  const potWidth = width * 0.5;
+  const trunkHeight = height * 0.25;
+  const trunkWidth = width * 0.1;
+
+  // Горшок
+  context.fillStyle = potColor;
+  context.beginPath();
+  context.rect(-potWidth / 2, height / 2 - potHeight - 5, potWidth, potHeight);
+  context.fill();
+  context.strokeStyle = 'rgba(133,73,0,0.66)';
+  context.lineWidth = 2;
+  context.stroke();
+
+  // Ствол
+  context.fillStyle = trunkColor;
+  context.beginPath();
+  context.rect(-trunkWidth / 2, height / 2 - potHeight - trunkHeight - 5, trunkWidth, trunkHeight);
+  context.fill();
+  context.stroke();
+
+  // Елочка (3 "яруса" из треугольников)
+  context.fillStyle = foliageColor;
+  context.strokeStyle = 'rgba(99,213,99,0.51)';
+  context.lineWidth = 2;
+
+  const topY = height / 2 - potHeight - trunkHeight - 15; // верх ствола
+
+  const layerHeights = [height * 0.25, height * 0.42, height * 0.67]; // высота ярусов
+  const layerWidths = [width * 0.3, width * 0.45, width * 0.6];      // ширина ярусов
+
+  let currentY = topY;
+  for (let i = 0; i < 3; i++) {
+    const h = layerHeights[i];
+    const w = layerWidths[i];
+
+    context.beginPath();
+    context.moveTo(0, currentY - 5 );   // верхушка яруса
+    context.lineTo(-w / 2, currentY - h - 3 * i);  // левый низ
+    context.lineTo(w / 2, currentY - h + 3 * i + i);   // правый низ
+    context.closePath();
+    context.fill();
+    context.stroke();
+
+    currentY += h * 0.9; // смещение вниз, чтобы ярусы перекрывались
+  }
+
+  context.restore();
+}
+
+
+// Рисуем пальму в горшке
+export function renderPalmTree(context, width, height, options = {}) {
+  const {
+    potColor = '#8B0000',
+    trunkColor = '#8B5A2B',
+    leafColor = '#228B22'
+  } = options;
+
+  context.save();
+  context.translate(width / 2, height / 2);
+
+  const potHeight = height * 0.2;
+  const potWidth = width * 0.4;
+  const trunkHeight = height * 0.4;
+  const trunkWidth = width * 0.08;
+  const leafLength = width * 0.35;
+  const leafWidth = width * 0.12;
+
+  // Горшок
+  context.fillStyle = potColor;
+  context.beginPath();
+  context.rect(-potWidth / 2, height / 2 - potHeight - 5, potWidth, potHeight);
+  context.fill();
+  context.strokeStyle = 'black';
+  context.lineWidth = 1;
+  context.stroke();
+
+  // Ствол
+  context.fillStyle = trunkColor;
+  context.beginPath();
+  context.rect(-trunkWidth / 2, height / 2 - potHeight - trunkHeight - 5, trunkWidth, trunkHeight);
+  context.fill();
+  context.strokeStyle = 'rgba(133,73,0,0.66)';
+  context.stroke();
+
+  // Листья (несколько направлений)
+  context.fillStyle = leafColor;
+  const leafAngles = [-60, -30, 0, 30, 60, 90]; // углы в градусах
+  leafAngles.forEach(angle => {
+    const rad = angle * Math.PI / 180;
+    context.save();
+    context.translate(0, height / 2 - potHeight - trunkHeight -5); // верх ствола
+    context.rotate(rad);
+    context.beginPath();
+    context.ellipse(0, 0, leafLength, leafWidth, 0, 0, Math.PI * 2);
+    context.fill();
+    context.strokeStyle = 'rgb(172,188,0)';
+    context.stroke();
+    context.restore();
+  });
+
+  context.restore();
+}

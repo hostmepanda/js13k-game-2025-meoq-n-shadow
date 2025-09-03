@@ -1,5 +1,5 @@
 import {GRAVITY_DOWN} from './utils'
-import {renderWoodConcreteFloor} from './tileHelpers'
+import {renderLamp, renderPalmTree, renderPottedTree, renderTable, renderWoodConcreteFloor} from './tileHelpers'
 import {renderCollectibleFish} from './collectableHelpers'
 
 const parseToColorMapper = {
@@ -113,8 +113,37 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
         gameObjects.obstacles.push(Sprite(cfg));
       }
 
-      if (['L','c','T','f','D','O','R'].includes(ch)) {
+      if (['L','c','T','f','D','O','R','Q', 'd'].includes(ch)) {
         cfg.collides = false
+        if (ch === 'Q') {
+          cfg.width = 40
+          cfg.height = 40
+          cfg.y = y * tileSize - tileSize + 5
+          cfg.render = function () {
+            renderLamp(this.context, this.width , this.height)
+          }
+        } else if (ch === 'T') {
+          cfg.width = 40
+          cfg.height = 40
+          cfg.y = y * tileSize - tileSize + 5
+          cfg.render = function () {
+            renderTable(this.context, this.width , this.height)
+          }
+        } else if (ch === 'D') {
+          cfg.width = 40
+          cfg.height = 40
+          cfg.y = y * tileSize - tileSize + 5
+          cfg.render = function () {
+            renderPalmTree(this.context, this.width , this.height)
+          }
+        } else if (ch === 'd') {
+          cfg.width = 40
+          cfg.height = 40
+          cfg.y = y * tileSize - tileSize + 5
+          cfg.render = function () {
+            renderPottedTree(this.context, this.width , this.height)
+          }
+        }
         gameObjects.obstacles.push(Sprite(cfg));
       }
 

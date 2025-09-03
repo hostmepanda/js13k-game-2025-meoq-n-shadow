@@ -85,7 +85,7 @@ export function levelRender({ gameData, kontra}) {
     }
 
     if (gameObjects.collectables.length > 0) {
-      renderFoodItems(context, gameObjects.collectables)
+      renderFoodItems(context, gameObjects.collectables.filter(({ isVisible }) => isVisible))
       gameObjects.collectables
       .filter(({ isVisible }) => isVisible)
       .forEach(collectable => {collectable?.render?.()})
