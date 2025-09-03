@@ -2,19 +2,16 @@
 import {GRAVITY_DOWN, GRAVITY_UP, MAX_FALL_SPEED} from './utils'
 
 export function increaseCatSize(character) {
-  // Максимальный множитель размера: 4
-  const MAX_SIZE_MULTIPLIER = 4
-
   // Увеличиваем множитель на определенное значение
   const sizeIncrement = 0.5 // Каждая еда увеличивает размер на 50%
 
   // Проверяем, не достигли ли максимального размера
-  if (character.sizeMultiplier < MAX_SIZE_MULTIPLIER) {
+  if (character.sizeMultiplier < character.maxSizeMultiplier) {
     // Запоминаем текущую позицию "ног" персонажа
     const bottomY = character.y + character.height
 
     // Увеличиваем множитель размера
-    character.sizeMultiplier = Math.min(MAX_SIZE_MULTIPLIER, character.sizeMultiplier + sizeIncrement)
+    character.sizeMultiplier = Math.min(character.maxSizeMultiplier, character.sizeMultiplier + sizeIncrement)
 
     // Применяем новый размер
     character.width = character.originalWidth * character.sizeMultiplier
@@ -23,20 +20,15 @@ export function increaseCatSize(character) {
     // Корректируем позицию Y, чтобы "ноги" оставались на том же уровне
     character.y = bottomY - character.height
 
-    // Регулируем физические параметры в зависимости от размера
-    // Чем больше кот, тем ниже он прыгает
-    const BASE_JUMP_FORCE = -550
-    const BASE_MOVE_SPEED = 200
-
     // Чем больше кот, тем ниже он прыгает
     // При размере 1 -> 100% силы прыжка
     // При размере 4 -> примерно 40% силы прыжка
-    character.jumpForce = BASE_JUMP_FORCE * (1 / (1 + (character.sizeMultiplier - 1) * 0.5))
+    character.jumpForce = character.originalJumpForce * (1 / (1 + (character.sizeMultiplier - 1) * 0.5))
 
     // Чем больше кот, тем медленнее он двигается
     // При размере 1 -> 100% скорости
     // При размере 4 -> примерно 45% скорости
-    character.moveSpeed = BASE_MOVE_SPEED * (1 / (1 + (character.sizeMultiplier - 1) * 0.4))
+    character.moveSpeed = character.originalMoveSpeed * (1 / (1 + (character.sizeMultiplier - 1) * 0.4))
   }
 }
 

@@ -47,7 +47,7 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
           x: x * tileSize,
           y: y * tileSize,
           width: 40,
-          height: 31,
+          height: 51,
           color: 'white',
           // Добавляем физические свойства
           velocityY: 0,
@@ -56,9 +56,12 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
           moveSpeed: 200,
           onGround: false,
           alpha: 1.0, // для прозрачности
+          originalJumpForce: -450,
+          originalMoveSpeed: 200,
           originalWidth: 40,
           originalHeight: 31,
           sizeMultiplier: 1,
+          maxSizeMultiplier: 2,
           facingRight: true,
           isMoving: false,
           attackDamage: 10, // урон от атаки
@@ -78,7 +81,9 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
             renderCatSideView(this.context, {
               flipX: !this.facingRight,
               frameIndex: this.frame,
-              scale: 2,
+              scale: this.sizeMultiplier + 1,
+              width: this.width,
+              heightShift: this.height -this.originalHeight,
               colors: [
                 'rgba(0,0,0,0)',
                 '#000000',

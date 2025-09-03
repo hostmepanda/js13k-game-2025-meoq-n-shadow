@@ -87,16 +87,24 @@ export function renderCatSideView(ctx, options = {
     ],
   ]
   const frame = frames?.[options.frameIndex] ?? frames[0]
-  drawPixels(ctx, frame, { scale: options.scale, flipX: options.flipX, colors: options.colors })
+  ctx.fillStyle = 'rgba(0,0,0)'
+  ctx.fillRect(0, 0, options.width, options.height)
+  drawPixels(ctx, frame, {
+    scale: options.scale,
+    flipX: options.flipX,
+    colors: options.colors,
+    shiftY: options.heightShift,
+  })
 }
 
-function drawPixels(ctx, pixels, { scale, colors, flipX }) {
+function drawPixels(ctx, pixels, { scale, colors, flipX, shiftY = 0 }) {
   for (let j = 0; j < pixels.length; j++) {
     for (let i = 0; i < pixels[j].length; i++) {
       const p = pixels[j][i];
       ctx.fillStyle = colors[p];
-      const x = flipX ? (20 - 1 - i) * scale : i * scale;
-      ctx.fillRect(x, j*scale, scale, scale);
+      const x = flipX ? (20 - 1 - i) * scale : i * scale
+      const y = j * scale + (scale >= 2.2 ? shiftY / 2 : shiftY)
+      ctx.fillRect(x, y, scale, scale);
     }
   }
 }

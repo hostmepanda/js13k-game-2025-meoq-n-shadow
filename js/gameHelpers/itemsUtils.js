@@ -22,7 +22,7 @@ export function checkFoodCollision(character, foodItems) {
     const food = foodItems[i]
 
     // Пропускаем уже собранную еду
-    if (food.collected) {
+    if (food.collected || character.sizeMultiplier >= character.maxSizeMultiplier) {
       continue
     }
 
