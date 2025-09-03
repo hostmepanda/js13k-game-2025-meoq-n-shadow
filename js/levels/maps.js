@@ -27,7 +27,7 @@ export const LEVEL_MAPS = {
     // 39 F one screen width
     "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
     "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
-    "N...21................X...................................................a.....X....................................................................W.............M..................a..X.............N",
+    "N.....................X...................................................a.....X....................................................................W.............M..................a..X.............N",
     "N.....................X.........................................................X....................................................................W.............M.....................X.............N",
     "N.................a...NFFFFffffffffffffffffffffffffffffffffff...................fffffffffffffffffffffffffff..........................................W.............M..........ff.........F.............N",
     "N...FF...........FFfffN..................................FFFFffff...............f.........................ffffffffffffff.............................mmmmmmmmmmmmmmm..........NN.........N.............N",
@@ -37,7 +37,7 @@ export const LEVEL_MAPS = {
     "WFFFFFFFFFFFFFFFFFFFFFFFXXXXFXXFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF....FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF....FFF...FFFF............FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF........N",
     "WmmmmmmmmmmmmmmmmmmmmmmXXXXXXXXmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm....mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm....mmm...mmmm...............mmmmmmmmmmmmmmmmmmmmmmmmmmmmN........N",
     "N............................ff..........................................................................................................................................................N.............N",
-    "N.......................ff...........................................................................................................ff............FFFFXXXXFFFF..........................N.........d...N",
+    "N..2..1.................ff...........................................................................................................ff............FFFFXXXXFFFF..........................N.........d...N",
     "N..........A...........................................................................................................................ff......................FFFFFFF...................N...ffffffffffN",
     "N...............................ff.......................................................................................................ff..........................W...................N.............N",
     "N..........................................................................................................................................ff........................W...................N.............N",

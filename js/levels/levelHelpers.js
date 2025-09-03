@@ -8,6 +8,7 @@ import {updateBlackCatAttack, updateCharacterPhysics} from '../gameHelpers/chara
 import {checkEnemyCollisions, checkEnemyCollisionWithEnvironment, createPoop} from '../gameHelpers/enemiesUtils'
 import {CANVAS, GAME_STATE} from '../consts'
 import {PlayerState as DefaultPlayerState} from '../states/player'
+import {renderParallaxBackground} from '../gameHelpers/backgroundHelpers'
 
 export function createLevel({ selectedLevel, gameStates, kontra}) {
   const {Sprite, canvas} = kontra
@@ -68,14 +69,10 @@ export function levelRender({ gameData, kontra}) {
   const { canvas, context} = kontra
   context.clearRect(0, 0, canvas.width, canvas.height)
 
-  renderBackground(context, canvas)
-  renderWithCamera(context, GameState.camera, (ctx) => {
-    if (gameObjects.backgrounds.length > 0) {
-      gameObjects.backgrounds.forEach(background => {
-        background.render()
-      })
-    }
+  // renderBackground(context, canvas)
+  renderParallaxBackground(context, GameState.camera.width, GameState.camera.height, GameState.camera.x, GameState.camera.y)
 
+  renderWithCamera(context, GameState.camera, (ctx) => {
     if (gameObjects.obstacles.length > 0) {
       gameObjects.obstacles
       .filter(obstacle => obstacle.isVisible)
