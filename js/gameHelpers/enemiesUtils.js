@@ -18,13 +18,15 @@ export function checkEnemyCollisionWithEnvironment(obstacles, enemy) {
       // Проверка боковых столкновений
       else if (enemy.velocityX > 0 && enemy.x + enemy.width > obstacle.x &&
         enemy.x < obstacle.x) {
+        console.log('// Столкновение справа')
         // Столкновение справа
         enemy.x = obstacle.x - enemy.width
         enemy.direction = 'left'
         enemy.velocityX *= -1
       } else if (enemy.velocityX < 0 && enemy.x < obstacle.x + obstacle.width &&
         enemy.x + enemy.width > obstacle.x + obstacle.width) {
-        // Столкновение слева
+        console.log('// Столкновение cлева')
+
         enemy.x = obstacle.x + obstacle.width
         enemy.direction = 'right'
         enemy.velocityX *= -1
@@ -38,7 +40,7 @@ export function createPoop(character, gameObjects, Sprite) {
   // Проверяем, достаточно ли большой размер кота
   if (character.sizeMultiplier > 1) {
     // Уменьшаем размер кота после какания
-    const poopSizeReduction = 0.2 // Уменьшение размера на 20%
+    const poopSizeReduction = 0.25 // Уменьшение размера на 25%
 
     // Запоминаем текущую позицию "ног" персонажа
     const bottomY = character.y + character.height
@@ -53,24 +55,15 @@ export function createPoop(character, gameObjects, Sprite) {
     // Корректируем позицию Y, чтобы "ноги" оставались на том же уровне
     character.y = bottomY - character.height
 
-    // Регулируем физические параметры в зависимости от размера
-    const BASE_JUMP_FORCE = -550
-    const BASE_MOVE_SPEED = 200
+    character.jumpForce = character.originalJumpForce * (1 / (1 + (character.sizeMultiplier - 1) * 0.5))
+    character.moveSpeed = character.originalMoveSpeed * (1 / (1 + (character.sizeMultiplier - 1) * 0.4))
 
-    // Обновляем силу прыжка и скорость после изменения размера
-    character.jumpForce = BASE_JUMP_FORCE * (1 / (1 + (character.sizeMultiplier - 1) * 0.5))
-    character.moveSpeed = BASE_MOVE_SPEED * (1 / (1 + (character.sizeMultiplier - 1) * 0.4))
-
-    // Создаем какашку
     const poopSize = 15 + (character.sizeMultiplier - 1) * 5 // Размер какашки зависит от размера кота
 
     // Определяем положение какашки под котом
-    const poopX = character.direction === 'left'
-      ? character.x + character.width - poopSize / 2
-      : character.x + poopSize / 2
-
-    // Импортируем Sprite из Kontra.js (должно быть в начале файла)
-    // import { Sprite } from '../engine/kontra.mjs';
+    const poopX = character.facingRight
+      ? character.x - poopSize / 2
+      : character.x + character.width - poopSize / 2
 
     // Создаем спрайт какашки с помощью Kontra.js
     const poop = Sprite({

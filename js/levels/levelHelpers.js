@@ -2,7 +2,7 @@ import {loadLevel, updateCamera} from '../states/game'
 import {parseLevel} from '../gameHelpers/levelParser'
 import {initKeyboardControls} from '../gameHelpers/keyboard'
 import {LEVEL_MAPS} from './maps'
-import {JUMP_FORCE, MOVE_SPEED, renderBackground, renderUI, renderWithCamera} from '../gameHelpers/utils'
+import {JUMP_FORCE, MOVE_SPEED, renderUI, renderWithCamera} from '../gameHelpers/utils'
 import {checkEnvironmentCollisions, checkFoodCollision, renderFoodItems} from '../gameHelpers/itemsUtils'
 import {updateBlackCatAttack, updateCharacterPhysics} from '../gameHelpers/charactersUtils'
 import {checkEnemyCollisions, checkEnemyCollisionWithEnvironment, createPoop} from '../gameHelpers/enemiesUtils'
@@ -192,8 +192,8 @@ export function updateLevel({gameStates, kontra}) {
     enemy.update(deltaTime)
     checkEnemyCollisionWithEnvironment(
       [
-        ...gameObjects.obstacles.filter(({ collides }) => collides),
-        ...gameObjects.enemies.filter(({ collides }) => collides),
+        ...gameObjects.obstacles.filter(({ collides, isVisible }) => collides && isVisible),
+        ...gameObjects.enemies.filter(({ collides, isVisible }) => collides && isVisible),
       ],
       enemy,
     )
@@ -257,8 +257,6 @@ export function updateLevel({gameStates, kontra}) {
   updateCamera(GameState, activeCharacter)
 
   // Визуальное обозначение активного персонажа
-  gameObjects.white.alpha = PlayerState.activeCharacter === 'white' ? 1.0 : 0.7
-  gameObjects.black.alpha = PlayerState.activeCharacter === 'black' ? 1.0 : 0.7
   gameObjects.enemies = gameObjects.enemies.filter(({ isDead }) => !isDead )
   gameObjects.collectables = gameObjects.collectables.filter(({ collected }) => !collected )
   if (!gameObjects.white.isAlive || !gameObjects.black.isAlive) {
