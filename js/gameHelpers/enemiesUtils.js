@@ -122,7 +122,6 @@ export function createPoop(character, gameObjects, Sprite) {
             this.width *= growFactor
             this.height *= growFactor
             this.velocityX = this.direction === 'left' ? -50 : 50
-            console.log('Какашка превратилась в монстра!')
           }
         }
         if (this.isMonster) {
