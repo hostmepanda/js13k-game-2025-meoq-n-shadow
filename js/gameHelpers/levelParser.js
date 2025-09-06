@@ -166,8 +166,6 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
               }
             }
             this.damageInvulnerabilityLeft = Math.max(0, this.damageInvulnerabilityLeft - this.dt);
-            console.log(this.damageInvulnerabilityLeft)
-
           },
           render() {
             const isJumping = this.isJumping
