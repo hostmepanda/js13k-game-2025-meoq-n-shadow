@@ -459,6 +459,32 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
               // }
             }
           };
+          cfg.render = function() {
+            // корпус (низкая шайба)
+            this.context.fillStyle = "#555";
+            this.context.beginPath();
+            this.context.rect(0, this.height - 8, this.width, 10); // прямоугольник-основа
+            this.context.fill();
+
+            // корпус (низкая шайба)
+            this.context.fillStyle = "#b1b1b1";
+            this.context.beginPath();
+            this.context.rect(0, this.height - 13, this.width, 5); // прямоугольник-основа
+            this.context.fill();
+
+            // сенсор (выпуклость сверху)
+            this.context.fillStyle = "#222";
+            this.context.beginPath();
+            this.context.rect(0, this.height - 19, this.width*0.2, this.height *0.3);
+            this.context.fill();
+
+            // кнопка на крышке
+            this.context.fillStyle = "#0f0";
+            this.context.beginPath();
+            this.context.arc(13, this.height - 15, this.height*0.15, 0, Math.PI*2);
+            this.context.fill();
+          }
+
         }
         if (ch === 'X') {
           cfg.isMonster = false
