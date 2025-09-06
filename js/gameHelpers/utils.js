@@ -15,6 +15,18 @@ export function isCollided(a, b) {
     a.y + a.height > b.y;
 }
 
+export function drawPixels(ctx, pixels, { scale, colors, flipX, shiftY = 0 }) {
+  for (let j = 0; j < pixels.length; j++) {
+    for (let i = 0; i < pixels[j].length; i++) {
+      const p = pixels[j][i];
+      ctx.fillStyle = colors[p];
+      const x = flipX ? (20 - 1 - i) * scale : i * scale
+      const y = j * scale + (scale >= 2.2 ? shiftY / 2 : shiftY)
+      ctx.fillRect(x, y, scale, scale);
+    }
+  }
+}
+
 export function renderWithCamera(context, camera, drawFunction) {
   context.save()
 

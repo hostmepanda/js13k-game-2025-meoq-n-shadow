@@ -1,4 +1,6 @@
 pixel kit and packs are taken from itch.io
+cats https://bowpixel.itch.io/meow-cat-85-animation?download
+
 
 TODO:
 - [X] Cats death and game over screens

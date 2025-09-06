@@ -1,3 +1,5 @@
+import {drawPixels} from './utils'
+
 export function renderCatSideView(ctx, options = {
   pose: 'idle',
   flipX: false,
@@ -156,7 +158,6 @@ export function renderCatSideView(ctx, options = {
     ],
   ]
   let frame
-  console.log(options.pose)
   if (options.pose === 'idle') {
     frame = idleFrames?.[options.frameIndex] ?? idleFrames[0]
   } else if (options.pose === 'jump') {
@@ -174,16 +175,4 @@ export function renderCatSideView(ctx, options = {
     colors: options.colors,
     shiftY: options.heightShift,
   })
-}
-
-function drawPixels(ctx, pixels, { scale, colors, flipX, shiftY = 0 }) {
-  for (let j = 0; j < pixels.length; j++) {
-    for (let i = 0; i < pixels[j].length; i++) {
-      const p = pixels[j][i];
-      ctx.fillStyle = colors[p];
-      const x = flipX ? (20 - 1 - i) * scale : i * scale
-      const y = j * scale + (scale >= 2.2 ? shiftY / 2 : shiftY)
-      ctx.fillRect(x, y, scale, scale);
-    }
-  }
 }
