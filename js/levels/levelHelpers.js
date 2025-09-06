@@ -82,9 +82,9 @@ export function levelRender({ gameData, kontra}) {
     }
 
     if (gameObjects.collectables.length > 0) {
-      renderFoodItems(context, gameObjects.collectables.filter(({ isVisible }) => isVisible))
+      // renderFoodItems(context, gameObjects.collectables.filter(({ isVisible, collected }) => isVisible && !collected))
       gameObjects.collectables
-      .filter(({ isVisible }) => isVisible)
+      .filter(({ isVisible, collected }) => isVisible && !collected)
       .forEach(collectable => {collectable?.render?.()})
     }
 
@@ -108,18 +108,25 @@ export function levelRender({ gameData, kontra}) {
 
     // Если кот атакует, добавляем визуализацию атаки
     if (gameObjects.black.isAttacking) {
-      context.fillStyle = 'rgba(255, 0, 0, 0.5)'; // Красное свечение
-
+      context.fillStyle = 'rgba(255,255,255)'; // Красное свечение
+      const attackY = gameObjects.black.y + gameObjects.black.width / 2
       // Направление атаки зависит от свойства facingRight
+      context.beginPath();
+
       if (gameObjects.black.facingRight) {
         // Атака вправо
         const attackX = gameObjects.black.x + gameObjects.black.width;
-        context.fillRect(attackX, gameObjects.black.y, gameObjects.black.attackRange, gameObjects.black.height);
+        context.arc(attackX, attackY, gameObjects.black.attackRange, Math.PI/2, -Math.PI/2, true); // правая половина
+        // context.fillRect(attackX, gameObjects.black.y, gameObjects.black.attackRange, gameObjects.black.height);
       } else {
         // Атака влево
-        const attackX = gameObjects.black.x - gameObjects.black.attackRange;
-        context.fillRect(attackX, gameObjects.black.y, gameObjects.black.attackRange, gameObjects.black.height);
+        const attackX = gameObjects.black.x
+        context.arc(attackX, attackY, gameObjects.black.attackRange, -Math.PI/2, Math.PI/2, true); // левая половина
+        // context.fillRect(attackX, gameObjects.black.y, gameObjects.black.attackRange, gameObjects.black.height);
       }
+
+      context.closePath();
+      context.fill();
     }
   })
 
@@ -185,7 +192,8 @@ export function updateLevel({gameStates, kontra}) {
         ...gameObjects.obstacles.filter(({ isVisible, collides }) => isVisible && collides),
         ...gameObjects.enemies.filter(({ isVisible, collides }) => isVisible && collides),
         ]
-      , deltaTime, GameState, collides);
+      , deltaTime, GameState, collides)
+    checkFoodCollision(player, gameObjects.collectables.filter(({ collected }) => !collected ))
   })
 
   gameObjects.enemies.forEach((enemy) => {
@@ -197,6 +205,10 @@ export function updateLevel({gameStates, kontra}) {
       ],
       enemy,
     )
+  })
+
+  gameObjects.collectables.forEach((collectable) => {
+    collectable.update(deltaTime)
   })
 
   updateBlackCatAttack(activeCharacter, gameObjects, deltaTime)
@@ -247,9 +259,6 @@ export function updateLevel({gameStates, kontra}) {
     }
   }
 
-  // Проверка столкновений с едой для белого кота
-  checkFoodCollision(gameObjects.white, gameObjects.collectables)
-
   // Ограничиваем движение персонажей границами уровня
   gameObjects.white.x = Math.max(0, Math.min(gameObjects.white.x, canvas.width * 7 - gameObjects.white.width))
   gameObjects.black.x = Math.max(0, Math.min(gameObjects.black.x, canvas.width * 7 - gameObjects.black.width))
@@ -258,7 +267,7 @@ export function updateLevel({gameStates, kontra}) {
 
   // Визуальное обозначение активного персонажа
   gameObjects.enemies = gameObjects.enemies.filter(({ isDead }) => !isDead )
-  gameObjects.collectables = gameObjects.collectables.filter(({ collected }) => !collected )
+  // gameObjects.collectables = gameObjects.collectables.filter(({ collected }) => !collected )
   if (!gameObjects.white.isAlive || !gameObjects.black.isAlive) {
     GameState.nextLevel = GAME_STATE.GAMEOVER
   }

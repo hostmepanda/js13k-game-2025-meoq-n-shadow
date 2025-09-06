@@ -20,9 +20,11 @@ export function renderFoodItems(context, foodItems) {
 export function checkFoodCollision(character, foodItems) {
   for (let i = 0; i < foodItems.length; i++) {
     const food = foodItems[i]
-
+    const hasMaximum = character.color === 'white'
+    ? character.sizeMultiplier >= character.maxSizeMultiplier
+      : character.attackMultiplier >= character.maxAttackMultiplier
     // Пропускаем уже собранную еду
-    if (food.collected || character.sizeMultiplier >= character.maxSizeMultiplier) {
+    if (food.collected || hasMaximum) {
       continue
     }
 
@@ -36,9 +38,16 @@ export function checkFoodCollision(character, foodItems) {
       food.collected = true
 
       // Применяем эффект в зависимости от типа еды
-      if (['A','a'].includes(food.type) && character.color === 'white') {
-        // Увеличиваем размер белого кота
-        increaseCatSize(character)
+      if (['A','a'].includes(food.type)) {
+        if (character.color === 'white') {
+          increaseCatSize(character)
+        } else {
+          character.attackMultiplier = Math.min(character.maxAttackMultiplier, character.attackMultiplier * (character.attackMultiplier + 1))
+          character.attackRange = character.originalAttackRange * character.attackMultiplier
+        }
+        if (food.type === 'a') {
+          food.visibilityTime = 10
+        }
       }
 
       return true

@@ -131,12 +131,14 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
           moveSpeed: 200,
           originalWidth: 40,
           originalHeight: 40,
-          sizeMultiplier: 1,
+          originalAttackRange: 15,
+          maxAttackMultiplier: 3,
+          attackMultiplier: 1,
           // Добавляем свойства для атаки
           isAttacking: false,
           attackDuration: 0.03, // миллисекунды
           attackTimer: 0,
-          attackRange: 60, // дальность атаки
+          attackRange: 15, // дальность атаки
           attackDamage: 10, // урон от атаки
           facingRight: true,
           // Свойства для cooldown
@@ -150,11 +152,19 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
           framesLength: 4,
           dt: 0,
           update(dt) {
-            this.dt += dt;
-            if (this.dt > 0.07) {   // каждые 0.3 сек смена кадра
-              this.frame = (this.frame + 1) % this.framesLength;
-              this.dt = 0;
+            this.dt += dt
+            if (this.isAttacking) {
+              if (this.dt > 0.07) {   // каждые 0.3 сек смена кадра
+                this.frame = (this.frame + 1) % 10
+                this.dt = 0
+              }
+            } else {
+              if (this.dt > 0.07) {   // каждые 0.3 сек смена кадра
+                this.frame = (this.frame + 1) % this.framesLength
+                this.dt = 0
+              }
             }
+
           },
           render() {
             const isJumping = this.isJumping
@@ -186,6 +196,7 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
                   '#413f3a',
                   '#ecdcc9',
                   '#f26060',
+                  'rgba(255,255,255,1)',
                 ],
               })
           },
@@ -251,10 +262,22 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
         cfg.collected = false
         cfg.isVisible = ch === 'A'
         cfg.color = 'rgba(0, 0, 0, 0)'
+        cfg.visibilityTime = 0
+        if (ch === 'a') {
+          cfg.update = function (deltaTime) {
+            if (this.visibilityTime <= 0) {
+              this.collected = false
+              this.visibilityTime = 0
+            } else {
+              this.visibilityTime -= deltaTime
+            }
+          }
+        }
+
         cfg.render = function () {
           renderCollectibleFish(this.context, this.width, this.height, {
             fishColor: 'rgb(255, 210, 40)',
-            glowColor: 'rgba(255, 210, 40, 0.3)'
+            glowColor: 'rgb(255,255,255)'
           });
         }
         gameObjects.collectables.push(Sprite(cfg));
