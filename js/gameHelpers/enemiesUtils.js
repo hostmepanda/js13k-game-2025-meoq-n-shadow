@@ -172,9 +172,11 @@ export function checkEnemyCollisions(player, enemies, states) {
         }
       } else if (enemy.type === 'E' || enemy.type === 'P' || enemy.type === 'B') {
         if (['P','B'].includes(enemy.type) && enemy.isMonster) {
+          console.log(player.damageInvulnerabilityLeft)
           if (player.damageInvulnerabilityLeft <= 0) {
             player.health -= enemy?.collisionDamage ?? 1
-            player.damageInvulnerabilityLeft = 1000
+            player.damageInvulnerabilityLeft = 10
+
             if (player.health <= 0) {
               if (states.PlayerState[player.color].lives > 0) {
                 states.PlayerState[player.color].lives = states.PlayerState[player.color].lives - 1
@@ -188,7 +190,6 @@ export function checkEnemyCollisions(player, enemies, states) {
       }
     }
   })
-  player.damageInvulnerabilityLeft = player.damageInvulnerabilityLeft <= 0 ? 0 : player.damageInvulnerabilityLeft - 10
 }
 
 export function renderPoop(ctx, options = { frameIndex: 0, scale: 1, flipX: false }) {
