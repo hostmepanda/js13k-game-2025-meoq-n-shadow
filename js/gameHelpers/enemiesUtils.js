@@ -18,14 +18,12 @@ export function checkEnemyCollisionWithEnvironment(obstacles, enemy) {
       // Проверка боковых столкновений
       else if (enemy.velocityX > 0 && enemy.x + enemy.width > obstacle.x &&
         enemy.x < obstacle.x) {
-        console.log('// Столкновение справа')
         // Столкновение справа
         enemy.x = obstacle.x - enemy.width
         enemy.direction = 'left'
         enemy.velocityX *= -1
       } else if (enemy.velocityX < 0 && enemy.x < obstacle.x + obstacle.width &&
         enemy.x + enemy.width > obstacle.x + obstacle.width) {
-        console.log('// Столкновение cлева')
 
         enemy.x = obstacle.x + obstacle.width
         enemy.direction = 'right'
