@@ -392,7 +392,7 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
                 health: 50,
                 collisionDamage: 15,
                 isVisible: true,
-                type: 'B'
+                type: 'B',
               }));
 
               this.trashTimer = 0; // сбрасываем таймер
@@ -413,30 +413,50 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
             // ...
           };
 
-          cfg.renderTrash = function(ctx) {
+          cfg.renderTrash = function() {
             for (const trash of this.trashItems) {
-              // Отрисовка мусора (простой квадрат)
-              this.context.fillStyle = 'rgba(150, 75, 0, 0.8)'; // коричневый с прозрачностью
-              this.context.fillRect(trash.x, trash.y, trash.width, trash.height);
+              this.context.save()
+              const r = trash.width
+              this.context.translate(trash.x, trash.y);
+              this.context.beginPath();
+              this.context.arc(0, 0, r, 0, Math.PI * 2);
+              this.context.fillStyle = "#eee";
+              this.context.fill();
+              this.context.strokeStyle = "#aaa";
+              this.context.stroke();
 
-              // Можно добавить детали, чтобы он выглядел как мусор
-              this.fillStyle = 'rgba(100, 50, 0, 0.9)';
-              const segments = 3;
-              const segWidth = trash.width / segments;
-              const segHeight = trash.height / segments;
+              // пара складок
+              this.context.strokeStyle = "rgba(0,0,0,0.2)";
+              this.context.beginPath();
+              this.context.moveTo(-r/2, -r/4);
+              this.context.lineTo(r/3, r/5);
+              this.context.moveTo(-r/3, r/4);
+              this.context.lineTo(r/2, -r/5);
+              this.context.stroke();
+              this.context.restore()
 
-              for (let i = 0; i < segments; i++) {
-                for (let j = 0; j < segments; j++) {
-                  if ((i + j) % 2 === 0) {
-                    this.context.fillRect(
-                      trash.x + i * segWidth,
-                      trash.y + j * segHeight,
-                      segWidth,
-                      segHeight
-                    );
-                  }
-                }
-              }
+              // // Отрисовка мусора (простой квадрат)
+              // this.context.fillStyle = 'rgba(150, 75, 0, 0.8)'; // коричневый с прозрачностью
+              // this.context.fillRect(trash.x, trash.y, trash.width, trash.height);
+              //
+              // // Можно добавить детали, чтобы он выглядел как мусор
+              // this.fillStyle = 'rgba(100, 50, 0, 0.9)';
+              // const segments = 3;
+              // const segWidth = trash.width / segments;
+              // const segHeight = trash.height / segments;
+              //
+              // for (let i = 0; i < segments; i++) {
+              //   for (let j = 0; j < segments; j++) {
+              //     if ((i + j) % 2 === 0) {
+              //       this.context.fillRect(
+              //         trash.x + i * segWidth,
+              //         trash.y + j * segHeight,
+              //         segWidth,
+              //         segHeight
+              //       );
+              //     }
+              //   }
+              // }
             }
           };
         }

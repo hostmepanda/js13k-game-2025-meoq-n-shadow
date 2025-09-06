@@ -92,7 +92,7 @@ export function levelRender({ gameData, kontra}) {
       gameObjects.enemies
       .forEach(enemy => {
         enemy?.render?.()
-        if (enemy.type === 'B') {
+        if (enemy.type === 'B' && enemy.trashItems.length > 0) {
           enemy.renderTrash()
         }
       })
