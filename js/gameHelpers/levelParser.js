@@ -78,22 +78,39 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
             }
           },
           render() {
-            renderCatSideView(this.context, {
-              flipX: !this.facingRight,
-              frameIndex: this.frame,
-              scale: this.sizeMultiplier + 1,
-              width: this.width,
-              heightShift: this.height -this.originalHeight,
-              colors: [
-                'rgba(0,0,0,0)',
-                '#000000',
-                '#ececec',
-                '#cfcfcf',
-                '#7a7a7a',
-                '#ecdcc9',
-                '#f26060',
-              ]
-            })
+            const isJumping = this.isJumping
+            const isWalking = this.isMoving && !isJumping
+            const isPooping = this.isPooping
+            let pose
+
+            if (isJumping) {
+              pose = 'jump'
+            } else if (isWalking) {
+              pose = 'walk'
+            } else if (isPooping) {
+              pose = 'attack'
+            } else {
+              pose = 'idle'
+            }
+
+            renderCatSideView(this.context,
+              {
+                pose,
+                flipX: !this.facingRight,
+                frameIndex: this.frame,
+                scale: this.sizeMultiplier + 1,
+                width: this.width,
+                heightShift: this.height -this.originalHeight,
+                colors: [
+                  'rgba(0,0,0,0)',
+                  '#000000',
+                  '#ececec',
+                  '#cfcfcf',
+                  '#7a7a7a',
+                  '#ecdcc9',
+                  '#f26060',
+                ]
+              })
           },
         })
       }
@@ -140,20 +157,37 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
             }
           },
           render() {
-            renderCatSideView(this.context, {
-              flipX: !this.facingRight,
-              frameIndex: this.frame,
-              scale: 2,
-              colors: [
-                'rgba(0,0,0,0)',
-                '#000000',
-                '#a2998d',
-                '#5c5751',
-                '#413f3a',
-                '#ecdcc9',
-                '#f26060',
-              ]
-            })
+            const isJumping = this.isJumping
+            const isWalking = this.isMoving && !isJumping
+            const isAttacking = this.isAttacking
+            let pose
+
+            if (isJumping) {
+              pose = 'jump'
+            } else if (isWalking) {
+              pose = 'walk'
+            } else if (isAttacking) {
+              pose = 'attack'
+            } else {
+              pose = 'idle'
+            }
+
+            renderCatSideView(this.context,
+              {
+                pose,
+                flipX: !this.facingRight,
+                frameIndex: this.frame,
+                scale: 2,
+                colors: [
+                  'rgba(0,0,0,0)',
+                  '#000000',
+                  '#a2998d',
+                  '#5c5751',
+                  '#413f3a',
+                  '#ecdcc9',
+                  '#f26060',
+                ],
+              })
           },
         })
       }
