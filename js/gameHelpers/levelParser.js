@@ -47,7 +47,7 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
           x: x * tileSize,
           y: y * tileSize,
           width: 40,
-          height: 51,
+          height: 31,
           color: 'white',
           // Добавляем физические свойства
           velocityY: 0,

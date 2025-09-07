@@ -2,8 +2,10 @@ import {createDefaultLevel, createLevel} from '../levels/levelHelpers'
 import {CANVAS, GAME_STATE} from '../consts'
 
 export const GameState = {
-  currentState: GAME_STATE.LEVEL1,
-  nextLevel: GAME_STATE.LEVEL1,
+  currentState: GAME_STATE.MENU,
+  nextLevel: GAME_STATE.MENU,
+  currentlyPlayingTrack: null,
+  musicNode: null,
   camera: {
     x: 0, // Начальная позиция камеры по X
     y: 0, // Начальная позиция камеры по Y

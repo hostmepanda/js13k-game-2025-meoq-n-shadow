@@ -3,12 +3,13 @@ import {parseLevel} from '../gameHelpers/levelParser'
 import {initKeyboardControls} from '../gameHelpers/keyboard'
 import {LEVEL_MAPS} from './maps'
 import {JUMP_FORCE, MOVE_SPEED, renderUI, renderWithCamera} from '../gameHelpers/utils'
-import {checkEnvironmentCollisions, checkFoodCollision, renderFoodItems} from '../gameHelpers/itemsUtils'
+import {checkEnvironmentCollisions, checkFoodCollision} from '../gameHelpers/itemsUtils'
 import {updateBlackCatAttack, updateCharacterPhysics} from '../gameHelpers/charactersUtils'
 import {checkEnemyCollisions, checkEnemyCollisionWithEnvironment, createPoop} from '../gameHelpers/enemiesUtils'
 import {CANVAS, GAME_STATE} from '../consts'
 import {PlayerState as DefaultPlayerState} from '../states/player'
 import {renderParallaxBackground} from '../gameHelpers/backgroundHelpers'
+import {playLevelMusic} from '../sound/sounds'
 
 export function createLevel({ selectedLevel, gameStates, kontra}) {
   const {Sprite, canvas} = kontra
@@ -193,7 +194,7 @@ export function updateLevel({gameStates, kontra}) {
         ...gameObjects.enemies.filter(({ isVisible, collides }) => isVisible && collides),
         ]
       , deltaTime, GameState, collides)
-    checkFoodCollision(player, gameObjects.collectables.filter(({ collected }) => !collected ))
+    checkFoodCollision(player, gameObjects.collectables.filter(({ collected, isVisible }) => !collected && isVisible ))
   })
 
   gameObjects.enemies.forEach((enemy) => {
