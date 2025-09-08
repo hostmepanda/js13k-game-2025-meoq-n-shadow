@@ -18,7 +18,7 @@ export async function gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}
         })
       break
     case GAME_STATE.MENU:
-      initMenuScreen(GameState)
+      initMenuScreen(GameState, canvas)
 
       updateMenuScreen({
         redirectScreen: GameState.currentState === GAME_STATE.MENU ? GAME_STATE.LEVEL1 : GAME_STATE.MENU,

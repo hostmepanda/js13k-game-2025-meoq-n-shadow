@@ -1,6 +1,6 @@
 import {loadLevel} from '../states/game'
 
-export function initMenuScreen(gameState) {
+export function initMenuScreen(gameState, canvas) {
   const handleSpaceClick = (event) => {
     if (event.code === 'Space') {
       gameState.input.space = true
@@ -14,6 +14,23 @@ export function initMenuScreen(gameState) {
       document.removeEventListener('keydown', handleSpaceClick)
     }
   })
+
+  document.addEventListener('click', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    // Проверяем, был ли клик по тексту автора
+    const halfWidth = gameState.menuScreenListeners.authorWidth / 2;
+    if (y >= gameState.menuScreenListeners.authorPos.y - gameState.menuScreenListeners.authorHeight &&
+      y <= gameState.menuScreenListeners.authorPos.y + 5 &&
+      x >= gameState.menuScreenListeners.authorPos.x - halfWidth &&
+      x <= gameState.menuScreenListeners.authorPos.x + halfWidth) {
+      // Клик по тексту автора - открываем ссылку
+      window.open('https://github.com/hostmepanda', '_blank');
+    }
+  });
+
 }
 
 export function updateMenuScreen({ redirectScreen, gameStates, kontra }) {

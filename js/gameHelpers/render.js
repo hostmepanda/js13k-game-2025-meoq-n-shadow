@@ -8,7 +8,7 @@ import {GAME_STATE} from '../consts'
 export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, canvas, context) {
   switch (GameState.currentState) {
     case GAME_STATE.MENU:
-      renderMainMenu(canvas, context)
+      renderMainMenu(canvas, context, GameState)
       break
     case GAME_STATE.LEVEL1:
     case GAME_STATE.LEVEL2:

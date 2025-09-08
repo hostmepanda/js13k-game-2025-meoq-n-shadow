@@ -6,6 +6,9 @@ export const GameState = {
   nextLevel: GAME_STATE.MENU,
   currentlyPlayingTrack: null,
   musicNode: null,
+  menuScreenListeners: {
+
+  },
   camera: {
     x: 0, // Начальная позиция камеры по X
     y: 0, // Начальная позиция камеры по Y
