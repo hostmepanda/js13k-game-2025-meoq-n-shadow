@@ -60,7 +60,7 @@ function renderLevelName(levelNumber) {
   }
 }
 
-export function renderUI(context, playerState) {
+export function renderUI({context, canvas}, {playerState, GameState}) {
   // Сохраняем текущее состояние контекста
   context.save();
 
@@ -159,6 +159,19 @@ export function renderUI(context, playerState) {
         context.fillStyle = '#165134';
         context.fillText('▶', blackCatX - 15, centerY-1);
       }
+    }
+
+    context.fillStyle = '#000000';
+    if (GameState.musicEnabled) {
+      context.font = '15px Arial';  // Меньший шрифт для имени создателя
+      context.fillText('🔉', canvas.width - 60, 15);
+      context.font = '10px Arial';  // Меньший шрифт для имени создателя
+      context.fillText('(press M to disable)', canvas.width - 100, 28);
+    } else {
+      context.font = '15px Arial';  // Меньший шрифт для имени создателя
+      context.fillText('🔇', canvas.width - 60, 15);
+      context.font = '10px Arial';  // Меньший шрифт для имени создателя
+      context.fillText('(press M to enable)', canvas.width - 100, 28);
     }
   }
 

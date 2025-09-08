@@ -9,7 +9,6 @@ import {checkEnemyCollisions, checkEnemyCollisionWithEnvironment, createPoop} fr
 import {CANVAS, GAME_STATE} from '../consts'
 import {PlayerState as DefaultPlayerState} from '../states/player'
 import {renderParallaxBackground} from '../gameHelpers/backgroundHelpers'
-import {playLevelMusic} from '../sound/sounds'
 
 export function createLevel({ selectedLevel, gameStates, kontra}) {
   const {Sprite, canvas} = kontra
@@ -70,7 +69,6 @@ export function levelRender({ gameData, kontra}) {
   const { canvas, context} = kontra
   context.clearRect(0, 0, canvas.width, canvas.height)
 
-  // renderBackground(context, canvas)
   renderParallaxBackground(context, GameState.camera.width, GameState.camera.height, GameState.camera.x, GameState.camera.y)
 
   renderWithCamera(context, GameState.camera, (ctx) => {
@@ -131,22 +129,26 @@ export function levelRender({ gameData, kontra}) {
     }
   })
 
-  renderUI(context, {
-    currentLevel: GameState.currentState,
-    cats: [
-      {
-        name: "Meoq",
-        health: gameObjects.white.health,
-        lives: PlayerState.white.lives,
-        isActive: PlayerState.activeCharacter === 'white',
-      },
-      {
-        name: "Shadow",
-        health: gameObjects.black.health,
-        lives: PlayerState.black.lives,
-        isActive: PlayerState.activeCharacter === 'black',
-      }
-    ],
+  renderUI({context, canvas}, {
+    playerState: {
+      currentLevel: GameState.currentState,
+      cats: [
+        {
+          name: "Meoq",
+          health: gameObjects.white.health,
+          lives: PlayerState.white.lives,
+          isActive: PlayerState.activeCharacter === 'white',
+        },
+        {
+          name: "Shadow",
+          health: gameObjects.black.health,
+          lives: PlayerState.black.lives,
+          isActive: PlayerState.activeCharacter === 'black',
+        }
+      ],
+    },
+    GameState,
+
   });
 }
 

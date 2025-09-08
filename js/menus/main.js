@@ -17,7 +17,7 @@ export function renderMainMenu(canvas, context, GameState) {
   context.fillText('Press Space to start', canvas.width / 2, canvas.height / 2 + 25);
 
   context.font = '15px Arial';  // Меньший шрифт для имени создателя
-  context.fillText('Move: A & D, jump: W, switch: Left Shift', canvas.width / 2, canvas.height / 2 + 55);
+  context.fillText('Move: A & D, jump: W, switch cat: Left Shift', canvas.width / 2, canvas.height / 2 + 55);
   context.fillText('poop (Meoq): Space, attack (Shadow): Space', canvas.width / 2, canvas.height / 2 + 78);
 
   context.font = '18px Arial';
@@ -72,6 +72,19 @@ export function renderMainMenu(canvas, context, GameState) {
     })
   context.restore()
   context.translate(0, 0)
+
+  context.fillStyle = '#ffffff';
+  if (GameState.musicEnabled) {
+    context.font = '25px Arial';  // Меньший шрифт для имени создателя
+    context.fillText('🔉', canvas.width - 80, canvas.height - 50);
+    context.font = '15px Arial';  // Меньший шрифт для имени создателя
+    context.fillText('(press M to disable)', canvas.width - 80, canvas.height - 28);
+  } else {
+    context.font = '25px Arial';  // Меньший шрифт для имени создателя
+    context.fillText('🔇', canvas.width - 80, canvas.height - 50);
+    context.font = '15px Arial';  // Меньший шрифт для имени создателя
+    context.fillText('(press M to enable)', canvas.width - 80, canvas.height - 28);
+  }
 
   GameState.menuScreenListeners = {
     titlePos: { x: canvas.width / 2 + 5, y: canvas.height / 2 - 60 },

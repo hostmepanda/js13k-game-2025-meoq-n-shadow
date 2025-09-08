@@ -16,6 +16,17 @@ function startGame() {
     PlayerState,
   } = loadLevel(GAME_STATE.LEVEL1, { gameObjects: {}, PlayerState: defaultPlayerState, GameState: defaultGameState }, { Sprite, canvas})
 
+
+  document.addEventListener('keyup', (event) => {
+    if (event.code === 'KeyM') {
+      GameState.musicEnabled = !GameState.musicEnabled
+    }
+
+    if (event.code === 'KeyP') {
+      GameState.paused = !GameState.paused
+    }
+  })
+
   const gameLoop = new GameLoop({
     update: (deltaTime) => gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canvas, context, deltaTime, Sprite, collides),
     render: () => gameLoopRenderMethod(gameObjects, {GameState, PlayerState}, canvas, context),

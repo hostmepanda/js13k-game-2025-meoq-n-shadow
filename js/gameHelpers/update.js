@@ -2,20 +2,29 @@ import {updateLevel} from '../levels/levelHelpers'
 import {initMenuScreen, updateMenuScreen} from '../menus/helpers'
 import {GAME_STATE} from '../consts'
 import {loadLevel} from '../states/game'
-import {levelTrack, playLevelMusic} from '../sound/sounds'
+import {playLevelMusic, stopLevelMusic} from '../sound/sounds'
 
 export async function gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}, canvas, context, deltaTime, Sprite, collides) {
+  if (GameState.musicEnabled) {
+    await playLevelMusic(GameState.currentState, GameState)
+  } else {
+    await stopLevelMusic(GameState)
+  }
+
   switch (GameState.currentState) {
     case GAME_STATE.LEVEL1:
     case GAME_STATE.LEVEL2:
     case GAME_STATE.LEVEL3:
     case GAME_STATE.LEVEL4:
-      await playLevelMusic(GameState.currentState, GameState)
-      updateLevel(
-        {
-          gameStates: {gameObjects, GameState, PlayerState},
-          kontra: {canvas, context, deltaTime, Sprite, collides},
-        })
+      if (GameState.paused) {
+
+      } else {
+        updateLevel(
+          {
+            gameStates: {gameObjects, GameState, PlayerState},
+            kontra: {canvas, context, deltaTime, Sprite, collides},
+          })
+      }
       break
     case GAME_STATE.MENU:
       initMenuScreen(GameState, canvas)
@@ -25,7 +34,6 @@ export async function gameLoopUpdateMethod(gameObjects, {GameState, PlayerState}
         gameStates: {gameObjects: gameObjects, GameState, PlayerState},
         kontra: {Sprite, canvas}
       })
-      await playLevelMusic(GameState.currentState, GameState)
       break
     case GAME_STATE.GAMEOVER:
     case GAME_STATE.VICTORYBLACK:

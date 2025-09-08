@@ -6,6 +6,9 @@ export const GameState = {
   nextLevel: GAME_STATE.MENU,
   currentlyPlayingTrack: null,
   musicNode: null,
+  musicEnabled: false,
+  paused: false,
+  previousMusicEnabled: false,
   menuScreenListeners: {
 
   },
