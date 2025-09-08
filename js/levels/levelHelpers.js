@@ -25,6 +25,7 @@ export function createLevel({ selectedLevel, gameStates, kontra}) {
     parseLevel({
       gameObjects: gameStates.gameObjects,
       levelMap: LEVEL_MAPS[selectedLevel],
+      selectedLevel,
       Sprite,
     }),
   )

@@ -2,6 +2,7 @@ import {GRAVITY_DOWN} from './utils'
 import {renderLamp, renderPalmTree, renderPottedTree, renderTable, renderWoodConcreteFloor} from './tileHelpers'
 import {renderCollectibleFish} from './collectableHelpers'
 import {renderCatSideView} from './catHelpers'
+import {GAME_STATE} from '../consts'
 
 const parseToColorMapper = {
   '#': 'yellow', /* # = level exit */
@@ -25,7 +26,56 @@ const parseToColorMapper = {
   'f': 'darkgreen', // f - invisible when boss is alive
 }
 
-export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
+const parseToColorTilesByLevel = {
+  [GAME_STATE.LEVEL1]: {
+    F: {
+      bodyColor: 'rgb(180, 180, 180)',
+      coverColor: 'rgb(170, 120, 70)',
+      injectColor: 'rgb(101,101,101)',
+    },
+    f: {
+      bodyColor: 'rgb(180, 180, 180)',
+      coverColor: 'rgb(170, 120, 70)',
+      injectColor: 'rgb(101,101,101)',
+    },
+    M: {
+      bodyColor: 'rgb(180, 180, 180)',
+      coverColor: 'rgb(142,142,142)',
+      injectColor: 'rgb(101,101,101)',
+      closingColor: 'rgb(142,142,142)',
+      rotation: 1,
+    },
+    m: {
+      bodyColor: 'rgb(180, 180, 180)',
+      coverColor: 'rgb(142,142,142)',
+      injectColor: 'rgb(101,101,101)',
+      rotation: 2,
+    },
+    N: {
+      bodyColor: 'rgb(180, 180, 180)',
+      coverColor: 'rgb(142,142,142)',
+      injectColor: 'rgb(101,101,101)',
+      rotation: 1,
+    },
+    n: {
+      bodyColor: 'rgb(180, 180, 180)',
+      injectColor: 'rgb(101,101,101)',
+    },
+    W: {
+      bodyColor: 'rgb(180, 180, 180)',
+      coverColor: 'rgb(142,142,142)',
+      injectColor: 'rgb(101,101,101)',
+    },
+    w: {
+      bodyColor: 'rgb(180, 180, 180)',
+      coverColor: 'rgb(142,142,142)',
+      injectColor: 'rgb(101,101,101)',
+    },
+  },
+  [GAME_STATE.LEVEL2]: {},
+}
+
+export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileSize = 20}) {
   levelMap.forEach((row, y) => {
     [...row].forEach((ch, x) => {
       if (ch === ".") {
@@ -204,22 +254,20 @@ export function parseLevel({ gameObjects, levelMap, Sprite, tileSize = 20}) {
         })
       }
 
-      if (['W','M','m','N','w','F','C', '#', 'f'].includes(ch)) {
+      if (['W','M','m','N','n','w','F','C', '#', 'f'].includes(ch)) {
         if (ch === 'f') {
           cfg.isVisible = false
         }
         cfg.collides = true
-        if (['W','M','m','N','w','F','f'].includes(ch)) {
+        if (['W','M','m','N','n','w','F','f'].includes(ch)) {
           cfg.render = function () {
-            // if (ch === 'U') {
-            //   this.context.save();
-            //   this.context.translate(this.width/2, this.height/2);
-            //   this.context.rotate(Math.PI / 2); // 90 градусов
-            //   renderWoodConcreteFloor(this.context, this.width, this.height, this.x, this.y, {type: 'm'});
-            //   this.context.restore();
-            // } else {
-              renderWoodConcreteFloor(this.context, this.width, this.height, this.x, this.y, {type: this.type})
-            // }
+            renderWoodConcreteFloor(
+              this.context,
+              this.width,
+              this.height,
+              {
+                  ...parseToColorTilesByLevel[selectedLevel][cfg.type],
+              })
           }
         }
         gameObjects.obstacles.push(Sprite(cfg));
