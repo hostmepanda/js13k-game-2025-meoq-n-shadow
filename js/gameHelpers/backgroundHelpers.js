@@ -136,57 +136,9 @@ export function createWallpaperPattern(ctx, options = {}) {
   return ctx.createPattern(off, 'repeat');
 }
 
-// Пример использования в твоём рендере параллакса
-// wallpaperPattern = createWallpaperPattern(context, { style: 'damask', tileSize: 128, bgColor:'#F0EAD6', fgColor:'#C2A759' });
-// context.fillStyle = wallpaperPattern;
-// context.fillRect(0,0,canvas.width, canvas.height);
-
-export function renderParallaxBackground(context, width, height, cameraX = 0, cameraY = 0, options = {
-  style: 'damask',   // 'damask' | 'stripes' | 'dots'
-  tileSize: 128,
-  bgColor: 'rgba(255,227,53,0.41)',
-  fgColor: 'rgba(255,215,0,0.38)',
-  accentColor: 'rgba(255,0,0,0.31)',
-  scale: 1,
-  layers: [
-    { speed: 1, alpha: 1 },
-    { speed: 1, alpha: 1 },
-    { speed: 1, alpha: 1 },
-  ]
-}) {
-  const basePatterns = [
-    createWallpaperPattern(context, {
-      ...options,
-      style: 'stripes',
-      tileSize: 390,
-      bgColor: 'rgba(115,65,0,0.85)',
-      fgColor: 'rgb(255,228,116)',
-      accentColor: 'rgb(244,244,244)',
-      scale: 2
-    }),
-    createWallpaperPattern(context, {
-      ...options,
-      scale: 2,
-      tileSize: 390,
-      style: 'stripes',
-      bgColor: 'rgba(255,236,156,0.38)',
-      fgColor: 'rgba(124,98,0,0.18)',
-      accentColor: 'rgb(244,244,244)',
-    }),
-    createWallpaperPattern(context, {
-      ...options,
-      tileSize: 390,
-      scale: 3,
-      style: 'damask',
-      fgColor: 'rgba(246,255,167,0.13)',
-    }),
-  ];
+export function renderParallaxBackground(context, width, height, cameraX = 0, cameraY = 0, options) {
   context.save();
-
-  // несколько слоёв с разной скоростью и прозрачностью
-  const layers = options.layers;
-
-  layers.forEach((layer, index) => {
+  options.layers.forEach((layer, index) => {
     // параллакс-смещение
     const offsetX = -cameraX * layer.speed;
     const offsetY = -cameraY * layer.speed;
@@ -197,7 +149,7 @@ export function renderParallaxBackground(context, width, height, cameraX = 0, ca
     context.setTransform(1, 0, 0, 1, 0, 0);
     context.translate(offsetX, offsetY);
 
-    context.fillStyle = basePatterns[index];
+    context.fillStyle = options.patternTiles[index];
     context.fillRect(-offsetX, -offsetY , width + options.tileSize, (height + options.tileSize));
   });
 

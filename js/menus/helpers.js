@@ -33,7 +33,7 @@ export function initMenuScreen(gameState, canvas) {
 
 }
 
-export function updateMenuScreen({ redirectScreen, gameStates, kontra }) {
+export function updateMenuScreen({ redirectScreen, gameStates, kontra }, levelBackgroundPatterns) {
   const { gameObjects, GameState, PlayerState } = gameStates;
   const { Sprite, canvas } = kontra;
   if (GameState.input.space) {
@@ -45,7 +45,7 @@ export function updateMenuScreen({ redirectScreen, gameStates, kontra }) {
       black:{lives: 10, size: 1},
     })
 
-    loadLevel({ gameObjects, PlayerState, GameState }, { Sprite, canvas})
+    loadLevel({ gameObjects, PlayerState, GameState }, { Sprite, canvas}, {}, levelBackgroundPatterns)
 
     GameState.currentState = redirectScreen;
     GameState.nextLevel = redirectScreen;

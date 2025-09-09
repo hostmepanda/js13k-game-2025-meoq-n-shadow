@@ -43,18 +43,6 @@ export function createLevel({ selectedLevel, gameStates, kontra}) {
     Object.assign(gameStates.PlayerState, DefaultPlayerState)
   }
 
-  gameStates.gameObjects.backgrounds.sunset = {
-    render: function (ctx) {
-      const gradient = ctx.createLinearGradient(0, 0, 0, CANVAS.height)
-      gradient.addColorStop(0, '#1a2b56')    // Темно-синий (верх неба)
-      gradient.addColorStop(0.4, '#864d9e')  // Фиолетовый
-      gradient.addColorStop(0.7, '#dd5e5e')  // Оранжево-красный
-      gradient.addColorStop(0.9, '#f9d423')  // Желтый (у горизонта)
-      ctx.fillStyle = gradient
-      ctx.fillRect(0, 0, CANVAS.width, CANVAS.height)
-    },
-  }
-
   gameStates.gameObjects.keyboard = initKeyboardControls()
   gameStates.gameObjects.level = levelState.level
 
@@ -65,14 +53,21 @@ export function createLevel({ selectedLevel, gameStates, kontra}) {
   }
 }
 
-export function levelRender({ gameData, kontra}) {
+export function levelRender({ gameData, kontra}, levelBackgroundPatterns) {
   const {PlayerState, GameState, gameObjects } = gameData
   const { canvas, context} = kontra
+
   context.clearRect(0, 0, canvas.width, canvas.height)
+  renderParallaxBackground(
+    context,
+    GameState.camera.width,
+    GameState.camera.height,
+    GameState.camera.x,
+    GameState.camera.y,
+    levelBackgroundPatterns,
+  )
 
-  renderParallaxBackground(context, GameState.camera.width, GameState.camera.height, GameState.camera.x, GameState.camera.y)
-
-  renderWithCamera(context, GameState.camera, (ctx) => {
+  renderWithCamera(context, GameState.camera, () => {
     if (gameObjects.obstacles.length > 0) {
       gameObjects.obstacles
       .filter(obstacle => obstacle.isVisible)
@@ -153,7 +148,7 @@ export function levelRender({ gameData, kontra}) {
   });
 }
 
-export function updateLevel({gameStates, kontra}) {
+export function updateLevel({gameStates, kontra}, levelBackgroundPatterns) {
   const { gameObjects, GameState, PlayerState} = gameStates
   const { Sprite, canvas, context, deltaTime, collides } = kontra
   const {keyboard} = gameObjects
@@ -277,18 +272,18 @@ export function updateLevel({gameStates, kontra}) {
   }
 
   if (GameState.nextLevel !== GameState.currentState) {
-    switchLevel(GameState.nextLevel, { GameState, gameObjects, PlayerState}, {Sprite, canvas, context})
+    switchLevel(GameState.nextLevel, { GameState, gameObjects, PlayerState}, {Sprite, canvas, context}, levelBackgroundPatterns)
   }
 }
 
-function switchLevel(targetLevel, { GameState, gameObjects, PlayerState}, {Sprite, canvas, context}) {
+function switchLevel(targetLevel, { GameState, gameObjects, PlayerState}, {Sprite, canvas, context}, levelBackgroundPatterns) {
   if ([
     GAME_STATE.LEVEL1,
     GAME_STATE.LEVEL2,
     GAME_STATE.LEVEL3,
     GAME_STATE.LEVEL4,
   ].includes(targetLevel)) {
-    const updatedLevel = loadLevel(targetLevel, { gameObjects }, {Sprite, canvas, context})
+    const updatedLevel = loadLevel(targetLevel, { gameObjects }, {Sprite, canvas, context}, levelBackgroundPatterns)
     Object.assign(gameObjects, updatedLevel.gameObjects)
   }
 
@@ -302,7 +297,7 @@ export function createDefaultLevel() {
     exit: null,
     start: null,
     keyboard: {},
-    backgrounds: [],
+    backgrounds: {},
     level: {},
     obstacles: [],
     collectables: [],

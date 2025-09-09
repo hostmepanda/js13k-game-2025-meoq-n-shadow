@@ -1,5 +1,6 @@
 import {createDefaultLevel, createLevel} from '../levels/levelHelpers'
 import {CANVAS, GAME_STATE} from '../consts'
+import {createWallpaperPattern} from '../gameHelpers/backgroundHelpers'
 
 export const GameState = {
   currentState: GAME_STATE.MENU,
@@ -45,7 +46,7 @@ export function updateCamera(gameState, activeCharacter) {
   );
 }
 
-export function loadLevel(targetLevel, states, drawHelpers) {
+export function loadLevel(targetLevel, states, drawHelpers, levelBackgroundPatterns = {}) {
   if (![GAME_STATE.LEVEL1, GAME_STATE.LEVEL2, GAME_STATE.LEVEL3, GAME_STATE.LEVEL4].includes(targetLevel)) {
     return
   }
@@ -59,5 +60,12 @@ export function loadLevel(targetLevel, states, drawHelpers) {
     states.gameObjects.black = null
   }
   states.gameObjects = createDefaultLevel()
+
+  if (targetLevel === GAME_STATE.LEVEL1) {
+    states.gameObjects.backgrounds = levelBackgroundPatterns[0]
+  } else if (targetLevel === GAME_STATE.LEVEL2) {
+    states.gameObjects.backgrounds = levelBackgroundPatterns[1]
+  }
+
   return createLevel({ selectedLevel: targetLevel, gameStates: states, kontra: drawHelpers })
 }

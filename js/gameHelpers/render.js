@@ -5,7 +5,7 @@ import {renderVictoryBlack} from '../menus/victroryBlack'
 import {renderVictoryWhite} from '../menus/victoryWhite'
 import {GAME_STATE} from '../consts'
 
-export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, canvas, context) {
+export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, canvas, context, levelBackgroundPatterns) {
     switch (GameState.currentState) {
       case GAME_STATE.MENU:
         renderMainMenu(canvas, context, GameState)
@@ -37,10 +37,17 @@ export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, ca
           context.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
 
         } else {
+          let backgrounds
+          if (GameState.currentState === GAME_STATE.LEVEL1) {
+            backgrounds = levelBackgroundPatterns[0]
+          } else if (GameState.currentState === GAME_STATE.LEVEL2) {
+            backgrounds = levelBackgroundPatterns[1]
+          }
+
           levelRender({
             gameData: {gameObjects, GameState, PlayerState},
             kontra: {canvas, context},
-          })
+          }, backgrounds)
         }
         break
       case GAME_STATE.GAMEOVER:

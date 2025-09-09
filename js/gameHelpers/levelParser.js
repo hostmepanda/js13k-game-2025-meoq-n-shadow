@@ -72,7 +72,49 @@ const parseToColorTilesByLevel = {
       injectColor: 'rgb(101,101,101)',
     },
   },
-  [GAME_STATE.LEVEL2]: {},
+  [GAME_STATE.LEVEL2]: {
+    F: {
+      bodyColor: 'rgb(37,37,37)',
+      coverColor: 'rgb(117,115,63)',
+      injectColor: 'rgb(2,174,2)',
+    },
+    f: {
+      bodyColor: 'rgb(37,37,37)',
+      coverColor: 'rgb(117,115,63)',
+      injectColor: 'rgb(2,174,2)',
+    },
+    M: {
+      bodyColor: 'rgb(128,128,128)',
+      coverColor: 'rgb(142,142,142)',
+      injectColor: 'rgb(101,101,101)',
+      closingColor: 'rgb(142,142,142)',
+      rotation: 1,
+    },
+    m: {
+      bodyColor: 'rgb(128,128,128)',
+      coverColor: 'rgb(62,62,62)',
+      injectColor: 'rgb(101,101,101)',
+      rotation: 2,
+    },
+    N: {
+      bodyColor: 'rgb(128,128,128)',
+      coverColor: 'rgb(62,62,62)',
+      rotation: 1,
+    },
+    n: {
+      bodyColor: 'rgb(128,128,128)',
+    },
+    W: {
+      bodyColor: 'rgb(128,128,128)',
+      coverColor: 'rgb(62,62,62)',
+      injectColor: 'rgb(101,101,101)',
+    },
+    w: {
+      bodyColor: 'rgb(128,128,128)',
+      coverColor: 'rgb(62,62,62)',
+      injectColor: 'rgb(101,101,101)',
+    },
+  },
 }
 
 export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileSize = 20}) {
