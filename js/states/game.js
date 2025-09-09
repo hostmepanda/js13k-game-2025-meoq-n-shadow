@@ -1,6 +1,5 @@
 import {createDefaultLevel, createLevel} from '../levels/levelHelpers'
 import {CANVAS, GAME_STATE} from '../consts'
-import {createWallpaperPattern} from '../gameHelpers/backgroundHelpers'
 
 export const GameState = {
   currentState: GAME_STATE.MENU,

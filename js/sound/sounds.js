@@ -103,8 +103,10 @@ export async function playLevelMusic(trackName, GameState) {
   } else {
     if (GameState.musicNode) {
       GameState.musicNode.stop()
+      GameState.musicNode = null
     }
   }
+  console.log("playing music", trackName);
   GameState.currentlyPlayingTrack = trackName;
   const musicToPlay = levelTrack[GameState.currentlyPlayingTrack];
   const music = parse(musicToPlay)
@@ -114,11 +116,11 @@ export async function playLevelMusic(trackName, GameState) {
   await zzfxX.resume();
 }
 
-export const levelTrack = {
+const levelTrack = {
   [GAME_STATE.MENU]: menu,
-  [GAME_STATE.GAMEOVER]: gameOver,
   [GAME_STATE.LEVEL1]: homeLevel2,
   [GAME_STATE.LEVEL2]: fearfullyCity2,
+  [GAME_STATE.GAMEOVER]: gameOver,
   [GAME_STATE.VICTORYBLACK]: victoryBlack,
   [GAME_STATE.VICTORYWHITE]: victoryWhite,
 }

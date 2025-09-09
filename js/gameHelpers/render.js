@@ -15,26 +15,23 @@ export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, ca
       case GAME_STATE.LEVEL3:
       case GAME_STATE.LEVEL4:
         if (GameState.paused) {
-          context.font = '20px Arial'
-          context.fillStyle = 'white';
-          context.textAlign = 'center';  // Устанавливаем выравнивание текста по центру
-          context.fillText('Press P to continue', canvas.width / 2, canvas.height / 2 + 25);
-
           // Первый прямоугольник (чёрный)
           context.beginPath(); // Начинаем новый путь
           context.fillStyle = 'rgba(0,0,0,0.47)'
           context.rect(canvas.width / 2 - 100, canvas.height / 2 - 50, 200, 50)
           context.fill()
 
-          // Второй прямоугольник (зелёный)
           context.beginPath(); // Начинаем новый путь
-          context.fillStyle = 'rgba(99,213,99,0.51)'
-          context.rect(canvas.width / 2 - 98, canvas.height / 2 - 48, 199, 49)
+          context.fillStyle = PlayerState.activeCharacter === 'white' ? 'rgba(255,255,255)' : 'rgb(0,0,0)';
+          context.rect(canvas.width / 2 - 98, canvas.height / 2 - 48, 198, 48)
           context.fill()
 
-          // Текст PAUSED (поместил его после прямоугольников, чтобы он был поверх)
-          context.fillStyle = 'white';
-          context.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
+          context.fillStyle = PlayerState.activeCharacter === 'white' ? 'black' : 'white';
+          context.font = '20px Arial'
+          context.textAlign = 'center'
+          context.fillText('PAUSED', canvas.width / 2, canvas.height / 2 - 28);
+          context.font = '15px Arial'
+          context.fillText('Press P to continue', canvas.width / 2, canvas.height / 2 - 8);
 
         } else {
           let backgrounds

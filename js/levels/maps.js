@@ -29,7 +29,7 @@ export const LEVEL_MAPS = {
     "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
     "N.....................X...................................................a.....X....................................................................W.............M..................a..X.............N",
     "N...12................X.........................................................X........................A...........................................W.............M.....................X.............N",
-    "N....#............a...NFFFFffffffffffffffffffffffffffffffffff............f......fffffffffffffffffffffffffff..........................................W.............M..........ff.........F.............N",
+    "N................#a...NFFFFffffffffffffffffffffffffffffffffff............f......fffffffffffffffffffffffffff..........................................W.............M..........ff.........F.............N",
     "N...FF...........FFfffN..................................FFFFffff...............f.........................ffffffffffffff.............................mmmmmmmmmmmmmmm..........NN.........N.............N",
     "N.....................X.....................................FFFFFffff...........fFFFFFFFFFFF............................fffffffffffffXXXXX........aa................XXXXfffffffffffffffffN.............N",
     "N.....................XXX.......Aa...................................ffff.......f...................................................XXXXXXffffffff.................a................d....N.............N",
