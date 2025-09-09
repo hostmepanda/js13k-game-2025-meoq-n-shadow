@@ -71,6 +71,14 @@ const parseToColorTilesByLevel = {
       coverColor: 'rgb(142,142,142)',
       injectColor: 'rgb(101,101,101)',
     },
+    O: {
+      bodyColor: 'rgb(150,236,255)',
+      coverColor: 'rgb(115,183,197)',
+    },
+    o: {
+      bodyColor: 'rgb(150,236,255)',
+      coverColor: 'rgb(115,183,197)',
+    },
   },
   [GAME_STATE.LEVEL2]: {
     F: {
@@ -85,16 +93,13 @@ const parseToColorTilesByLevel = {
     },
     M: {
       bodyColor: 'rgb(128,128,128)',
-      coverColor: 'rgb(142,142,142)',
-      injectColor: 'rgb(101,101,101)',
-      closingColor: 'rgb(142,142,142)',
+      coverColor: 'rgb(62,62,62)',
       rotation: 1,
     },
     m: {
       bodyColor: 'rgb(128,128,128)',
       coverColor: 'rgb(62,62,62)',
-      injectColor: 'rgb(101,101,101)',
-      rotation: 2,
+      rotation: 3,
     },
     N: {
       bodyColor: 'rgb(128,128,128)',
@@ -104,15 +109,23 @@ const parseToColorTilesByLevel = {
     n: {
       bodyColor: 'rgb(128,128,128)',
     },
+    X: {
+      bodyColor: 'rgba(39,150,230,0.51)',
+    },
     W: {
       bodyColor: 'rgb(128,128,128)',
       coverColor: 'rgb(62,62,62)',
-      injectColor: 'rgb(101,101,101)',
+      rotation: 2,
     },
     w: {
       bodyColor: 'rgb(128,128,128)',
       coverColor: 'rgb(62,62,62)',
-      injectColor: 'rgb(101,101,101)',
+    },
+    O: {
+      bodyColor: 'rgb(150,236,255)',
+    },
+    o: {
+      bodyColor: 'rgb(150,236,255)',
     },
   },
 }
@@ -296,12 +309,12 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         })
       }
 
-      if (['W','M','m','N','n','w','F','C', '#', 'f'].includes(ch)) {
+      if (['W','M','m','N','n','w','F','C', '#', 'f','O','o'].includes(ch)) {
         if (ch === 'f') {
           cfg.isVisible = false
         }
         cfg.collides = true
-        if (['W','M','m','N','n','w','F','f'].includes(ch)) {
+        if (['W','M','m','N','n','w','F','f','O','o'].includes(ch)) {
           cfg.render = function () {
             renderWoodConcreteFloor(
               this.context,
