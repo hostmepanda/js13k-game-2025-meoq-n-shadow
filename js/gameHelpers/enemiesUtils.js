@@ -129,36 +129,36 @@ export function createPoop(ch, gameObjects, Sprite) {
       },
     });
     gameObjects.enemies.push(poop);
-    return true // Успешно покакал
+    return true
   }
 
-  return false // Не удалось покакать (размер слишком мал)
+  return false
 }
 
-export function checkEnemyCollisions(player, enemies, states) {
-  enemies.forEach((enemy, index) => {
-    if (isCollided(player, enemy)) {
-      if (enemy.type === 'X') {
-        if (player.color === 'white') {
-          const canBreak = player.sizeMultiplier * player.attackDamage >= enemy.health
+export function checkEnemyCollisions(p, enemies, states) {
+  enemies.forEach((e, index) => {
+    if (isCollided(p, e)) {
+      if (e.type === 'X') {
+        if (p.color === 'white') {
+          const canBreak = p.sizeMultiplier * p.attackDamage >= e.health
           if (canBreak) {
             enemies[index].health = 0
             enemies[index].isAlive = false
-            enemies[index].isDead = enemy.canDie
+            enemies[index].isDead = e.canDie
           }
         }
-      } else if (enemy.type === 'E' || enemy.type === 'P' || enemy.type === 'B') {
-        if (['P','B'].includes(enemy.type) && enemy.isMonster) {
-          if (player.dvl <= 0) {
-            player.health -= enemy?.collisionDamage ?? 1
-            player.dvl = 10
+      } else if (e.type === 'E' || e.type === 'P' || e.type === 'B') {
+        if (['P','B'].includes(e.type) && e.isMonster) {
+          if (p.dvl <= 0) {
+            p.health -= e?.collisionDamage ?? 1
+            p.dvl = 10
 
-            if (player.health <= 0) {
-              if (states.PlayerState[player.color].lives > 0) {
-                states.PlayerState[player.color].lives = states.PlayerState[player.color].lives - 1
-                player.health = 100
+            if (p.health <= 0) {
+              if (states.PlayerState[p.color].lives > 0) {
+                states.PlayerState[p.color].lives = states.PlayerState[p.color].lives - 1
+                p.health = 100
               } else {
-                player.isAlive = false
+                p.isAlive = false
               }
             }
           }
