@@ -4,7 +4,7 @@ import {renderCollectibleFish} from './collectableHelpers'
 import {renderCatSideView} from './catHelpers'
 import {GAME_STATE} from '../consts'
 
-const parseToColorMapper = {
+const pcm = {
   '#': 'yellow', /* # = level exit */
   'A': 'blue', /* fish */
   'B': 'purple', /* B = boss */
@@ -120,73 +120,69 @@ const parseToColorTilesByLevel = {
 export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileSize = 20}) {
   levelMap.forEach((row, y) => {
     [...row].forEach((ch, x) => {
-      if (ch === ".") {
-        return
-      }
+      if (ch === ".") return
 
       let cfg = {
         x: x * tileSize,
         y: y * tileSize,
         width: tileSize,
         height: tileSize,
-        color: parseToColorMapper?.[ch] ?? "gray",
+        color: pcm?.[ch] ?? "gray",
         type: ch,
         isVisible: true,
       };
 
+      const defCatCfg = {
+        dvl: 0,
+        dt: 0,
+        facingRight: true,
+        framesLength: 4,
+        health: 100,
+        height: 31,
+        isJumping: true,
+        isMoving: false,
+        originalHeight: 31,
+        x: x * tileSize,
+        y: y * tileSize,
+        width: 40,
+        velocityY: 0,
+        originalWidth: 40,
+      }
+
       if (ch === 'G') {
         gameObjects.white = Sprite({
-          x: x * tileSize,
-          y: y * tileSize,
-          width: 40,
-          height: 31,
-          color: 'white',
-          // Добавляем физические свойства
-          velocityY: 0,
-          isJumping: true,
-          jumpForce: -450, // Отрицательное значение, т.к. ось Y направлена вниз
+          ...defCatCfg,
+          attackDamage: 10,
+          jumpForce: -450,
+          maxSizeMultiplier: 2,
           moveSpeed: 200,
           onGround: false,
-          alpha: 1.0, // для прозрачности
           originalJumpForce: -450,
           originalMoveSpeed: 200,
-          originalWidth: 40,
-          originalHeight: 31,
           sizeMultiplier: 1,
-          maxSizeMultiplier: 2,
-          facingRight: true,
-          isMoving: false,
-          attackDamage: 10, // урон от атаки
-          health: 100,
-          damageInvulnerabilityLeft: 0,
-          frame: 0,
-          framesLength: 4,
-          dt: 0,
           update(dt) {
             this.dt += dt;
             if (this.dt > 0.07) {   // каждые 0.3 сек смена кадра
               this.frame = (this.frame + 1) % this.framesLength;
               this.dt = 0;
             }
-            this.damageInvulnerabilityLeft = Math.max(0, this.damageInvulnerabilityLeft - this.dt);
+            this.dvl = Math.max(0, this.dvl - this.dt);
           },
           render() {
-            const isJumping = this.isJumping
-            const isWalking = this.isMoving && !isJumping
-            const isPooping = this.isPooping
             let pose
 
-            if (isJumping) {
+            if (this.isJumping) {
               pose = 'jump'
-            } else if (isWalking) {
+            } else if (this.isMoving && !this.isJumping) {
               pose = 'walk'
-            } else if (isPooping) {
+            } else if (this.isPooping) {
               pose = 'attack'
             } else {
               pose = 'idle'
             }
 
-            renderCatSideView(this.context,
+            renderCatSideView(
+              this.context,
               {
                 pose,
                 flipX: !this.facingRight,
@@ -210,66 +206,41 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
 
       if (ch === 'H') {
         gameObjects.black = Sprite({
-          x: x * tileSize,
-          y: y * tileSize,
-          width: 40,
-          height: 31,
-          color: 'rgba(0,0,0,0)',
-          // Добавляем физические свойства
-          velocityY: 0,
-          isJumping: true,
-          jumpForce: -550, // Отрицательное значение, т.к. ось Y направлена вниз
-          onGround: false,
-          alpha: 1.0, // для прозрачности
-          moveSpeed: 200,
-          originalWidth: 40,
-          originalHeight: 40,
-          originalAttackRange: 15,
-          maxAttackMultiplier: 3,
-          attackMultiplier: 1,
-          // Добавляем свойства для атаки
-          isAttacking: false,
-          attackDuration: 0.03, // миллисекунды
-          attackTimer: 0,
-          attackRange: 15, // дальность атаки
-          attackDamage: 10, // урон от атаки
-          facingRight: true,
-          // Свойства для cooldown
+          ...defCatCfg,
           attackCooldown: 0.5, // миллисекунды (время перезарядки)
           attackCooldownTimer: 0, // текущий таймер перезарядки
+          attackDamage: 10, // урон от атаки
+          attackDuration: 0.03, // миллисекунды
+          attackMultiplier: 1,
+          attackRange: 15, // дальность атаки
+          attackTimer: 0,
           canAttack: true, // флаг, может ли кот атаковать
-          isMoving: false,
-          health: 100,
-          damageInvulnerabilityLeft: 0,
+          color: 'rgba(0,0,0,0)',
           frame: 0,
-          framesLength: 4,
-          dt: 0,
-          update(dt) {
+          isAttacking: false,
+          jumpForce: -550,
+          maxAttackMultiplier: 3,
+          moveSpeed: 200,
+          onGround: false,
+          originalAttackRange: 15,
+          originalHeight: 40,
+
+          update(dt){
             this.dt += dt
-            if (this.isAttacking) {
-              if (this.dt > 0.07) {   // каждые 0.3 сек смена кадра
-                this.frame = (this.frame + 1) % 10
-                this.dt = 0
-              }
-            } else {
-              if (this.dt > 0.07) {   // каждые 0.3 сек смена кадра
-                this.frame = (this.frame + 1) % this.framesLength
-                this.dt = 0
-              }
+            if (this.dt > 0.07) {
+              this.frame = (this.frame + 1) % this.isAttacking ? 10 : this.framesLength
+              this.dt = 0
             }
-            this.damageInvulnerabilityLeft = Math.max(0, this.damageInvulnerabilityLeft - this.dt);
+            this.dvl = Math.max(0, this.dvl - this.dt)
           },
           render() {
-            const isJumping = this.isJumping
-            const isWalking = this.isMoving && !isJumping
-            const isAttacking = this.isAttacking
             let pose
 
-            if (isJumping) {
+            if (this.isJumping) {
               pose = 'jump'
-            } else if (isWalking) {
+            } else if (this.isMoving && !this.isJumping) {
               pose = 'walk'
-            } else if (isAttacking) {
+            } else if (this.isAttacking) {
               pose = 'attack'
             } else {
               pose = 'idle'
@@ -388,30 +359,23 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           cfg.velocityY = 0
           cfg.velocityX = 0
           cfg.isJumping = true
-          cfg.jumpForce = -350 // Меньше, чем у игрока
+          cfg.jumpForce = -350
           cfg.moveSpeed = 300
           cfg.onGround = true
           cfg.facingRight = false
-
-          // Запоминаем начальную позицию
           cfg.spawnX = x * tileSize
           cfg.spawnY = y * tileSize
-
-          // Границы перемещения (10 тайлов в каждую сторону)
           cfg.boundaryLeft = cfg.spawnX - 12 * tileSize
           cfg.boundaryRight = cfg.spawnX + 12 * tileSize
-
-          // Таймеры для принятия решений
           cfg.decisionTimer = 0
-          cfg.decisionInterval = 1 // секунды между сменой поведения
-
-          cfg.trashItems = []; // массив для хранения мусора
-          cfg.maxTrashItems = 2; // максимальное количество мусора
-          cfg.trashCooldown = 5; // секунды между созданием мусора
-          cfg.trashTimer = 0; // таймер для отсчета
-          cfg.trashLifespan = 10; // время жизни мусора в секундах
-          cfg.trashDamage = 20; // урон от столкновения с мусором
-          cfg.trashWidth = tileSize / 2; // размер мусора
+          cfg.decisionInterval = 1
+          cfg.trashItems = [];
+          cfg.maxTrashItems = 2;
+          cfg.trashCooldown = 5;
+          cfg.trashTimer = 0;
+          cfg.trashLifespan = 10;
+          cfg.trashDamage = 20;
+          cfg.trashWidth = tileSize / 2;
           cfg.trashHeight = tileSize / 2;
 
           cfg.update = function(deltaTime) {
@@ -635,25 +599,24 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
 
       if (ch === 'P') {
         gameObjects.enemies.push(Sprite({
-          type: 'P',
-          x: cfg.x,
-          y: cfg.y,
-          width: cfg.width,
-          height: cfg.height,
+          canDie: false,
           color: 'brown',
-          // Свойства из оригинального объекта
           createdAt: Date.now(),
+          direction: Math.random() > 0.5 ? 'left' : 'right',
+          health: 100,
+          height: cfg.height,
+          isAlive: true,
+          isDead: false,
           isMonster: false,
+          jumpTimer: 0,
+          onGround: false,
           transformAt: Date.now() + 5000,
+          type: 'P',
           velocityX: 0,
           velocityY: 0,
-          direction: Math.random() > 0.5 ? 'left' : 'right',
-          onGround: false,
-          jumpTimer: 0,
-          health: 100,
-          isAlive: true,
-          canDie: false,
-          isDead: false,
+          width: cfg.width,
+          x: cfg.x,
+          y: cfg.y,
           update(deltaTime) {
             if (!this.isAlive) {
               this.isMonster = false

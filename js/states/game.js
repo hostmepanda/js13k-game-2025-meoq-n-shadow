@@ -9,12 +9,10 @@ export const GameState = {
   musicEnabled: false,
   paused: false,
   previousMusicEnabled: false,
-  msl: {
-
-  },
+  msl: {  },
   camera: {
-    x: 0, // Начальная позиция камеры по X
-    y: 0, // Начальная позиция камеры по Y
+    x: 0,
+    y: 0,
     width: CANVAS.width,
     height: CANVAS.height,
     // Границы уровня

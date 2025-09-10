@@ -169,9 +169,9 @@ export function checkEnemyCollisions(player, enemies, states) {
         }
       } else if (enemy.type === 'E' || enemy.type === 'P' || enemy.type === 'B') {
         if (['P','B'].includes(enemy.type) && enemy.isMonster) {
-          if (player.damageInvulnerabilityLeft <= 0) {
+          if (player.dvl <= 0) {
             player.health -= enemy?.collisionDamage ?? 1
-            player.damageInvulnerabilityLeft = 10
+            player.dvl = 10
 
             if (player.health <= 0) {
               if (states.PlayerState[player.color].lives > 0) {
