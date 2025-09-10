@@ -147,7 +147,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         isVisible: true,
       };
 
-      if (ch === '2') {
+      if (ch === 'G') {
         gameObjects.white = Sprite({
           x: x * tileSize,
           y: y * tileSize,
@@ -221,7 +221,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         })
       }
 
-      if (ch === '1') {
+      if (ch === 'H') {
         gameObjects.black = Sprite({
           x: x * tileSize,
           y: y * tileSize,

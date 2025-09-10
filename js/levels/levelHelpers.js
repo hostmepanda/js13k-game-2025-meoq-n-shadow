@@ -10,6 +10,14 @@ import {CANVAS, GAME_STATE} from '../consts'
 import {PlayerState as DefaultPlayerState} from '../states/player'
 import {renderParallaxBackground} from '../gameHelpers/backgroundHelpers'
 
+function decodeRow(row) {
+  return row.replace(/(\D)(\d+)/g, (_, ch, n) => ch.repeat(+n));
+}
+
+function expandMap(map) {
+  return map.map(row => decodeRow(row))
+}
+
 export function createLevel({ selectedLevel, gameStates, kontra}) {
   const {Sprite, canvas} = kontra
 
@@ -24,7 +32,7 @@ export function createLevel({ selectedLevel, gameStates, kontra}) {
     gameStates.gameObjects,
     parseLevel({
       gameObjects: gameStates.gameObjects,
-      levelMap: LEVEL_MAPS[selectedLevel],
+      levelMap: expandMap(LEVEL_MAPS[selectedLevel]),
       selectedLevel,
       Sprite,
     }),

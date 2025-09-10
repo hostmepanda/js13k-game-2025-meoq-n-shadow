@@ -1,26 +1,4 @@
 import {GAME_STATE} from '../consts'
-/*
-  '#': 'yellow'  # = level exit
-  'A': 'blue'  fish
-  'B': 'purple'  B = boss
-  'C': 'black'  C = ceiling
-  'D': 'darkred'  D = door
-  'E': 'red'  E = enemy
-  'F': 'darkgreen'  F = floor
-  'L': 'yellow'  L = lamp
-  '2': 'white'  white cat
-  'O': 'lightblue'  O = window
-  'P': 'brown'  P = poop
-  'R': 'saddlebrown'  R = wardrobe
-  '1': 'black'  black cat
-  'T': 'peru'  T = table
-  'W': 'brown'  W = wall
-  'X': 'gray'  X = breakable wall
-  'c': 'sienna'  c = chair
-  'Q': 'green'  Q = flower
-  'f': 'darkgreen', // f - invisible when boss is alive
- */
-
 
 export const LEVEL_MAPS = {
   [GAME_STATE.LEVEL1]: [
@@ -28,8 +6,8 @@ export const LEVEL_MAPS = {
     "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
     "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
     "N.....................X...................................................a.....X....................................................................W.............M..................a..X.............N",
-    "N...12................X.........................................................X........................A...........................................W.............M.....................X.............N",
-    "N................#a...NFFFFffffffffffffffffffffffffffffffffff............f......fffffffffffffffffffffffffff..........................................W.............M..........ff.........F.............N",
+    "N.....................X.........................................................X........................A...........................................W.............M.....................X.............N",
+    "N................ a...NFFFFffffffffffffffffffffffffffffffffff............f......fffffffffffffffffffffffffff..........................................W.............M..........ff.........F.............N",
     "N...FF...........FFfffN..................................FFFFffff...............f.........................ffffffffffffff.............................mmmmmmmmmmmmmmm..........NN.........N.............N",
     "N.....................X.....................................FFFFFffff...........fFFFFFFFFFFF............................fffffffffffffXXXXX........aa................XXXXfffffffffffffffffN.............N",
     "N.....................XXX.......Aa...................................ffff.......f...................................................XXXXXXffffffff.................a................d....N.............N",
@@ -40,7 +18,7 @@ export const LEVEL_MAPS = {
     "N.......................ff...........................................................................................................ff............FFFFXXXXFFFF..........................N.........d...N",
     "N.........................f............................................................................................................ff......................FFFFFFF...................N...ffffffffffN",
     "N..........................f....ff.......................................................................................................ff..........................W...................N.............N",
-    "N..........a.......................f.......................................................................................................ff........................WFF.................N.............N",
+    "NGH........a.......................f.......................................................................................................ff........................WFF.................N.............N",
     "N..........F..................ff.....f.......................................................................................................ff..................mmmmW...................Nffffffffff...N",
     "N...d......M...............Q............................................D.......................................d................................Q..................................Q....N...........##N",
     "N...T.D....M.D.D....d......T.d...............Dd.Q.......................TQ....................................d.T.......................Dd.......T...................................T...N......D....##N",
@@ -71,28 +49,6 @@ export const LEVEL_MAPS = {
   ],
   [GAME_STATE.LEVEL3]: [
     // 39 F one screen width
-    "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
-    "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
-    "W......................................................................................................................................................................................................W",
-    "W......................................................................................................................................................................................................W",
-    "W......................................................................................................................................................................................................W",
-    "W......................................................................................................................................................................................................W",
-    "W......................................................................................................................................................................................................W",
-    "W......................................................................................................................................................................................................W",
-    "W......................................................................................................................................................................................................W",
-    "WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW",
-    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-    "W......................................................................................................................................................................................................W",
-    "W......................................................................................................................................................................................................W",
-    "W......................................................................................................................................................................................................W",
-    "W......................................................................................................................................................................................................W",
-    "W.....................S..................................................................................................................................................M.............................W",
-    "W......................................................................................................................................................................................................W",
-    "W......................................................................................................................................................................................................W",
-    "W......................................................................................................................................................................................................W",
-    "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-  ],
-  [GAME_STATE.LEVEL4]: [
     "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
     "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
     "W......................................................................................................................................................................................................W",
