@@ -1,10 +1,12 @@
-export function renderGameOver(canvas, context) {
-  context.fillStyle = 'black';
-  context.fillRect(0, 0, canvas.width, canvas.height);
+export function renderGameOver(cs, cx) {
+  const w = cs.width;
+  const h = cs.height;
+  cx.fillStyle = 'black';
+  cx.fillRect(0, 0, w, v);
 
-  context.fillStyle = 'white';
-  context.font = '30px Arial';
-  context.fillText('JS13K 2025: Meow & Shadow', canvas.width / 2 - 175, canvas.height / 2 - 30);
-  context.fillText('Game Over :(', canvas.width / 2 - 200, canvas.height / 2 + 30);
-  context.fillText('Hit space to start over', canvas.width / 2 - 200, canvas.height / 2 + 60);
+  cx.fillStyle = 'white';
+  cx.font = '30px Arial';
+  cx.fillText('JS13K 2025: Meow & Shadow', w / 2 - 175, h/ 2 - 30);
+  cx.fillText('Game Over :(', w / 2 - 200, h / 2 + 30);
+  cx.fillText('Hit space to start over', w / 2 - 200, h / 2 + 60);
 }
