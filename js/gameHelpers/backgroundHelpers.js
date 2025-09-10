@@ -1,4 +1,3 @@
-// Создаёт offscreen canvas с паттерном и возвращает CanvasPattern
 export function createWallpaperPattern(ctx, options = {}) {
   const {
     style = 'damask',     // 'damask' | 'stripes' | 'dots'
@@ -9,35 +8,26 @@ export function createWallpaperPattern(ctx, options = {}) {
     scale = 1            // масштаб узора (1 = по tileSize)
   } = options;
 
-
-  // offscreen canvas (поддерживается в современных браузерах)
   const off = document.createElement('canvas');
   off.width = Math.round(tileSize * scale);
   off.height = Math.round(tileSize * scale);
   const c = off.getContext('2d');
-  // фон
   c.fillStyle = bgColor;
   c.fillRect(0, 0, off.width, off.height);
-
-  // helper: stroke/fill defaults
   c.lineJoin = 'round';
   c.lineCap = 'round';
 
   if (style === 'stripes') {
-    // тонкие диагональные полосы
     const stripeW = Math.max(4, Math.round(6 * scale));
     c.save();
     c.translate(off.width/2, off.height/2);
     c.rotate(-20 * Math.PI/180);
     c.translate(-off.width/2, -off.height/2);
-
     c.fillStyle = fgColor;
     for (let x = -off.width; x < off.width * 2; x += stripeW * 3) {
       c.fillRect(x, -off.height, stripeW, off.height * 4);
     }
     c.restore();
-
-    // лёгкая текстура (полупрозрачные штрихи)
     c.globalAlpha = 0.08;
     c.fillStyle = fgColor;
     for (let i = 0; i < 30; i++) {
@@ -47,7 +37,6 @@ export function createWallpaperPattern(ctx, options = {}) {
     }
     c.globalAlpha = 1;
   } else if (style === 'dots') {
-    // равномерные точки (узор в шахматном виде)
     const step = Math.round(24 * scale);
     const r = Math.round(4 * scale);
     c.fillStyle = fgColor;
@@ -59,7 +48,6 @@ export function createWallpaperPattern(ctx, options = {}) {
         c.fill();
       }
     }
-    // опциональные блёски
     if (accentColor) {
       c.globalAlpha = 0.12;
       c.fillStyle = accentColor;
@@ -71,9 +59,7 @@ export function createWallpaperPattern(ctx, options = {}) {
       c.globalAlpha = 1;
     }
   } else {
-    // DAMASK-like motif (симметричный цветочный элемент)
     const w = off.width, h = off.height;
-    // центральный цветок (с зеркалированием)
     const drawPetal = (cx, cy, rx, ry, rot = 0) => {
       c.save();
       c.translate(cx, cy);
@@ -85,20 +71,15 @@ export function createWallpaperPattern(ctx, options = {}) {
     };
 
     c.fillStyle = fgColor;
-    // base symmetric motif at center
     const cx = w/2, cy = h/2;
     drawPetal(cx, cy, w*0.12, h*0.28, 0);
     drawPetal(cx, cy, w*0.12, h*0.28, Math.PI/2);
     drawPetal(cx, cy, w*0.12, h*0.28, Math.PI/4);
     drawPetal(cx, cy, w*0.12, h*0.28, -Math.PI/4);
-
-    // small dots & center
     c.beginPath();
     c.arc(cx, cy, Math.round(6*scale), 0, Math.PI*2);
     c.fill();
 
-    // mirrored copies to make tiling feel ornamental
-    // place smaller motifs at tile corners (ensure seamless look)
     const smallR = Math.round(8*scale);
     const cornerOffsets = [
       [-w/3, -h/3],
@@ -113,7 +94,6 @@ export function createWallpaperPattern(ctx, options = {}) {
       c.fill();
     });
 
-    // subtle highlight if accentColor provided
     if (accentColor) {
       c.globalAlpha = 0.12;
       c.fillStyle = accentColor;
@@ -123,38 +103,31 @@ export function createWallpaperPattern(ctx, options = {}) {
       c.globalAlpha = 1;
     }
 
-    // add thin outline to motif for clarity
     c.strokeStyle = 'rgba(0,0,0,0.06)';
     c.lineWidth = Math.max(1, Math.round(1*scale));
-    // subtle strokes around main petals
     c.beginPath();
     c.ellipse(cx, cy, w*0.12, h*0.12, 0, 0, Math.PI*2);
     c.stroke();
   }
 
-  // Возвращаем паттерн, готовый к использованию
   return ctx.createPattern(off, 'repeat');
 }
 
-export function renderParallaxBackground(context, width, height, cameraX = 0, cameraY = 0, options) {
-  context.save();
+export function renderParallaxBackground(cx, width, height, cameraX = 0, cameraY = 0, options) {
+  cx.save();
   options.layers.forEach((layer, index) => {
-    // параллакс-смещение
     const offsetX = -cameraX * layer.speed;
     const offsetY = -cameraY * layer.speed;
 
-    context.globalAlpha = layer.alpha;
+    cx.globalAlpha = layer.alpha;
+    cx.setTransform(1, 0, 0, 1, 0, 0);
+    cx.translate(offsetX, offsetY);
 
-    // сбрасываем трансформации перед каждым слоем
-    context.setTransform(1, 0, 0, 1, 0, 0);
-    context.translate(offsetX, offsetY);
-
-    context.fillStyle = options.patternTiles[index];
-    context.fillRect(-offsetX, -offsetY , width + options.tileSize, (height + options.tileSize));
+    cx.fillStyle = options.patternTiles[index];
+    cx.fillRect(-offsetX, -offsetY , width + options.tileSize, (height + options.tileSize));
   });
 
-  // сбросить все эффекты
-  context.setTransform(1, 0, 0, 1, 0, 0);
-  context.globalAlpha = 1;
-  context.restore();
+  cx.setTransform(1, 0, 0, 1, 0, 0);
+  cx.globalAlpha = 1;
+  cx.restore();
 }

@@ -1,93 +1,73 @@
 import {drawPixels, isCollided} from './utils'
 
-export function checkEnemyCollisionWithEnvironment(obstacles, enemy) {
-  obstacles.forEach(obstacle => {
+export function checkEnemyCollisionWithEnvironment(o, e) {
+  o.forEach(obstacle => {
     if (
-      enemy.x < obstacle.x + obstacle.width &&
-      enemy.x + enemy.width > obstacle.x &&
-      enemy.y < obstacle.y + obstacle.height &&
-      enemy.y + enemy.height > obstacle.y
+      e.x < obstacle.x + obstacle.width &&
+      e.x + e.width > obstacle.x &&
+      e.y < obstacle.y + obstacle.height &&
+      e.y + e.height > obstacle.y
     ) {
-      // Проверка столкновения сверху (монстр стоит на препятствии)
-      if (enemy.y + enemy.height > obstacle.y &&
-        enemy.y + enemy.height < obstacle.y + obstacle.height / 2) {
-        enemy.y = obstacle.y - enemy.height
-        enemy.velocityY = 0
-        enemy.onGround = true
+      if (e.y + e.height > obstacle.y &&
+        e.y + e.height < obstacle.y + obstacle.height / 2) {
+        e.y = obstacle.y - e.height
+        e.velocityY = 0
+        e.onGround = true
       }
-      // Проверка боковых столкновений
-      else if (enemy.velocityX > 0 && enemy.x + enemy.width > obstacle.x &&
-        enemy.x < obstacle.x) {
-        // Столкновение справа
-        enemy.x = obstacle.x - enemy.width
-        enemy.direction = 'left'
-        enemy.velocityX *= -1
-      } else if (enemy.velocityX < 0 && enemy.x < obstacle.x + obstacle.width &&
-        enemy.x + enemy.width > obstacle.x + obstacle.width) {
-
-        enemy.x = obstacle.x + obstacle.width
-        enemy.direction = 'right'
-        enemy.velocityX *= -1
+      else if (e.velocityX > 0 && e.x + e.width > obstacle.x &&
+        e.x < obstacle.x) {
+        e.x = obstacle.x - e.width
+        e.direction = 'left'
+        e.velocityX *= -1
+      } else if (e.velocityX < 0 && e.x < obstacle.x + obstacle.width &&
+        e.x + e.width > obstacle.x + obstacle.width) {
+        e.x = obstacle.x + obstacle.width
+        e.direction = 'right'
+        e.velocityX *= -1
       }
     }
   })
 }
 
-// Функция для создания какашки
-export function createPoop(character, gameObjects, Sprite) {
-  // Проверяем, достаточно ли большой размер кота
-  if (character.sizeMultiplier > 1) {
-    // Уменьшаем размер кота после какания
+export function createPoop(ch, gameObjects, Sprite) {
+  if (ch.sizeMultiplier > 1) {
     const poopSizeReduction = 0.25 // Уменьшение размера на 25%
+    const bottomY = ch.y + ch.height
+    ch.sizeMultiplier = Math.max(1, ch.sizeMultiplier - poopSizeReduction)
+    ch.width = ch.originalWidth * ch.sizeMultiplier
+    ch.height = ch.originalHeight * ch.sizeMultiplier
+    ch.y = bottomY - ch.height
+    ch.jumpForce = ch.originalJumpForce * (1 / (1 + (ch.sizeMultiplier - 1) * 0.5))
+    ch.moveSpeed = ch.originalMoveSpeed * (1 / (1 + (ch.sizeMultiplier - 1) * 0.4))
 
-    // Запоминаем текущую позицию "ног" персонажа
-    const bottomY = character.y + character.height
+    const poopSize = 15 + (ch.sizeMultiplier - 1) * 5
+    const poopX = ch.facingRight
+      ? ch.x - poopSize / 2
+      : ch.x + ch.width - poopSize / 2
 
-    // Уменьшаем множитель размера, но не меньше 1
-    character.sizeMultiplier = Math.max(1, character.sizeMultiplier - poopSizeReduction)
-
-    // Пересчитываем размеры
-    character.width = character.originalWidth * character.sizeMultiplier
-    character.height = character.originalHeight * character.sizeMultiplier
-
-    // Корректируем позицию Y, чтобы "ноги" оставались на том же уровне
-    character.y = bottomY - character.height
-
-    character.jumpForce = character.originalJumpForce * (1 / (1 + (character.sizeMultiplier - 1) * 0.5))
-    character.moveSpeed = character.originalMoveSpeed * (1 / (1 + (character.sizeMultiplier - 1) * 0.4))
-
-    const poopSize = 15 + (character.sizeMultiplier - 1) * 5 // Размер какашки зависит от размера кота
-
-    // Определяем положение какашки под котом
-    const poopX = character.facingRight
-      ? character.x - poopSize / 2
-      : character.x + character.width - poopSize / 2
-
-    // Создаем спрайт какашки с помощью Kontra.js
     const poop = Sprite({
-      x: poopX,
-      y: character.y + character.height - poopSize,
-      width: poopSize,
-      height: poopSize,
-      color: 'brown', // Добавляем цвет
-      type: 'P',
-      // Свойства из оригинального объекта
-      createdAt: Date.now(),
-      isMonster: false,
-      size: poopSize,
-      transformAt: Date.now() + 5000,
-      velocityX: 0,
-      velocityY: 0,
-      direction: Math.random() > 0.5 ? 'left' : 'right',
-      onGround: false,
-      jumpTimer: 0,
-      health: 100,
-      isAlive: true,
       canDie: false,
-      isDead: false,
+      color: 'brown',
+      createdAt: Date.now(),
+      direction: Math.random() > 0.5 ? 'left' : 'right',
       dt: 0,
       frame: 0,
       framesLength: 6,
+      health: 100,
+      height: poopSize,
+      isAlive: true,
+      isDead: false,
+      isMonster: false,
+      jumpTimer: 0,
+      onGround: false,
+      size: poopSize,
+      transformAt: Date.now() + 5000,
+      type: 'P',
+      velocityX: 0,
+      velocityY: 0,
+      width: poopSize,
+      x: poopX,
+      y: ch.y + ch.height - poopSize,
       render() {
         renderPoop(this.context, {
           isMonster: this.isMonster,
