@@ -1,5 +1,4 @@
-import { init, Sprite, collides } from './engine/kontra.min.mjs'
-
+import { init, Sprite, collides } from './engine/kontra-custom'
 import {GameState as defaultGameState, loadLevel} from './states/game'
 import {GameLoop} from './gameHelpers/loop'
 import {PlayerState as defaultPlayerState } from './states/player'

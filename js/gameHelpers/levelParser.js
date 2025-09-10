@@ -26,71 +26,58 @@ const parseToColorMapper = {
   'f': 'darkgreen', // f - invisible when boss is alive
 }
 
+const blueBg = {
+  bodyColor: 'rgb(150,236,255)',
+  coverColor: 'rgb(115,183,197)',
+}
+
+const grayBg = {
+  bodyColor: 'rgb(180, 180, 180)',
+  coverColor: 'rgb(142,142,142)',
+  injectColor: 'rgb(101,101,101)',
+}
+
+const woodBg = {
+  bodyColor: 'rgb(180, 180, 180)',
+  coverColor: 'rgb(170, 120, 70)',
+  injectColor: 'rgb(101,101,101)',
+}
+
+const greenBg = {
+  bodyColor: 'rgb(37,37,37)',
+  coverColor: 'rgb(117,115,63)',
+  injectColor: 'rgb(2,174,2)',
+}
+
 const parseToColorTilesByLevel = {
   [GAME_STATE.LEVEL1]: {
-    F: {
-      bodyColor: 'rgb(180, 180, 180)',
-      coverColor: 'rgb(170, 120, 70)',
-      injectColor: 'rgb(101,101,101)',
-    },
-    f: {
-      bodyColor: 'rgb(180, 180, 180)',
-      coverColor: 'rgb(170, 120, 70)',
-      injectColor: 'rgb(101,101,101)',
-    },
+    F: woodBg,
+    f: woodBg,
     M: {
-      bodyColor: 'rgb(180, 180, 180)',
-      coverColor: 'rgb(142,142,142)',
-      injectColor: 'rgb(101,101,101)',
+      ...grayBg,
       closingColor: 'rgb(142,142,142)',
       rotation: 1,
     },
     m: {
-      bodyColor: 'rgb(180, 180, 180)',
-      coverColor: 'rgb(142,142,142)',
-      injectColor: 'rgb(101,101,101)',
+      ...grayBg,
       rotation: 2,
     },
     N: {
-      bodyColor: 'rgb(180, 180, 180)',
-      coverColor: 'rgb(142,142,142)',
-      injectColor: 'rgb(101,101,101)',
+      ...grayBg,
       rotation: 1,
     },
     n: {
       bodyColor: 'rgb(180, 180, 180)',
       injectColor: 'rgb(101,101,101)',
     },
-    W: {
-      bodyColor: 'rgb(180, 180, 180)',
-      coverColor: 'rgb(142,142,142)',
-      injectColor: 'rgb(101,101,101)',
-    },
-    w: {
-      bodyColor: 'rgb(180, 180, 180)',
-      coverColor: 'rgb(142,142,142)',
-      injectColor: 'rgb(101,101,101)',
-    },
-    O: {
-      bodyColor: 'rgb(150,236,255)',
-      coverColor: 'rgb(115,183,197)',
-    },
-    o: {
-      bodyColor: 'rgb(150,236,255)',
-      coverColor: 'rgb(115,183,197)',
-    },
+    W: grayBg,
+    w: grayBg,
+    O: blueBg,
+    o: blueBg,
   },
   [GAME_STATE.LEVEL2]: {
-    F: {
-      bodyColor: 'rgb(37,37,37)',
-      coverColor: 'rgb(117,115,63)',
-      injectColor: 'rgb(2,174,2)',
-    },
-    f: {
-      bodyColor: 'rgb(37,37,37)',
-      coverColor: 'rgb(117,115,63)',
-      injectColor: 'rgb(2,174,2)',
-    },
+    F: greenBg,
+    f: greenBg,
     M: {
       bodyColor: 'rgb(128,128,128)',
       coverColor: 'rgb(62,62,62)',
@@ -653,8 +640,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           y: cfg.y,
           width: cfg.width,
           height: cfg.height,
-          color: 'brown', // Добавляем цвет
-
+          color: 'brown',
           // Свойства из оригинального объекта
           createdAt: Date.now(),
           isMonster: false,
