@@ -16,10 +16,14 @@ TODO:
 - [] Fix collision for enemies
 - [] +2 types of enemy: shooting and flying?
 - [] cut scenes
-- [] designs
-- [] add music and sounds
+- [X] designs
+- [X] add music and sounds
 - [] add effects
 - [] cleanup all logs
+- [] compress to fit to 13k
+
+## Maps
+There are two commands to compress and decompress maps, see package.json
 
 Progress
 29-08-2025
