@@ -1,10 +1,12 @@
-export function renderVictoryWhite(canvas, context) {
-  context.fillStyle = 'black';
-  context.fillRect(0, 0, canvas.width, canvas.height);
+export function renderVictoryWhite(cv, cx) {
+  const w = cv.width;
+  const h = cv.height;
+  cx.fillStyle = 'black';
+  cx.fillRect(0, 0, w, h);
 
-  context.fillStyle = 'white';
-  context.font = '30px Arial';
-  context.fillText('JS13K 2025: Meow & Shadow', canvas.width / 2 - 175, canvas.height / 2 - 30);
-  context.fillText('You have won! White cat took all the Glory!', canvas.width / 2 - 200, canvas.height / 2 + 30);
-  context.fillText('Hit space to start over', canvas.width / 2 - 200, canvas.height / 2 + 60);
+  cx.fillStyle = 'white';
+  cx.font = '30px Arial';
+  cx.fillText('JS13K 2025: Meow & Shadow', w / 2 - 175, h / 2 - 30);
+  cx.fillText('You have won! White cat took all the Glory!', w / 2 - 200, h / 2 + 30);
+  cx.fillText('Hit space to start over', w / 2 - 200, h / 2 + 60);
 }

@@ -1,38 +1,37 @@
 import {renderCatSideView} from '../gameHelpers/catHelpers'
 
-export function renderMainMenu(canvas, context, GameState) {
-  // Заливка фона черным цветом
-  context.fillStyle = 'black';
-  context.fillRect(0, 0, canvas.width, canvas.height);
+export function renderMainMenu(cv, cx, GameState) {
+  const w = cv.width
+  const h = cv.height
+  cx.fillStyle = 'black'
+  cx.fillRect(0, 0, w, h)
 
-  // Настройка стиля текста
-  context.fillStyle = 'white';
-  context.font = '30px Arial';
-  context.textAlign = 'center';  // Устанавливаем выравнивание текста по центру
+  cx.fillStyle = 'white'
+  cx.font = '30px Arial'
+  cx.textAlign = 'center'
 
-  // Отрисовка текста с указанием центра
-  context.fillText('Meoq & Shadow', canvas.width / 2 + 5, canvas.height / 2 - 60);
-  context.fillStyle = '#ffffff';
-  context.font = '25px Arial';  // Меньший шрифт для имени создателя
-  context.fillText('Press Space to start', canvas.width / 2, canvas.height / 2 + 25);
+  cx.fillText('Meoq & Shadow', w / 2 + 5, h / 2 - 60)
+  cx.fillStyle = '#ffffff'
+  cx.font = '25px Arial'
+  cx.fillText('Press Space to start', w / 2, h / 2 + 25)
 
-  context.font = '15px Arial';  // Меньший шрифт для имени создателя
-  context.fillText('Move: A & D, jump: W, switch cat: Left Shift', canvas.width / 2, canvas.height / 2 + 55);
-  context.fillText('poop (Meoq): Space, attack (Shadow): Space', canvas.width / 2, canvas.height / 2 + 78);
+  cx.font = '15px Arial'
+  cx.fillText('Move: A & D, jump: W, switch cat: Left Shift', w / 2, h / 2 + 55)
+  cx.fillText('poop (Meoq): Space, attack (Shadow): Space', w / 2, h / 2 + 78)
 
-  context.font = '18px Arial';
-  context.fillText('JS13K GAME 2025', canvas.width / 2, canvas.height / 2 + 110);
+  cx.font = '18px Arial'
+  cx.fillText('JS13K GAME 2025', w / 2, h / 2 + 110)
 
-  // Добавляем информацию о создателе
-  context.font = '15px Arial';  // Меньший шрифт для имени создателя
-  context.fillText('created by hostmepanda', canvas.width / 2, canvas.height / 2 + 135);
-  context.font = '12px Arial';  // Меньший шрифт для имени создателя
-  context.fillStyle = '#66ccff';
-  context.fillText('(github.com/hostmepanda)', canvas.width / 2, canvas.height / 2 + 155);
 
-  context.save()
-  context.translate(canvas.width / 2 - 40, canvas.height / 2 - 45)
-  renderCatSideView(context,
+  cx.font = '15px Arial'
+  cx.fillText('created by hostmepanda', w / 2, h / 2 + 135)
+  cx.font = '12px Arial'
+  cx.fillStyle = '#66ccff'
+  cx.fillText('(github.com/hostmepanda)', w / 2, h / 2 + 155)
+
+  cx.save()
+  cx.translate(w / 2 - 40, h / 2 - 45)
+  renderCatSideView(cx,
     {
       pose: 'idle',
       flipX: false,
@@ -50,8 +49,8 @@ export function renderMainMenu(canvas, context, GameState) {
         '#f26060',
       ]
     })
-  context.translate(50, 0)
-  renderCatSideView(context,
+  cx.translate(50, 0)
+  renderCatSideView(cx,
     {
       pose: 'idle',
       flipX: true,
@@ -70,27 +69,20 @@ export function renderMainMenu(canvas, context, GameState) {
         'rgba(255,255,255,1)',
       ]
     })
-  context.restore()
-  context.translate(0, 0)
+  cx.restore()
+  cx.translate(0, 0)
 
-  context.fillStyle = '#ffffff';
-  if (GameState.musicEnabled) {
-    context.font = '25px Arial';  // Меньший шрифт для имени создателя
-    context.fillText('🔉', canvas.width - 80, canvas.height - 50);
-    context.font = '15px Arial';  // Меньший шрифт для имени создателя
-    context.fillText('(press M to disable)', canvas.width - 80, canvas.height - 28);
-  } else {
-    context.font = '25px Arial';  // Меньший шрифт для имени создателя
-    context.fillText('🔇', canvas.width - 80, canvas.height - 50);
-    context.font = '15px Arial';  // Меньший шрифт для имени создателя
-    context.fillText('(press M to enable)', canvas.width - 80, canvas.height - 28);
-  }
+  cx.fillStyle = '#ffffff'
+  cx.font = '25px Arial'
+  cx.fillText(GameState.musicEnabled ? '🔉' : '🔇', w - 80, h - 50)
+  cx.font = '15px Arial'
+  cx.fillText(`(press M to ${GameState.musicEnabled ? 'disable' : 'enable'})`, w - 80, h - 28)
 
   GameState.menuScreenListeners = {
-    titlePos: { x: canvas.width / 2 + 5, y: canvas.height / 2 - 60 },
-    gameNamePos: { x: canvas.width / 2, y: canvas.height / 2 + 110 },
-    authorPos: { x: canvas.width / 2, y: canvas.height / 2 + 155 },
-    authorWidth: context.measureText('(github.com/hostmepanda)').width,
+    titlePos: { x: w / 2 + 5, y: h / 2 - 60 },
+    gameNamePos: { x: w / 2, y: h / 2 + 110 },
+    authorPos: { x: w / 2, y: h / 2 + 155 },
+    authorWidth: cx.measureText('(github.com/hostmepanda)').width,
     authorHeight: 12
   }
 }
