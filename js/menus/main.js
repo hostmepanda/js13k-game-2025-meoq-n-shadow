@@ -33,9 +33,6 @@ export function renderMainMenu(cv, cx, GameState) {
   cx.translate(w / 2 - 40, h / 2 - 45)
   renderCatSideView(cx,
     {
-      pose: 'idle',
-      flipX: false,
-      frameIndex: 0,
       scale: 2,
       width: 40,
       heightShift: 0,
@@ -52,9 +49,7 @@ export function renderMainMenu(cv, cx, GameState) {
   cx.translate(50, 0)
   renderCatSideView(cx,
     {
-      pose: 'idle',
       flipX: true,
-      frameIndex: 0,
       scale: 2,
       width: 40,
       heightShift: 0,
@@ -78,7 +73,7 @@ export function renderMainMenu(cv, cx, GameState) {
   cx.font = '15px Arial'
   cx.fillText(`(press M to ${GameState.musicEnabled ? 'disable' : 'enable'})`, w - 80, h - 28)
 
-  GameState.menuScreenListeners = {
+  GameState.msl = {
     titlePos: { x: w / 2 + 5, y: h / 2 - 60 },
     gameNamePos: { x: w / 2, y: h / 2 + 110 },
     authorPos: { x: w / 2, y: h / 2 + 155 },

@@ -1,32 +1,29 @@
 import {loadLevel} from '../states/game'
 
 export function initMenuScreen(gameState, canvas) {
-  const handleSpaceClick = (event) => {
-    if (event.code === 'Space') {
+  const spclk = (e) => {
+    if (e.code === 'Space') {
       gameState.input.space = true
     }
   }
-  document.addEventListener('keydown', handleSpaceClick)
-
-  document.addEventListener('keyup', (event) => {
-    if (event.code === 'Space') {
+  document.addEventListener('keydown', spclk)
+  document.addEventListener('keyup', (e) => {
+    if (e.code === 'Space') {
       gameState.input.space = false
-      document.removeEventListener('keydown', handleSpaceClick)
+      document.removeEventListener('keydown', spclk)
     }
   })
 
-  document.addEventListener('click', (event) => {
+  document.addEventListener('click', (e) => {
     const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
-    // Проверяем, был ли клик по тексту автора
-    const halfWidth = gameState.menuScreenListeners.authorWidth / 2;
-    if (y >= gameState.menuScreenListeners.authorPos.y - gameState.menuScreenListeners.authorHeight &&
-      y <= gameState.menuScreenListeners.authorPos.y + 5 &&
-      x >= gameState.menuScreenListeners.authorPos.x - halfWidth &&
-      x <= gameState.menuScreenListeners.authorPos.x + halfWidth) {
-      // Клик по тексту автора - открываем ссылку
+    const halfWidth = gameState.msl.authorWidth / 2;
+    if (y >= gameState.msl.authorPos.y - gameState.msl.authorHeight &&
+      y <= gameState.msl.authorPos.y + 5 &&
+      x >= gameState.msl.authorPos.x - halfWidth &&
+      x <= gameState.msl.authorPos.x + halfWidth) {
       window.open('https://github.com/hostmepanda', '_blank');
     }
   });

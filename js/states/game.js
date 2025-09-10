@@ -9,7 +9,7 @@ export const GameState = {
   musicEnabled: false,
   paused: false,
   previousMusicEnabled: false,
-  menuScreenListeners: {
+  msl: {
 
   },
   camera: {
