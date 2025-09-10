@@ -228,7 +228,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           update(dt){
             this.dt += dt
             if (this.dt > 0.07) {
-              this.frame = (this.frame + 1) % this.isAttacking ? 10 : this.framesLength
+              this.frame = (this.frame + 1) % this.isAttacking ? 2 : this.framesLength
               this.dt = 0
             }
             this.dvl = Math.max(0, this.dvl - this.dt)
