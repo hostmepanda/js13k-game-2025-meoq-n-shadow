@@ -20,7 +20,11 @@ TODO:
 - [X] add music and sounds
 - [] add effects
 - [] cleanup all logs
+- [] fix poops for white cat
+- [] boss for 2nd and 3rd level
+- [] pink cat at 3rd level
 - [] compress to fit to 13k
+- [] add visual effect of taking damage for cat and enemies
 
 ## Maps
 There are two commands to compress and decompress maps, see package.json
