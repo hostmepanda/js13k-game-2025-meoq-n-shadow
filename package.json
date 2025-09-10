@@ -12,7 +12,9 @@
   "main": "index.html",
   "scripts": {
     "dev": "vite",
-    "build": "node esbuild.mjs"
+    "build": "node esbuild.mjs",
+    "compress-level": "node tools/compress-level.mjs",
+    "decompress-level": "node tools/decompress-level.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.9",

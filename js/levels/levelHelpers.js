@@ -11,7 +11,7 @@ import {PlayerState as DefaultPlayerState} from '../states/player'
 import {renderParallaxBackground} from '../gameHelpers/backgroundHelpers'
 
 function decodeRow(row) {
-  return row.replace(/(\D)(\d+)/g, (_, ch, n) => ch.repeat(+n));
+  return row.replace(/(\D)(\d*)/g, (_, ch, n) => ch.repeat(n ? +n : 1));
 }
 
 function expandMap(map) {
