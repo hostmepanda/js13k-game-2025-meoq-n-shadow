@@ -180,7 +180,7 @@ export function renderPoop(ctx, width, height, options = { frameIndex: 0, scale:
       { width: 4,  height: 6 },  // верхний (самый узкий)
       { width: -12,  height: -5 },  // верхний (самый узкий)
     ];
-    const colors = ['#8B5A2B', '#7c4303', '#ff0000']; // тёмнее -> светлее
+    const colors = ['#8B5A2B', '#7c4303', '#bc8000']; // тёмнее -> светлее
     let currentY = height; // начнём с низа
     for (let i = 0; i < levels.length; i++) {
       const lvl = levels[i];
