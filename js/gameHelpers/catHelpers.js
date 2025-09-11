@@ -186,3 +186,16 @@ export function renderCatSideView(ctx, options = {
     shiftY: options.heightShift,
   })
 }
+
+export function updateSprite(sprite, dt, options = {}) {
+  const {
+    attackFrames = 2,
+    frameDelay = 0.07,
+  } = options
+  sprite.dt += dt
+  if (sprite.dt > frameDelay) {
+    sprite.frame = (sprite.frame + 1) % (sprite.isAttacking ? attackFrames : sprite.framesLength)
+    sprite.dt = 0
+  }
+  sprite.dvl = Math.max(0, sprite.dvl - sprite.dt)
+}

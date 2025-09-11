@@ -1,7 +1,7 @@
 import {GRAVITY_DOWN} from './utils'
 import {renderLamp, renderTable, renderTree, rndrTl} from './tileHelpers'
 import {renderCollectibleFish} from './collectableHelpers'
-import {renderCatSideView} from './catHelpers'
+import {renderCatSideView, updateSprite} from './catHelpers'
 import {GAME_STATE} from '../consts'
 import {createPoop} from './enemiesUtils'
 
@@ -159,26 +159,21 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         width: 40,
         velocityY: 0,
         originalWidth: 40,
+        originalMoveSpeed: 200,
+        moveSpeed: 200,
+        onGround: false,
       }
 
       if (ch === 'G') {
         gameObjects.white = Sprite({
           ...defCatCfg,
-          attackDamage: 10,
+          attackDamage: 0,
           jumpForce: -450,
           maxSizeMultiplier: 2,
-          moveSpeed: 200,
-          onGround: false,
           originalJumpForce: -450,
-          originalMoveSpeed: 200,
           sizeMultiplier: 1,
-          update(dt) {
-            this.dt += dt;
-            if (this.dt > 0.07) {   // каждые 0.3 сек смена кадра
-              this.frame = (this.frame + 1) % this.framesLength;
-              this.dt = 0;
-            }
-            this.dvl = Math.max(0, this.dvl - this.dt);
+          update(dt){
+            updateSprite(this, dt)
           },
           render() {
             let pose
@@ -188,7 +183,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
             } else if (this.isMoving && !this.isJumping) {
               pose = 'walk'
             } else if (this.isPooping) {
-              pose = 'attack'
+              pose = 'poop'
             } else {
               pose = 'idle'
             }
@@ -227,23 +222,13 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           attackRange: 15, // дальность атаки
           attackTimer: 0,
           canAttack: true, // флаг, может ли кот атаковать
-          color: 'rgba(0,0,0,0)',
-          frame: 0,
           isAttacking: false,
           jumpForce: -550,
           maxAttackMultiplier: 3,
-          moveSpeed: 200,
-          onGround: false,
           originalAttackRange: 15,
-          originalHeight: 40,
 
           update(dt){
-            this.dt += dt
-            if (this.dt > 0.07) {
-              this.frame = (this.frame + 1) % this.isAttacking ? 2 : this.framesLength
-              this.dt = 0
-            }
-            this.dvl = Math.max(0, this.dvl - this.dt)
+            updateSprite(this, dt)
           },
           render() {
             let pose
@@ -258,12 +243,14 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
               pose = 'idle'
             }
 
-            renderCatSideView(this.context,
+            renderCatSideView(
+              this.context,
               {
                 pose,
                 flipX: !this.facingRight,
                 frameIndex: this.frame,
                 scale: 2,
+                width: this.width,
                 colors: [
                   'rgba(0,0,0,0)',
                   '#000000',
@@ -352,20 +339,15 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           cfg.isJumping = true
           cfg.isMonster = true
           cfg.jumpForce = -350
+          cfg.lifeSpan = 15;
           cfg.maxTrashItems = 2;
           cfg.moveSpeed = 300
           cfg.onGround = true
           cfg.spawnX = x * tileSize
           cfg.spawnY = y * tileSize
           cfg.trashCooldown = 10;
-          cfg.trashDamage = 20;
-          cfg.trashHeight = tileSize / 2;
-          cfg.trashItems = [];
-          cfg.trashTimer = 0;
-          cfg.trashWidth = tileSize / 2;
           cfg.velocityX = 0
           cfg.velocityY = 0
-          cfg.lifeSpan = 15;
 
           cfg.update = function(deltaTime) {
             if (!this.isAlive) return;
@@ -438,135 +420,15 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
             this.context.arc(13, this.height - 15, this.height*0.15, 0, Math.PI*2);
             this.context.fill();
           }
+          gameObjects.enemies.push(Sprite(cfg));
         }
 
-      if (['E','B'].includes(ch)) {
-        cfg.canDie = true
-        cfg.isDead = false
-        cfg.isAlive = true
-        cfg.enemy = true
-        cfg.isMonster = true
-        cfg.health = 100
-        cfg.collisionDamage = 50
-
-        if (ch === 'E') {
-          cfg.update = function (deltaTime) {
-            if (!this.isAlive) {
-              this.isMonster = false
-              this.isAlive = true
-              this.transformAt = Date.now() + 5000
-              this.velocityX = 0
-              this.velocityY = 0
-              this.onGround = false
-              this.jumpTimer = 0
-              this.health = 100
-            }
-
-            const now = Date.now()
-            if (!this.isMonster) {
-              if (now >= this.transformAt) {
-                this.isMonster = true
-                const growFactor = 1.2
-                this.width *= growFactor
-                this.height *= growFactor
-                this.velocityX = this.direction === 'left' ? -50 : 50
-                console.log('Какашка превратилась в монстра!')
-              }
-            }
-            if (this.isMonster) {
-              this.jumpTimer -= deltaTime
-              if (this.onGround && this.jumpTimer <= 0) {
-                if (Math.random() < 0.02) {
-                  this.velocityY = -350 - Math.random() * 150 // Случайная сила прыжка
-                  this.onGround = false
-                  this.jumpTimer = 1 + Math.random() * 2 // Задержка между прыжками
-                }
-                if (Math.random() < 0.01) {
-                  this.direction = this.direction === 'left' ? 'right' : 'left'
-                  this.velocityX *= -1
-                }
-              }
-            }
-
-            if (!this.onGround) {
-              this.velocityY += 980 * deltaTime
-            }
-
-            this.y += this.velocityY * deltaTime
-            this.x += this.velocityX * deltaTime
-            this.onGround = false
-          }
-        }
-        gameObjects.enemies.push(Sprite(cfg));
+      if (['E'].includes(ch)) {
+        createPoop(cfg.x, cfg.y, gameObjects, Sprite, -100) // depends on level
       }
 
       if (ch === 'P') {
-        gameObjects.enemies.push(Sprite({
-          canDie: true,
-          color: 'brown',
-          createdAt: Date.now(),
-          direction: Math.random() > 0.5 ? 'left' : 'right',
-          health: 3,
-          height: cfg.height,
-          isAlive: true,
-          isDead: false,
-          isMonster: false,
-          jumpTimer: 0,
-          onGround: false,
-          transformAt: Date.now() + 5000,
-          type: 'P',
-          velocityX: 0,
-          velocityY: 0,
-          width: cfg.width,
-          x: cfg.x,
-          y: cfg.y,
-          update(deltaTime) {
-            if (!this.isAlive) {
-              this.isMonster = false
-              this.isAlive = true
-              this.transformAt = Date.now() + 5000
-              this.velocityX = 0
-              this.velocityY = 0
-              this.onGround = false
-              this.jumpTimer = 0
-              this.health = 100
-            }
-
-            const now = Date.now()
-            if (!this.isMonster) {
-              if (now >= this.transformAt) {
-                this.isMonster = true
-                const growFactor = 1.2
-                this.width *= growFactor
-                this.height *= growFactor
-                this.velocityX = this.direction === 'left' ? -50 : 50
-                console.log('Какашка превратилась в монстра!')
-              }
-            }
-            if (this.isMonster) {
-              this.jumpTimer -= deltaTime
-              if (this.onGround && this.jumpTimer <= 0) {
-                if (Math.random() < 0.02) {
-                  this.velocityY = -350 - Math.random() * 150 // Случайная сила прыжка
-                  this.onGround = false
-                  this.jumpTimer = 1 + Math.random() * 2 // Задержка между прыжками
-                }
-                if (Math.random() < 0.01) {
-                  this.direction = this.direction === 'left' ? 'right' : 'left'
-                  this.velocityX *= -1
-                }
-              }
-            }
-
-            if (!this.onGround) {
-              this.velocityY += 980 * deltaTime
-            }
-
-            this.y += this.velocityY * deltaTime
-            this.x += this.velocityX * deltaTime
-            this.onGround = false
-          },
-        }))
+        createPoop(cfg.x, cfg.y, gameObjects, Sprite, -100) // depends on level
       }
     });
   });

@@ -93,9 +93,6 @@ export function levelRender({ gameData, kontra}, levelBackgroundPatterns) {
       gameObjects.enemies
       .forEach(enemy => {
         enemy?.render?.()
-        if (enemy.type === 'B' && enemy.trashItems.length > 0) {
-          enemy.renderTrash()
-        }
       })
     }
 
@@ -185,10 +182,7 @@ export function updateLevel({gameStates, kontra}, levelBackgroundPatterns) {
     updateCharacterPhysics(player, deltaTime)
     checkEnemyCollisions(
       player,
-      [
-        ...gameObjects.enemies,
-        ...(boss?.isAlive ? boss.trashItems: []),
-      ],
+      gameObjects.enemies,
       { PlayerState, GameState },
     )
     checkEnvironmentCollisions(
