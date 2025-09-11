@@ -1,22 +1,6 @@
 import {increaseCatSize} from './charactersUtils'
 import {GAME_STATE} from '../consts'
 
-export function renderFoodItems(context, foodItems) {
-  foodItems.forEach(food => {
-    // Рисуем только несобранную еду
-    if (!food.collected) {
-      context.fillStyle = food.color
-      context.fillRect(food.x, food.y, food.width, food.height)
-
-      // Можно добавить эффект "свечения" для лучшей видимости
-      context.shadowColor = 'rgba(0, 0, 255, 0.7)'
-      context.shadowBlur = 10
-      context.fillRect(food.x, food.y, food.width, food.height)
-      context.shadowBlur = 0
-    }
-  })
-}
-
 export function checkFoodCollision(character, foodItems, collides) {
   for (let i = 0; i < foodItems.length; i++) {
     const food = foodItems[i]
