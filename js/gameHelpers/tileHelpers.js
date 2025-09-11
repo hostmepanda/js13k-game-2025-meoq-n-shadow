@@ -143,52 +143,56 @@ export function renderTable(cx, width, height, options = {}) {
 }
 
 // Рисуем торшер
-export function renderLamp(cx, width, height, options = {}) {
+export function renderLamp(cx, w, h, o = {}) {
   const {
-    shadeColor = '#FFD700', // абажур
+    shadeColor = '#FFD700',
     standColor = '#333',
     addGlow = true
-  } = options;
+  } = o;
 
   cx.save();
-  cx.translate(width / 2, height / 2);
+  cx.translate(w/2, h/2);
 
-  const lampHeight = height * 0.8;
-  const standWidth = width * 0.05;
+  const lH = h*.8;
+  const sW = w*.05;
+  const lTop = -lH/2; // верхняя точка лампы
+  const gY = lTop + h*.15; // позиция Y для свечения
 
   // === СВЕЧЕНИЕ ===
   if (addGlow) {
-    const glowGradient = cx.createRadialGradient(
-      0, -lampHeight / 2 + (height * 0.15), 5,
-      0, -lampHeight / 2 + (height * 0.15), width
+    const g = cx.createRadialGradient(
+      0, gY, 5,
+      0, gY, w
     );
-    glowGradient.addColorStop(0, 'rgba(255, 255, 200, 0.6)');
-    glowGradient.addColorStop(1, 'rgba(255, 255, 200, 0)');
+    g.addColorStop(0, 'rgba(255,255,200,0.6)');
+    g.addColorStop(1, 'rgba(255,255,200,0)');
 
-    cx.fillStyle = glowGradient;
+    cx.fillStyle = g;
     cx.beginPath();
-    cx.ellipse(0, -lampHeight / 2 + (height * 0.2), width * 0.9, height * 0.7, 0, 0, Math.PI * 2);
+    cx.ellipse(0, lTop + h*.2, w*.9, h*.7, 0, 0, Math.PI*2);
     cx.fill();
   }
 
   // === НОЖКА ===
   cx.fillStyle = standColor;
   cx.beginPath();
-  cx.rect(-standWidth / 2, -lampHeight / 2, standWidth, lampHeight);
+  cx.rect(-sW/2, lTop, sW, lH);
   cx.fill();
   cx.strokeStyle = 'rgb(246,255,167)';
   cx.lineWidth = 2;
   cx.stroke();
 
   // === АБАЖУР ===
-  const shadeWidth = width * 0.6;
-  const shadeHeight = height * 0.3;
+  const shW = w*.6;
+  const shH = h*.3;
+  const shW4 = shW*.4; // 40% от ширины абажура
+
   cx.fillStyle = shadeColor;
   cx.beginPath();
-  cx.moveTo(-shadeWidth / 2, -lampHeight / 2);
-  cx.lineTo(shadeWidth / 2, -lampHeight / 2);
-  cx.lineTo(shadeWidth * 0.4, -lampHeight / 2 + shadeHeight);
-  cx.lineTo(-shadeWidth * 0.4, -lampHeight / 2 + shadeHeight);
+  cx.moveTo(-shW/2, lTop);
+  cx.lineTo(shW/2, lTop);
+  cx.lineTo(shW4, lTop + shH);
+  cx.lineTo(-shW4, lTop + shH);
   cx.closePath();
   cx.fill();
   cx.stroke();
