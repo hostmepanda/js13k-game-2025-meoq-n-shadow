@@ -197,25 +197,25 @@ export function renderLamp(cx, width, height, options = {}) {
 }
 
 // Рисуем дерево в горшке
-export function renderPottedTree(cx, width, height, options = {}) {
+export function renderPottedTree(cx, w, h, o = {}) {
   const {
     potColor = '#bc8000',
     trunkColor = '#654321',
     foliageColor = '#228B22'
-  } = options;
+  } = o;
 
   cx.save();
-  cx.translate(width / 2, height / 2);
+  cx.translate(w/2, h/2);
 
-  const potHeight = height * 0.2;
-  const potWidth = width * 0.5;
-  const trunkHeight = height * 0.25;
-  const trunkWidth = width * 0.1;
+  // Размеры элементов
+  const pH = h*.2, pW = w*.5;
+  const tH = h*.25, tW = w*.1;
+  const topY = h/2 - pH - tH - 15;
 
   // Горшок
   cx.fillStyle = potColor;
   cx.beginPath();
-  cx.rect(-potWidth / 2, height / 2 - potHeight - 5, potWidth, potHeight);
+  cx.rect(-pW/2, h/2-pH-5, pW, pH);
   cx.fill();
   cx.strokeStyle = 'rgba(133,73,0,0.66)';
   cx.lineWidth = 2;
@@ -224,60 +224,55 @@ export function renderPottedTree(cx, width, height, options = {}) {
   // Ствол
   cx.fillStyle = trunkColor;
   cx.beginPath();
-  cx.rect(-trunkWidth / 2, height / 2 - potHeight - trunkHeight - 5, trunkWidth, trunkHeight);
+  cx.rect(-tW/2, h/2-pH-tH-5, tW, tH);
   cx.fill();
   cx.stroke();
 
-  // Елочка (3 "яруса" из треугольников)
+  // Елочка
   cx.fillStyle = foliageColor;
   cx.strokeStyle = 'rgba(99,213,99,0.51)';
-  cx.lineWidth = 2;
 
-  const topY = height / 2 - potHeight - trunkHeight - 15; // верх ствола
+  const lH = [h*.25, h*.42, h*.67]; // высота ярусов
+  const lW = [w*.3, w*.45, w*.6];   // ширина ярусов
 
-  const layerHeights = [height * 0.25, height * 0.42, height * 0.67]; // высота ярусов
-  const layerWidths = [width * 0.3, width * 0.45, width * 0.6];      // ширина ярусов
-
-  let currentY = topY;
+  // Рисуем все ярусы в одном цикле
+  let y = topY;
   for (let i = 0; i < 3; i++) {
-    const h = layerHeights[i];
-    const w = layerWidths[i];
-
     cx.beginPath();
-    cx.moveTo(0, currentY - 5 );   // верхушка яруса
-    cx.lineTo(-w / 2, currentY - h - 3 * i);  // левый низ
-    cx.lineTo(w / 2, currentY - h + 3 * i + i);   // правый низ
+    cx.moveTo(0, y-5);
+    cx.lineTo(-lW[i]/2, y-lH[i]-3*i);
+    cx.lineTo(lW[i]/2, y-lH[i]+3*i+i);
     cx.closePath();
     cx.fill();
     cx.stroke();
-
-    currentY += h * 0.9; // смещение вниз, чтобы ярусы перекрывались
+    y += lH[i]*.9;
   }
-
   cx.restore();
 }
 
-export function renderPalmTree(cx, width, height, options = {}) {
+export function renderPalmTree(cx, w, h, o = {}) {
   const {
     potColor = '#8B0000',
     trunkColor = '#8B5A2B',
     leafColors = ['#7ada7a','#ffe335','#f6ffa7','#fb6c37','#228B22','#229B22']
-  } = options;
+  } = o;
 
   cx.save();
-  cx.translate(width / 2, height / 2);
+  cx.translate(w/2, h/2);
 
-  const ptH = height * 0.2;
-  const ptW = width * 0.4;
-  const tkH = height * 0.4;
-  const tkW = width * 0.08;
-  const lfLn = width * 0.35;
-  const lfW = width * 0.12;
+  // Размеры элементов
+  const pH = h*.2;
+  const pW = w*.4;
+  const tH = h*.4;
+  const tW = w*.08;
+  const lL = w*.35;
+  const lW = w*.12;
+  const top = h/2-pH-tH-5; // позиция верха ствола
 
   // Горшок
   cx.fillStyle = potColor;
   cx.beginPath();
-  cx.rect(-ptW / 2, height / 2 - ptH - 5, ptW, ptH);
+  cx.rect(-pW/2, h/2-pH-5, pW, pH);
   cx.fill();
   cx.strokeStyle = 'black';
   cx.lineWidth = 1;
@@ -286,27 +281,29 @@ export function renderPalmTree(cx, width, height, options = {}) {
   // Ствол
   cx.fillStyle = trunkColor;
   cx.beginPath();
-  cx.rect(-tkW / 2, height / 2 - ptH - tkH - 5, tkW, tkH);
+  cx.rect(-tW/2, top, tW, tH);
   cx.fill();
   cx.strokeStyle = 'rgba(133,73,0,0.66)';
   cx.stroke();
 
   // Листья (несколько направлений)
-  const leafAngles = [-60, -30, 0, 30, 60, 90]; // углы в градусах
-  leafAngles.forEach((angle, index) => {
-    cx.fillStyle = leafColors[index];
+  const angles = [-60, -30, 0, 30, 60, 90];
 
-    const rad = angle * Math.PI / 180;
+  cx.strokeStyle = 'rgb(172,188,0)';
+
+  // Переместим основную трансляцию на верх ствола сразу
+  cx.translate(0, top);
+
+  for(let i = 0; i < 6; i++) {
     cx.save();
-    cx.translate(0, height / 2 - ptH - tkH -5); // верх ствола
-    cx.rotate(rad);
+    cx.fillStyle = leafColors[i];
+    cx.rotate(angles[i] * Math.PI/180);
     cx.beginPath();
-    cx.ellipse(0, 0, lfLn, lfW, 0, 0, Math.PI * 2);
+    cx.ellipse(0, 0, lL, lW, 0, 0, Math.PI*2);
     cx.fill();
-    cx.strokeStyle = 'rgb(172,188,0)';
     cx.stroke();
     cx.restore();
-  });
+  }
 
   cx.restore();
 }
