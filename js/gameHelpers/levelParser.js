@@ -1,5 +1,5 @@
 import {GRAVITY_DOWN} from './utils'
-import {renderLamp, renderPalmTree, renderPottedTree, renderTable, rndrTl} from './tileHelpers'
+import {renderLamp, renderTable, renderTree, rndrTl} from './tileHelpers'
 import {renderCollectibleFish} from './collectableHelpers'
 import {renderCatSideView} from './catHelpers'
 import {GAME_STATE} from '../consts'
@@ -295,13 +295,10 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           cfg.render = function () {
             renderTable(this.context, this.width , this.height)
           }
-        } else if (ch === 'D') {
+        }
+        if (['d','D'].includes(ch)) {
           cfg.render = function () {
-            renderPalmTree(this.context, this.width , this.height)
-          }
-        } else if (ch === 'd') {
-          cfg.render = function () {
-            renderPottedTree(this.context, this.width , this.height)
+            renderTree(this.context, this.width , this.height, { type: ch === 'D' ? 'palm' : 'yolk' })
           }
         }
         gameObjects.obstacles.push(Sprite(cfg));

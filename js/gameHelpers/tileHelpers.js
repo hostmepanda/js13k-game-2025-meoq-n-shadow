@@ -159,113 +159,77 @@ export function renderLamp(cx, w, h, o = {}) {
 }
 
 // Рисуем дерево в горшке
-export function renderPottedTree(cx, w, h, o = {}) {
-  const {
-    potColor = '#bc8000',
-    trunkColor = '#654321',
-    foliageColor = '#228B22'
-  } = o;
+export function renderTree(c, w, h, o = {}) {
+  const isPalm = o.type === "palm";
+  const pot = o.potColor || (isPalm ? '#8B0000' : '#bc8000');
+  const trunk = o.trunkColor || (isPalm ? '#8B5A2B' : '#654321');
+  const fColor = o.foliageColor || '#228B22';
+  const leafC = o.leafColors || ['#7ada7a','#ffe335','#f6ffa7','#fb6c37','#228B22','#229B22'];
 
-  cx.save();
-  cx.translate(w/2, h/2);
-
-  // Размеры элементов
-  const pH = h*.2, pW = w*.5;
-  const tH = h*.25, tW = w*.1;
-  const topY = h/2 - pH - tH - 15;
-
-  // Горшок
-  cx.fillStyle = potColor;
-  cx.beginPath();
-  cx.rect(-pW/2, h/2-pH-5, pW, pH);
-  cx.fill();
-  cx.strokeStyle = 'rgba(133,73,0,0.66)';
-  cx.lineWidth = 2;
-  cx.stroke();
-
-  // Ствол
-  cx.fillStyle = trunkColor;
-  cx.beginPath();
-  cx.rect(-tW/2, h/2-pH-tH-5, tW, tH);
-  cx.fill();
-  cx.stroke();
-
-  // Елочка
-  cx.fillStyle = foliageColor;
-  cx.strokeStyle = 'rgba(99,213,99,0.51)';
-
-  const lH = [h*.25, h*.42, h*.67]; // высота ярусов
-  const lW = [w*.3, w*.45, w*.6];   // ширина ярусов
-
-  // Рисуем все ярусы в одном цикле
-  let y = topY;
-  for (let i = 0; i < 3; i++) {
-    cx.beginPath();
-    cx.moveTo(0, y-5);
-    cx.lineTo(-lW[i]/2, y-lH[i]-3*i);
-    cx.lineTo(lW[i]/2, y-lH[i]+3*i+i);
-    cx.closePath();
-    cx.fill();
-    cx.stroke();
-    y += lH[i]*.9;
-  }
-  cx.restore();
-}
-
-export function renderPalmTree(cx, w, h, o = {}) {
-  const {
-    potColor = '#8B0000',
-    trunkColor = '#8B5A2B',
-    leafColors = ['#7ada7a','#ffe335','#f6ffa7','#fb6c37','#228B22','#229B22']
-  } = o;
-
-  cx.save();
-  cx.translate(w/2, h/2);
+  c.save();
+  c.translate(w/2, h/2);
 
   // Размеры элементов
-  const pH = h*.2;
-  const pW = w*.4;
-  const tH = h*.4;
-  const tW = w*.08;
-  const lL = w*.35;
-  const lW = w*.12;
-  const top = h/2-pH-tH-5; // позиция верха ствола
+  const pH = h*.2, pW = w * (isPalm ? .4 : .5);
+  const tH = h * (isPalm ? .4 : .25), tW = w * (isPalm ? .08 : .1);
+  const topY = h/2 - pH - tH - (isPalm ? 5 : 15);
 
   // Горшок
-  cx.fillStyle = potColor;
-  cx.beginPath();
-  cx.rect(-pW/2, h/2-pH-5, pW, pH);
-  cx.fill();
-  cx.strokeStyle = 'black';
-  cx.lineWidth = 1;
-  cx.stroke();
+  c.fillStyle = pot;
+  c.beginPath();
+  c.rect(-pW/2, h/2-pH-5, pW, pH);
+  c.fill();
+  c.strokeStyle = isPalm ? 'black' : 'rgba(133,73,0,0.66)';
+  c.lineWidth = isPalm ? 1 : 2;
+  c.stroke();
 
   // Ствол
-  cx.fillStyle = trunkColor;
-  cx.beginPath();
-  cx.rect(-tW/2, top, tW, tH);
-  cx.fill();
-  cx.strokeStyle = 'rgba(133,73,0,0.66)';
-  cx.stroke();
+  c.fillStyle = trunk;
+  c.beginPath();
+  c.rect(-tW/2, isPalm ? topY : h/2-pH-tH-5, tW, tH);
+  c.fill();
+  c.strokeStyle = 'rgba(133,73,0,0.66)';
+  c.stroke();
 
-  // Листья (несколько направлений)
-  const angles = [-60, -30, 0, 30, 60, 90];
+  if (isPalm) {
+    // Листья пальмы
+    const lL = w*.35, lW = w*.12;
+    const angles = [-60, -30, 0, 30, 60, 90];
 
-  cx.strokeStyle = 'rgb(172,188,0)';
+    c.strokeStyle = 'rgb(172,188,0)';
+    c.translate(0, topY);
 
-  // Переместим основную трансляцию на верх ствола сразу
-  cx.translate(0, top);
+    for(let i = 0; i < 6; i++) {
+      c.save();
+      c.fillStyle = leafC[i];
+      c.rotate(angles[i] * Math.PI/180);
+      c.beginPath();
+      c.ellipse(0, 0, lL, lW, 0, 0, Math.PI*2);
+      c.fill();
+      c.stroke();
+      c.restore();
+    }
+  } else {
+    // Елочка
+    c.fillStyle = fColor;
+    c.strokeStyle = 'rgba(99,213,99,0.51)';
 
-  for(let i = 0; i < 6; i++) {
-    cx.save();
-    cx.fillStyle = leafColors[i];
-    cx.rotate(angles[i] * Math.PI/180);
-    cx.beginPath();
-    cx.ellipse(0, 0, lL, lW, 0, 0, Math.PI*2);
-    cx.fill();
-    cx.stroke();
-    cx.restore();
+    const lH = [h*.25, h*.42, h*.67]; // высота ярусов
+    const lW = [w*.3, w*.45, w*.6];   // ширина ярусов
+
+    // Рисуем все ярусы в одном цикле
+    let y = topY;
+    for (let i = 0; i < 3; i++) {
+      c.beginPath();
+      c.moveTo(0, y-5);
+      c.lineTo(-lW[i]/2, y-lH[i]-3*i);
+      c.lineTo(lW[i]/2, y-lH[i]+3*i+i);
+      c.closePath();
+      c.fill();
+      c.stroke();
+      y += lH[i]*.9;
+    }
   }
 
-  cx.restore();
+  c.restore();
 }
