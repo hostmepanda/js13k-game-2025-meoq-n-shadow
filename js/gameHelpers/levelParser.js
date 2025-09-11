@@ -1,5 +1,5 @@
 import {GRAVITY_DOWN} from './utils'
-import {renderLamp, renderTable, renderTree, rndrTl} from './tileHelpers'
+import {renderLamp, renderTree, rndrTl} from './tileHelpers'
 import {renderCollectibleFish} from './collectableHelpers'
 import {renderCatSideView, updateSprite} from './catHelpers'
 import {GAME_STATE} from '../consts'
@@ -19,7 +19,6 @@ const pcm = {
   'P': 'brown', /* P = poop */
   'R': 'saddlebrown', /* R = wardrobe */
   'H': 'black', /* black cat */
-  'T': 'peru', /* T = table */
   'W': 'brown', /* W = wall */
   'X': 'gray', /* X = breakable wall */
   'c': 'sienna', /* c = chair */
@@ -66,6 +65,12 @@ const parseToColorTilesByLevel = {
     N: {
       ...grayBg,
       rotation: 1,
+    },
+    T: {
+      bodyColor: 'rgba(251,108,55,0)',
+      closingColor: 'rgb(188,128,0)',
+      coverColor: 'rgb(188,128,0)',
+      rotation: 2,
     },
     n: {
       bodyColor: 'rgb(180, 180, 180)',
@@ -267,7 +272,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         })
       }
 
-        if (['W','M','m','N','n','w','F','f','O','o','X','Y'].includes(ch)) {
+        if (['W','M','m','N','n','w','F','f','O','o','X','Y','T'].includes(ch)) {
           cfg.render = function () {
             rndrTl(
               this.context,
@@ -287,10 +292,6 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         if (ch === 'Q') {
           cfg.render = function () {
             renderLamp(this.context, this.width , this.height)
-          }
-        } else if (ch === 'T') {
-          cfg.render = function () {
-            renderTable(this.context, this.width , this.height)
           }
         }
         if (['d','D'].includes(ch)) {

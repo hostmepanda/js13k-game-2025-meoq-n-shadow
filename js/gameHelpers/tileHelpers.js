@@ -27,6 +27,7 @@ export function rndrTl(cx, w, h, o = {}) {
 
     // Нижняя крышка (использует тот же цвет)
     if (closingColor) {
+      cx.fillStyle = closingColor;
       cx.fillRect(0, h-7, w, 7);
     }
   }
@@ -50,52 +51,6 @@ export function rndrTl(cx, w, h, o = {}) {
       }
     }
   }
-
-  cx.restore();
-}
-
-// Рисуем стол
-export function renderTable(cx, w, h, o = {}) {
-  const {
-    tableColor = '#8B4513',
-    legColor = '#5C3317'
-  } = o;
-
-  cx.save();
-  cx.translate(w/2, h/2);
-
-  const tW = w*.8;
-  const tH = h*.2;
-  const lW = tW*.1;
-  const lH = h*.4;
-  const tHalf = tW/2;
-  const lPos = tHalf-lW/2;
-
-  // Столешница
-  cx.fillStyle = tableColor;
-  cx.beginPath();
-  cx.rect(-tHalf, -tH/2, tW, tH);
-  cx.fill();
-
-  // Установка стиля для обводки
-  cx.strokeStyle = 'black';
-  cx.lineWidth = 1;
-  cx.stroke();
-
-  // Ножки
-  cx.fillStyle = legColor;
-
-  // Правая ножка
-  cx.beginPath();
-  cx.rect(lPos-2, tH/2, lW, lH);
-  cx.fill();
-  cx.stroke();
-
-  // Левая ножка
-  cx.beginPath();
-  cx.rect(-(lPos+1), tH/2, lW, lH);
-  cx.fill();
-  cx.stroke();
 
   cx.restore();
 }
