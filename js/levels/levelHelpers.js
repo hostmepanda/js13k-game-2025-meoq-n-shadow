@@ -147,7 +147,6 @@ export function levelRender({ gameData, kontra}, levelBackgroundPatterns) {
       ],
     },
     GameState,
-
   });
 }
 
@@ -156,16 +155,10 @@ export function updateLevel({gameStates, kontra}, levelBackgroundPatterns) {
   const { Sprite, canvas, context, deltaTime, collides } = kontra
   const {keyboard} = gameObjects
 
-  if (!gameObjects.white || !gameObjects.black) {
-    console.error('Персонажи не определены!')
-    return
-  }
-
   if (PlayerState.activeCharacter === undefined) {
     PlayerState.activeCharacter = 'white' // По умолчанию выбран белый персонаж
   }
 
-  // Обработка переключения персонажа по нажатию Shift
   if (keyboard.isKeyPressed('ShiftLeft') || keyboard.isKeyPressed('ShiftRight')) {
     // Используем debounce, чтобы предотвратить многократное переключение при удержании
     if (!PlayerState.lastShiftTime || Date.now() - PlayerState.lastShiftTime > 300) {
