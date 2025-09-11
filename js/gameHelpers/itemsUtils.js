@@ -17,44 +17,27 @@ export function renderFoodItems(context, foodItems) {
   })
 }
 
-export function checkFoodCollision(character, foodItems) {
+export function checkFoodCollision(character, foodItems, collides) {
   for (let i = 0; i < foodItems.length; i++) {
     const food = foodItems[i]
     const hasMaximum = character.color === 'white'
-    ? character.sizeMultiplier >= character.maxSizeMultiplier
+      ? character.sizeMultiplier >= character.maxSizeMultiplier
       : character.attackMultiplier >= character.maxAttackMultiplier
-    // Пропускаем уже собранную еду
     if (food.collected || hasMaximum) {
       continue
     }
 
-    // Проверяем столкновение с едой
-    if (character.x < food.x + food.width &&
-      character.x + character.width > food.x &&
-      character.y < food.y + food.height &&
-      character.y + character.height > food.y) {
-
-      // Отмечаем еду как собранную
-      food.collected = true
-
-      // Применяем эффект в зависимости от типа еды
-      if (['A','a'].includes(food.type)) {
-        if (character.color === 'white') {
-          increaseCatSize(character)
-        } else {
-          character.attackMultiplier = Math.min(character.maxAttackMultiplier, character.attackMultiplier * (character.attackMultiplier + 1))
-          character.attackRange = character.originalAttackRange * character.attackMultiplier
-        }
-        if (food.type === 'a') {
-          food.visibilityTime = 10
-        }
+    if (collides(character, food) && !food.collected && !hasMaximum) {
+      if (character.color === 'white') {
+        increaseCatSize(character)
+      } else {
+        character.attackMultiplier = Math.min(character.maxAttackMultiplier, character.attackMultiplier * (character.attackMultiplier + 1))
+        character.attackRange = character.originalAttackRange * character.attackMultiplier
       }
-
-      return true
+      food.collected = true
+      food.visibilityTime = 10
     }
   }
-
-  return false
 }
 
 export function checkEnvironmentCollisions(player, obstacles, deltaTime, GameState, collides) {

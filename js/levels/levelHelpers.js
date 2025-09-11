@@ -198,7 +198,7 @@ export function updateLevel({gameStates, kontra}, levelBackgroundPatterns) {
         ...gameObjects.enemies.filter(({ isVisible, collides }) => isVisible && collides),
         ]
       , deltaTime, GameState, collides)
-    checkFoodCollision(player, gameObjects.collectables.filter(({ collected, isVisible }) => !collected && isVisible ))
+    checkFoodCollision(player, gameObjects.collectables.filter(({ collected, isVisible }) => !collected && isVisible ), collides)
   })
 
   gameObjects.enemies.forEach((enemy) => {
