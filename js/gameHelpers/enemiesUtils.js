@@ -180,23 +180,16 @@ export function renderPoop(ctx, width, height, options = { frameIndex: 0, scale:
       { width: 4,  height: 6 },  // верхний (самый узкий)
       { width: -12,  height: -5 },  // верхний (самый узкий)
     ];
-
-    // цвета для каждого уровня (можно менять)
     const colors = ['#8B5A2B', '#7c4303', '#ff0000']; // тёмнее -> светлее
-    // рисуем уровни снизу вверх; левый край всегда x=0 (вид сбоку)
     let currentY = height; // начнём с низа
     for (let i = 0; i < levels.length; i++) {
       const lvl = levels[i];
       const lvlTopY = currentY - lvl.height;
-      // draw filled block (левый выровненный)
       ctx.fillStyle = colors[i];
       ctx.fillRect(0 + i*5, lvlTopY, lvl.width, lvl.height);
-
-      // нарисуем тонкий контур, чтобы лучше видно было границы
       ctx.strokeStyle = 'rgba(0,0,0,0.3)';
       ctx.lineWidth = 1;
       ctx.strokeRect(0.5+ i*5, lvlTopY + 0.5, lvl.width - 1, lvl.height - 1);
-
       currentY = lvlTopY; // подняться вверх для следующего уровня
     }
     return
@@ -312,18 +305,12 @@ export function renderPoop(ctx, width, height, options = { frameIndex: 0, scale:
       '11111111111111111111',
     ]
   ];
-
-
-
-  // Цвета
   const colors = [
-    "rgba(255,255,255,0)", // коричневый
-    "#8B4513", // коричневый
-    "#000000", // зрачок
-    "#ff2e9d", // зрачок
-    "rgba(133,73,0,0.66)", // зрачок
+    "rgba(255,255,255,0)",
+    "#8B4513",
+    "#000000",
+    "#ff2e9d",
+    "rgb(133,73,0)",
   ]
-
-
-  drawPixels(ctx, options.isMonster ? poopMonsterFrames[options.frameIndex] : poopFrames[options.frameIndex], { scale:1, colors, flipX: options.flipX })
+  drawPixels(ctx, poopFrames[options.frameIndex], { scale:1, colors, flipX: options.flipX })
 }
