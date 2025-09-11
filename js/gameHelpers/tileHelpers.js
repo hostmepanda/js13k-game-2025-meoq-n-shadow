@@ -1,143 +1,101 @@
-export function rndrTl(cx, width, height, options = {}) {
+export function rndrTl(cx, w, h, o = {}) {
   const {
-    bodyColor = 'rgb(180, 180, 180)',
-    coverColor, // 'rgb(170, 120, 70)',
-    injectColor, //'rgb(175,175,175)',
+    bodyColor = 'rgb(180,180,180)',
+    coverColor,
+    injectColor,
     closingColor,
     rotation = 0,
-  } = options;
-
-  cx.save()
-
-  if (rotation !== 0) {
-    cx.translate(width/2, height/2);
-    if (rotation >= 1) {
-      cx.rotate(Math.PI / 2) // 90 градусов
-    }
-    if (rotation >= 2) {
-      cx.rotate(Math.PI / 2) // 90 градусов
-    }
-    if (rotation >= 3) {
-      cx.rotate(Math.PI / 2) // 90 градусов
-    }
-    cx.translate(-width/2, -height/2);
-  }
-
-  cx.fillStyle = bodyColor;
-  cx.fillRect(0, 0, width, height);
-
-  if (coverColor) {
-    cx.fillStyle = coverColor;
-    cx.fillRect(0, 0, width, 7);
-  }
-
-  if (closingColor) {
-    const woodHeight = 7
-    cx.fillStyle = coverColor;
-    cx.fillRect(0, height - 7, width, 7);
-  }
-
-  if (injectColor) {
-    cx.fillStyle = injectColor;
-    cx.fillRect(width / 2 - width / 4, height / 2 - height / 15, 1, 1);
-    cx.fillRect(width / 2 - width / 4, height / 2 + height / 4, 1, 1);
-    cx.fillRect(width / 2 + width / 4, height / 2 - height / 15, 1, 1);
-    cx.fillRect(width / 2 + width / 4, height / 2 + height / 4, 1, 1);
-  }
-
-  cx.restore()
-}
-
-/**
- * Вспомогательная функция для добавления текстуры гипсокартона
- */
-function addDryWallTexture(cx, x, y, width, height) {
-  // Генерируем точки на основе координат
-  const h = ((x + 67) * (y + 97)) % 256;
-
-  // Вместо случайного числа точек - фиксированное количество,
-  // но с разными позициями для разных тайлов
-  for (let i = 0; i < 5; i++) {
-    const pointX = x + ((h * (i+1)) % width);
-    const pointY = y + ((h * (i+7)) % height);
-
-    cx.fillStyle = 'rgba(150, 150, 150, 0.15)';
-    cx.beginPath();
-    cx.arc(pointX, pointY, 0.4, 0, Math.PI * 2);
-    cx.fill();
-  }
-
-  // Линия стыка гипсокартона
-  if (width > 20 || height > 20) {
-    cx.strokeStyle = 'rgba(200, 200, 200, 0.5)';
-    cx.lineWidth = 0.5;
-
-    if (width > height) {
-      const lineY = y + height / 2;
-      cx.beginPath();
-      cx.moveTo(x, lineY);
-      cx.lineTo(x + width, lineY);
-      cx.stroke();
-    } else {
-      const lineX = x + width / 2;
-      cx.beginPath();
-      cx.moveTo(lineX, y);
-      cx.lineTo(lineX, y + height);
-      cx.stroke();
-    }
-  }
-}
-
-
-// Рисуем стол
-export function renderTable(cx, width, height, options = {}) {
-  const {
-    tableColor = '#8B4513', // коричневый
-    legColor = '#5C3317'
-  } = options;
+  } = o;
 
   cx.save();
-  cx.translate(width / 2, height / 2);
 
-  const tableWidth = width * 0.8;
-  const tableHeight = height * 0.2;
+  if (rotation) {
+    cx.translate(w/2, h/2);
+    // Упрощенный поворот: r*90 градусов
+    cx.rotate((Math.PI/2) * (rotation % 4));
+    cx.translate(-w/2, -h/2);
+  }
+
+  // Основное тело
+  cx.fillStyle = bodyColor;
+  cx.fillRect(0, 0, w, h);
+
+  // Верхняя крышка
+  if (coverColor) {
+    cx.fillStyle = coverColor;
+    cx.fillRect(0, 0, w, 7);
+
+    // Нижняя крышка (использует тот же цвет)
+    if (closingColor) {
+      cx.fillRect(0, h-7, w, 7);
+    }
+  }
+
+  // Отрисовка точек крепления
+  if (injectColor) {
+    cx.fillStyle = injectColor;
+    const wq = w/4; // четверть ширины
+    const hm = h/2; // середина высоты
+    const hs = h/15; // маленькое смещение по высоте
+    const hq = h/4; // четверть высоты
+
+    // Рисуем все 4 точки за один проход
+    for(let i=0; i<2; i++) {
+      for(let j=0; j<2; j++) {
+        cx.fillRect(
+          w/2 + (i?1:-1)*wq,
+          hm + (j?hq:-hs),
+          1, 1
+        );
+      }
+    }
+  }
+
+  cx.restore();
+}
+
+// Рисуем стол
+export function renderTable(cx, w, h, o = {}) {
+  const {
+    tableColor = '#8B4513',
+    legColor = '#5C3317'
+  } = o;
+
+  cx.save();
+  cx.translate(w/2, h/2);
+
+  const tW = w*.8;
+  const tH = h*.2;
+  const lW = tW*.1;
+  const lH = h*.4;
+  const tHalf = tW/2;
+  const lPos = tHalf-lW/2;
 
   // Столешница
   cx.fillStyle = tableColor;
   cx.beginPath();
-  cx.rect(-tableWidth / 2, -tableHeight / 2, tableWidth, tableHeight);
+  cx.rect(-tHalf, -tH/2, tW, tH);
   cx.fill();
+
+  // Установка стиля для обводки
   cx.strokeStyle = 'black';
   cx.lineWidth = 1;
   cx.stroke();
 
   // Ножки
-  const legWidth = tableWidth * 0.1;
-  const legHeight = height * 0.4;
   cx.fillStyle = legColor;
 
+  // Правая ножка
   cx.beginPath();
-  cx.rect(
-    (tableWidth / 2 - legWidth / 2 - 2),
-    tableHeight / 2,
-    legWidth,
-    legHeight
-  );
+  cx.rect(lPos-2, tH/2, lW, lH);
   cx.fill();
-  cx.lineWidth = 1;
   cx.stroke();
 
+  // Левая ножка
   cx.beginPath();
-  cx.rect(
-    -1 * (tableWidth / 2 - legWidth / 2 + 1),
-    tableHeight / 2,
-    legWidth,
-    legHeight
-  );
+  cx.rect(-(lPos+1), tH/2, lW, lH);
   cx.fill();
-  cx.lineWidth = 1
   cx.stroke();
-
 
   cx.restore();
 }
