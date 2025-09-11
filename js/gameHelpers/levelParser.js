@@ -1,5 +1,5 @@
 import {GRAVITY_DOWN} from './utils'
-import {renderLamp, renderPalmTree, renderPottedTree, renderTable, renderWoodConcreteFloor} from './tileHelpers'
+import {renderLamp, renderPalmTree, renderPottedTree, renderTable, rndrTl} from './tileHelpers'
 import {renderCollectibleFish} from './collectableHelpers'
 import {renderCatSideView} from './catHelpers'
 import {GAME_STATE} from '../consts'
@@ -13,11 +13,11 @@ const pcm = {
   'E': 'red', /* E = enemy */
   'F': 'darkgreen', /* F = floor */
   'L': 'yellow', /* L = lamp */
-  '2': 'white', /* white cat */
+  'G': 'white', /* white cat */
   'O': 'lightblue', /* O = window */
   'P': 'brown', /* P = poop */
   'R': 'saddlebrown', /* R = wardrobe */
-  '1': 'black', /* black cat */
+  'H': 'black', /* black cat */
   'T': 'peru', /* T = table */
   'W': 'brown', /* W = wall */
   'X': 'gray', /* X = breakable wall */
@@ -129,12 +129,15 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         height: tileSize,
         color: pcm?.[ch] ?? "gray",
         type: ch,
-        isVisible: true,
+        isVisible: !['f', 'a'].includes(ch),
+        collides: ['W','M','m','N','n','w','F','C', '#', 'f','O','o', 'X'].includes(ch),
       };
 
       const defCatCfg = {
+        ...cfg,
         dvl: 0,
         dt: 0,
+        frame: 0,
         facingRight: true,
         framesLength: 4,
         health: 100,
@@ -267,14 +270,9 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         })
       }
 
-      if (['W','M','m','N','n','w','F','C', '#', 'f','O','o'].includes(ch)) {
-        if (ch === 'f') {
-          cfg.isVisible = false
-        }
-        cfg.collides = true
         if (['W','M','m','N','n','w','F','f','O','o'].includes(ch)) {
           cfg.render = function () {
-            renderWoodConcreteFloor(
+            rndrTl(
               this.context,
               this.width,
               this.height,
@@ -282,37 +280,26 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
                   ...parseToColorTilesByLevel[selectedLevel][cfg.type],
               })
           }
-        }
         gameObjects.obstacles.push(Sprite(cfg));
-      }
+        }
 
       if (['L','c','T','f','D','O','R','Q', 'd'].includes(ch)) {
-        cfg.collides = false
-        if (ch === 'Q') {
           cfg.width = 40
           cfg.height = 40
           cfg.y = y * tileSize - tileSize + 5
+        if (ch === 'Q') {
           cfg.render = function () {
             renderLamp(this.context, this.width , this.height)
           }
         } else if (ch === 'T') {
-          cfg.width = 40
-          cfg.height = 40
-          cfg.y = y * tileSize - tileSize + 5
           cfg.render = function () {
             renderTable(this.context, this.width , this.height)
           }
         } else if (ch === 'D') {
-          cfg.width = 40
-          cfg.height = 40
-          cfg.y = y * tileSize - tileSize + 5
           cfg.render = function () {
             renderPalmTree(this.context, this.width , this.height)
           }
         } else if (ch === 'd') {
-          cfg.width = 40
-          cfg.height = 40
-          cfg.y = y * tileSize - tileSize + 5
           cfg.render = function () {
             renderPottedTree(this.context, this.width , this.height)
           }
@@ -599,11 +586,11 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
 
       if (ch === 'P') {
         gameObjects.enemies.push(Sprite({
-          canDie: false,
+          canDie: true,
           color: 'brown',
           createdAt: Date.now(),
           direction: Math.random() > 0.5 ? 'left' : 'right',
-          health: 100,
+          health: 3,
           height: cfg.height,
           isAlive: true,
           isDead: false,

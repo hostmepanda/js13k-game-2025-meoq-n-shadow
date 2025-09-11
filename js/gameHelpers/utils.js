@@ -27,26 +27,21 @@ export function drawPixels(ctx, pixels, { scale, colors, flipX, shiftY = 0 }) {
   }
 }
 
-export function renderWithCamera(context, camera, drawFunction) {
-  context.save()
-
-  // Смещаем всё на отрицательное положение камеры
-  context.translate(-camera.x, -camera.y)
-
-  // Выполняем функцию отрисовки
-  drawFunction(context)
-
-  context.restore()
+export function renderWithCamera(cx, camera, df) {
+  cx.save()
+  cx.translate(-camera.x, -camera.y)
+  df(cx)
+  cx.restore()
 }
 
-export function renderBackground(context, canvas) {
+export function renderBackground(cx, cs) {
   // Градиентный фон, если нет изображения
-  const gradient = context.createLinearGradient(0, 0, 0, canvas.height)
+  const gradient = cx.createLinearGradient(0, 0, 0, cs.height)
   gradient.addColorStop(0, '#87CEEB')
   gradient.addColorStop(1, '#E0F7FA')
 
-  context.fillStyle = gradient
-  context.fillRect(0, 0, canvas.width, canvas.height)
+  cx.fillStyle = gradient
+  cx.fillRect(0, 0, cs.width, cs.height)
 }
 function renderLevelName(levelNumber) {
   if (levelNumber === GAME_STATE.LEVEL1) {
@@ -60,42 +55,42 @@ function renderLevelName(levelNumber) {
   }
 }
 
-export function renderUI({context, canvas}, {playerState, GameState}) {
+export function renderUI({context: cx, canvas: cs}, {playerState, GameState}) {
   // Сохраняем текущее состояние контекста
-  context.save();
+  cx.save();
 
   // Размеры и параметры UI
   const tileSize = 20; // Новый размер тайла
   const uiHeight = tileSize * 2;
-  const canvasWidth = context.canvas.width;
+  const canvasWidth = cx.canvas.width;
 
   // Рисуем черную область сверху экрана
-  context.fillStyle = 'black';
-  context.fillRect(0, 0, canvasWidth, uiHeight);
+  cx.fillStyle = 'black';
+  cx.fillRect(0, 0, canvasWidth, uiHeight);
 
   // Рисуем внутреннюю рамку в стиле Денди
-  context.fillStyle = '#333';
-  context.fillRect(5, 5, canvasWidth - 10, uiHeight - 10);
+  cx.fillStyle = '#333';
+  cx.fillRect(5, 5, canvasWidth - 10, uiHeight - 10);
 
   // Стилизованная рамка для UI
-  context.lineWidth = 2;
-  context.strokeStyle = '#FFD700'; // Золотой цвет для рамки
-  context.fillStyle = 'rgb(246,255,167)';
-  context.fillRect(4, 4, canvasWidth - 10, uiHeight - 10);
+  cx.lineWidth = 2;
+  cx.strokeStyle = '#FFD700'; // Золотой цвет для рамки
+  cx.fillStyle = 'rgb(246,255,167)';
+  cx.fillRect(4, 4, canvasWidth - 10, uiHeight - 10);
 
   // Делим UI на три равные секции
   const sectionWidth = canvasWidth / 3 - 60;
 
   // Задаем базовые параметры текста
-  context.textAlign = 'left';
-  context.textBaseline = 'middle';
-  context.font = 'bold 12px monospace'; // Более компактный шрифт
+  cx.textAlign = 'left';
+  cx.textBaseline = 'middle';
+  cx.font = 'bold 12px monospace'; // Более компактный шрифт
 
   // Секция 1: Уровень
   const levelX = 20;
   const centerY = uiHeight / 2;
-  context.fillStyle = '#FF8C00'; // Оранжевый для уровня
-  context.fillText(`LEVEL: ${renderLevelName(playerState.currentLevel) || 'SECRET'}`, levelX, centerY);
+  cx.fillStyle = '#FF8C00'; // Оранжевый для уровня
+  cx.fillText(`LEVEL: ${renderLevelName(playerState.currentLevel) || 'SECRET'}`, levelX, centerY);
 
   // Отображаем информацию о котах
   const cats = playerState.cats || [];
@@ -104,16 +99,12 @@ export function renderUI({context, canvas}, {playerState, GameState}) {
     const whiteCat = cats[0];
     const whiteCatX = sectionWidth + 10;
 
-    // Определяем цвет для активного/неактивного кота
-    let whiteCatColor = whiteCat.isActive ? '#165134' : '#a1a1a1';
-
-    // Рисуем информацию о белом коте
-    context.fillStyle = whiteCatColor;
+    cx.fillStyle =  whiteCat.isActive ? '#165134' : '#a1a1a1';;
     const whiteCatText = `${whiteCat.name}: ${whiteCat.lives || 0}/10`;
-    context.fillText(whiteCatText, whiteCatX, centerY);
+    cx.fillText(whiteCatText, whiteCatX, centerY);
 
     // Полоска здоровья белого кота
-    const textWidth = context.measureText(whiteCatText).width;
+    const textWidth = cx.measureText(whiteCatText).width;
     const whiteHealthBarX = whiteCatX + textWidth + 10;
     const healthBarY = centerY - 5;
     const healthBarWidth = sectionWidth - textWidth - 30;
@@ -121,14 +112,14 @@ export function renderUI({context, canvas}, {playerState, GameState}) {
     const whiteHealthPercent = (whiteCat.health || 0) / 100;
 
     // Рисуем сегментированную полоску здоровья
-    renderHealthBar(context, whiteHealthBarX, healthBarY, healthBarWidth, healthBarHeight, whiteHealthPercent);
+    renderHealthBar(cx, whiteHealthBarX, healthBarY, healthBarWidth, healthBarHeight, whiteHealthPercent);
 
     // Если кот активный, добавляем индикатор
     if (whiteCat.isActive) {
       const blinkRate = Math.floor(Date.now() / 500) % 2;
       if (blinkRate === 0) {
-        context.fillStyle = '#165134';
-        context.fillText('▶', whiteCatX - 15, centerY-1);
+        cx.fillStyle = '#165134';
+        cx.fillText('▶', whiteCatX - 15, centerY-1);
       }
     }
 
@@ -140,52 +131,52 @@ export function renderUI({context, canvas}, {playerState, GameState}) {
     let blackCatColor = blackCat.isActive ? '#165134' : '#afafaf'; // Голубоватый для контраста с черным
 
     // Рисуем информацию о черном коте
-    context.fillStyle = blackCatColor;
+    cx.fillStyle = blackCatColor;
     const blackCatText = `${blackCat.name}: ${blackCat.lives || 0}/10`;
-    context.fillText(blackCatText, blackCatX, centerY);
+    cx.fillText(blackCatText, blackCatX, centerY);
 
     // Полоска здоровья черного кота
-    const blackTextWidth = context.measureText(blackCatText).width;
+    const blackTextWidth = cx.measureText(blackCatText).width;
     const blackHealthBarX = blackCatX + blackTextWidth + 10;
     const blackHealthPercent = (blackCat.health || 0) / 100;
 
     // Рисуем сегментированную полоску здоровья
-    renderHealthBar(context, blackHealthBarX, healthBarY, healthBarWidth, healthBarHeight, blackHealthPercent);
+    renderHealthBar(cx, blackHealthBarX, healthBarY, healthBarWidth, healthBarHeight, blackHealthPercent);
 
     // Если кот активный, добавляем индикатор
     if (blackCat.isActive) {
       const blinkRate = Math.floor(Date.now() / 500) % 2;
       if (blinkRate === 0) {
-        context.fillStyle = '#165134';
-        context.fillText('▶', blackCatX - 15, centerY-1);
+        cx.fillStyle = '#165134';
+        cx.fillText('▶', blackCatX - 15, centerY-1);
       }
     }
 
-    context.fillStyle = '#000000';
+    cx.fillStyle = '#000000';
     if (GameState.musicEnabled) {
-      context.font = '15px Arial';  // Меньший шрифт для имени создателя
-      context.fillText('🔉', canvas.width - 60, 15);
-      context.font = '10px Arial';  // Меньший шрифт для имени создателя
-      context.fillText('(press M to disable)', canvas.width - 100, 28);
+      cx.font = '15px Arial';  // Меньший шрифт для имени создателя
+      cx.fillText('🔉', cs.width - 60, 15);
+      cx.font = '10px Arial';  // Меньший шрифт для имени создателя
+      cx.fillText('(press M to disable)', cs.width - 100, 28);
     } else {
-      context.font = '15px Arial';  // Меньший шрифт для имени создателя
-      context.fillText('🔇', canvas.width - 60, 15);
-      context.font = '10px Arial';  // Меньший шрифт для имени создателя
-      context.fillText('(press M to enable)', canvas.width - 100, 28);
+      cx.font = '15px Arial';  // Меньший шрифт для имени создателя
+      cx.fillText('🔇', cs.width - 60, 15);
+      cx.font = '10px Arial';  // Меньший шрифт для имени создателя
+      cx.fillText('(press M to enable)', cs.width - 100, 28);
     }
   }
 
   // Восстанавливаем состояние контекста
-  context.restore();
+  cx.restore();
 }
 
 /**
  * Отрисовывает сегментированную полоску здоровья в стиле игры про Черного Плаща
  */
-function renderHealthBar(context, x, y, width, height, healthPercent) {
+function renderHealthBar(cx, x, y, width, height, healthPercent) {
   // Фон полоски здоровья
-  context.fillStyle = '#000';
-  context.fillRect(x - 1, y - 1, width + 2, height + 2);
+  cx.fillStyle = '#000';
+  cx.fillRect(x - 1, y - 1, width + 2, height + 2);
 
   // Количество сегментов в полоске здоровья
   const segments = 10;
@@ -208,8 +199,8 @@ function renderHealthBar(context, x, y, width, height, healthPercent) {
       }
 
       // Заполняем сегмент
-      context.fillStyle = segmentColor;
-      context.fillRect(
+      cx.fillStyle = segmentColor;
+      cx.fillRect(
         segmentX,
         y,
         segmentWidth - 1, // Оставляем место для разделителя
@@ -217,8 +208,8 @@ function renderHealthBar(context, x, y, width, height, healthPercent) {
       );
 
       // Добавляем световой эффект сверху сегмента (как в Денди играх)
-      context.fillStyle = '#FFFFFF';
-      context.fillRect(
+      cx.fillStyle = '#FFFFFF';
+      cx.fillRect(
         segmentX,
         y,
         segmentWidth - 1,
@@ -226,8 +217,8 @@ function renderHealthBar(context, x, y, width, height, healthPercent) {
       );
     } else {
       // Пустой сегмент
-      context.fillStyle = '#444';
-      context.fillRect(
+      cx.fillStyle = '#444';
+      cx.fillRect(
         segmentX,
         y,
         segmentWidth - 1,
@@ -237,7 +228,7 @@ function renderHealthBar(context, x, y, width, height, healthPercent) {
   }
 
   // Рамка для полоски здоровья
-  context.strokeStyle = '#888';
-  context.lineWidth = 1;
-  context.strokeRect(x - 1, y - 1, width + 2, height + 2);
+  cx.strokeStyle = '#888';
+  cx.lineWidth = 1;
+  cx.strokeRect(x - 1, y - 1, width + 2, height + 2);
 }

@@ -18,7 +18,7 @@ export const LEVEL_MAPS = {
     "N.25f.108f2.22F7.19N.3f10N",
     "N.26f.4f2.103f2.26W.19N.13N",
     "NGH.8a.23f.103f2.24WF2.17N.13N",
-    "N.10F.18f2.5f.103f2.18m4W.19Nf10.3N",
+    "N.9AF.18f2.5f.103f2.18m4W.19Nf10.3N",
     "N.3d.6M.15Q.44D.39d.32Q.34Q.4N.11#2N",
     "N.3T.D.4M.D.D.4d.6T.d.15Dd.Q.23TQ.36d.T.23Dd.7T.35T.3N.6D.4#2N",
     "F200"

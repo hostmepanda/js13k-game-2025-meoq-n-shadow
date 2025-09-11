@@ -1,71 +1,53 @@
 // Функция для увеличения размера кота
 import {GRAVITY_DOWN, GRAVITY_UP, MAX_FALL_SPEED} from './utils'
 
-export function increaseCatSize(character) {
-  // Увеличиваем множитель на определенное значение
+export function increaseCatSize(ch) {
   const sizeIncrement = 0.5 // Каждая еда увеличивает размер на 50%
-
-  // Проверяем, не достигли ли максимального размера
-  if (character.sizeMultiplier < character.maxSizeMultiplier) {
-    // Запоминаем текущую позицию "ног" персонажа
-    const bottomY = character.y + character.height
-
-    // Увеличиваем множитель размера
-    character.sizeMultiplier = Math.min(character.maxSizeMultiplier, character.sizeMultiplier + sizeIncrement)
-
-    // Применяем новый размер
-    character.width = character.originalWidth * character.sizeMultiplier
-    character.height = character.originalHeight * character.sizeMultiplier
-
-    // Корректируем позицию Y, чтобы "ноги" оставались на том же уровне
-    character.y = bottomY - character.height
-
-    // Чем больше кот, тем ниже он прыгает
-    // При размере 1 -> 100% силы прыжка
-    // При размере 4 -> примерно 40% силы прыжка
-    character.jumpForce = character.originalJumpForce * (1 / (1 + (character.sizeMultiplier - 1) * 0.5))
-
-    // Чем больше кот, тем медленнее он двигается
-    // При размере 1 -> 100% скорости
-    // При размере 4 -> примерно 45% скорости
-    character.moveSpeed = character.originalMoveSpeed * (1 / (1 + (character.sizeMultiplier - 1) * 0.4))
+  if (ch.sizeMultiplier < ch.maxSizeMultiplier) {
+    const bottomY = ch.y + ch.height
+    ch.sizeMultiplier = Math.min(ch.maxSizeMultiplier, ch.sizeMultiplier + sizeIncrement)
+    ch.width = ch.originalWidth * ch.sizeMultiplier
+    ch.height = ch.originalHeight * ch.sizeMultiplier
+    ch.y = bottomY - ch.height
+    ch.jumpForce = ch.originalJumpForce * (1 / (1 + (ch.sizeMultiplier - 1) * 0.5))
+    ch.moveSpeed = ch.originalMoveSpeed * (1 / (1 + (ch.sizeMultiplier - 1) * 0.4))
   }
 }
 
-export function updateBlackCatAttack(character, gameObjects, delta) {
+export function updateBlackCatAttack(ch, go, delta) {
   // Если кот атакует, уменьшаем таймер атаки
-  if (character.isAttacking) {
-    character.attackTimer -= delta;
+  if (ch.isAttacking) {
+    ch.attackTimer -= delta;
 
     // Проверяем попадание по врагам
-    gameObjects.enemies?.forEach((enemy, index) => {
+    go.enemies?.forEach((e, index) => {
       let inAttackRange = false;
-      if (character.facingRight) {
+      if (ch.facingRight) {
         // Атака вправо
-        inAttackRange = (enemy.x >= character.x + character.width) &&
-          (enemy.x <= character.x + character.width + character.attackRange) &&
-          (enemy.y + enemy.height >= character.y) &&
-          (enemy.y <= character.y + character.height);
+        inAttackRange = (e.x >= ch.x + ch.width) &&
+          (e.x <= ch.x + ch.width + ch.attackRange) &&
+          (e.y + e.height >= ch.y) &&
+          (e.y <= ch.y + ch.height);
       } else {
         // Атака влево
-        inAttackRange = (enemy.x + enemy.width >= character.x - character.attackRange) &&
-          (enemy.x <= character.x) &&
-          (enemy.y + enemy.height >= character.y) &&
-          (enemy.y <= character.y + character.height);
+        inAttackRange = (e.x + e.width >= ch.x - ch.attackRange) &&
+          (e.x <= ch.x) &&
+          (e.y + e.height >= ch.y) &&
+          (e.y <= ch.y + ch.height);
       }
 
-      if (inAttackRange && enemy.isMonster) {
-        enemy.health -= character.attackDamage;
-        enemy.hitEffect = true;
-        enemy.hitTimer = 200 // длительность эффекта
-        if (enemy.health <= 0) {
-          enemy.isAlive = false
-          enemy.isDead = enemy.canDie
+      if (inAttackRange && e.isMonster) {
+        e.health -= ch.attackDamage;
+        e.hitEffect = true;
+        e.hitTimer = 200 // длительность эффекта
+        if (e.health <= 0) {
+          e.isAlive = false
+          e.isDead = e.canDie
         }
-        if (enemy.isDead && enemy.type === 'B') {
+        if (e.isDead && e.type === 'B') {
           [
-            ...gameObjects.obstacles,
-            ...gameObjects.collectables,
+            ...go.obstacles,
+            ...go.collectables,
           ].forEach(obstacle => {
             if (['f','a'].includes(obstacle.type)) {
               obstacle.isVisible = true
@@ -75,46 +57,46 @@ export function updateBlackCatAttack(character, gameObjects, delta) {
       }
     });
     // Если таймер истек, завершаем атаку
-    if (character.attackTimer <= 0) {
-      character.isAttacking = false;
+    if (ch.attackTimer <= 0) {
+      ch.isAttacking = false;
     }
   }
   // Обработка cooldown атаки
-  if (!character.canAttack) {
-    character.attackCooldownTimer -= delta;
+  if (!ch.canAttack) {
+    ch.attackCooldownTimer -= delta;
 
     // Если таймер cooldown истек, разрешаем атаковать снова
-    if (character.attackCooldownTimer <= 0) {
-      character.canAttack = true;
+    if (ch.attackCooldownTimer <= 0) {
+      ch.canAttack = true;
     }
   }
 
 }
 
 // Функция для обновления физики персонажа с резким прыжком
-export function updateCharacterPhysics(character, deltaTime) {
+export function updateCharacterPhysics(ch, dt) {
   // Применяем гравитацию с разными значениями для подъема и падения
-  if (!character.onGround) { // или !character.isOnGround, в зависимости от того, какое имя вы выберете
+  if (!ch.onGround) { // или !character.isOnGround, в зависимости от того, какое имя вы выберете
     // Если персонаж движется вверх (отрицательная скорость Y)
-    if (character.velocityY < 0) {
-      character.velocityY += GRAVITY_UP * deltaTime;
+    if (ch.velocityY < 0) {
+      ch.velocityY += GRAVITY_UP * dt;
     } else {
       // Если персонаж движется вниз (положительная скорость Y)
-      character.velocityY += GRAVITY_DOWN * deltaTime;
+      ch.velocityY += GRAVITY_DOWN * dt;
     }
 
     // Ограничиваем максимальную скорость падения
-    if (character.velocityY > MAX_FALL_SPEED) {
-      character.velocityY = MAX_FALL_SPEED;
+    if (ch.velocityY > MAX_FALL_SPEED) {
+      ch.velocityY = MAX_FALL_SPEED;
     }
   }
 
   // Применяем вертикальную скорость
-  character.y += character.velocityY * deltaTime;
+  ch.y += ch.velocityY * dt;
 
   // Можно оставить только проверку верхней границы
-  if (character.y < 20) {
-    character.y = 20;
-    character.velocityY = GRAVITY_DOWN;
+  if (ch.y < 20) {
+    ch.y = 20;
+    ch.velocityY = GRAVITY_DOWN;
   }
 }
