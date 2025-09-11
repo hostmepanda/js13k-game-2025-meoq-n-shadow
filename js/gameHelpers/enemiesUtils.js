@@ -32,7 +32,7 @@ export function createPoop(x, y, gameObjects, Sprite, lifeSpan = -100) {
         facingRight: Math.random() > 0.5,
         dt: 0,
         frame: 0,
-        framesLength: 6,
+        framesLength: 2,
         health: 5, //depends on level
         moveSpeed: 20, // depend on level or size
         height: 15,
@@ -90,21 +90,7 @@ export function createPoop(x, y, gameObjects, Sprite, lifeSpan = -100) {
               this.velocityX = this.moveSpeed;
             }
           } else {
-            this.decisionTimer -= deltaTime;
-            if (this.decisionTimer <= 0) {
-              const decision = Math.floor(Math.random() * 5);
-              if (decision === 0) {
-                this.velocityX = this.moveSpeed
-                this.facingRight = true;
-              } else if (decision === 1 || decision === 5) {
-                this.velocityX  = -1 * this.moveSpeed
-                this.facingRight = false;
-              } else if (decision >= 2 && this.onGround) {
-                this.velocityY = -450 - Math.random() * 150
-                this.onGround = false;
-              }
-              this.decisionTimer = this.decisionInterval;
-            }
+            updateMonsterBehavior(this, deltaTime)
           }
         },
       })
@@ -112,7 +98,7 @@ export function createPoop(x, y, gameObjects, Sprite, lifeSpan = -100) {
 }
 
 export function checkEnemyCollisions(p, enemies, states) {
-  enemies.forEach((e, index) => {
+  enemies.forEach((e) => {
     if (isCollided(p, e)) {
       if (e.type === 'E' || e.type === 'P' || e.type === 'B') {
         if (['P','B'].includes(e.type) && e.isMonster) {
@@ -161,11 +147,11 @@ export function renderPoop(ctx, width, height, options = { frameIndex: 0, scale:
   const poopFrames = [
     [
       '00000000000000000000',
-      '00000020000000000000',
-      '00000000000000200000',
-      '00000000000000000000',
-      '00000000000011000000',
-      '00000000000111100000',
+      '00002200002200000000',
+      '00000200002200000000',
+      '00000000000000000020',
+      '02000022000011000020',
+      '02000000000111100000',
       '00000000011111000000',
       '00000001111111100000',
       '00000000111111100000',
@@ -179,11 +165,11 @@ export function renderPoop(ctx, width, height, options = { frameIndex: 0, scale:
     ],
     [
       '00000000000000000000',
+      '00000022000000000000',
+      '02000022000002200000',
       '00000000000000000000',
-      '00000020000002000000',
-      '00000000000000000000',
-      '00000000000011000000',
-      '00000000000111100000',
+      '00002000000011000000',
+      '00002000000111100000',
       '00000000011111000000',
       '00000001111111100000',
       '00000000111111100000',
@@ -195,78 +181,6 @@ export function renderPoop(ctx, width, height, options = { frameIndex: 0, scale:
       '01111111111111111110',
       '11111111111111111111',
     ],
-    [
-      '00000000000000000000',
-      '00000000000000000000',
-      '00000000000000000000',
-      '00000200000020000000',
-      '00000000000011000000',
-      '00000000000111100000',
-      '00000000011111000000',
-      '00000001111111100000',
-      '00000000111111100000',
-      '00000011111111000000',
-      '00000111111111110000',
-      '00001111111111110000',
-      '00001111111111100000',
-      '00011111111111111100',
-      '01111111111111111110',
-      '11111111111111111111',
-    ],
-    [
-      '00000000000000000000',
-      '00000000000000000000',
-      '00000000000000000000',
-      '00000000000020000000',
-      '00000020000011000000',
-      '00000000000111100000',
-      '00000000011111000000',
-      '00000001111111100000',
-      '00000000111111100000',
-      '00000011111111000000',
-      '00000111111111110000',
-      '00001111111111110000',
-      '00001111111111100000',
-      '00011111111111111100',
-      '01111111111111111110',
-      '11111111111111111111',
-    ],
-    [
-      '00000000000000000000',
-      '00000000000000000000',
-      '00000000000000000000',
-      '00000002000002000000',
-      '00000000000011000000',
-      '00000000000111100000',
-      '00000000011111000000',
-      '00000001111111100000',
-      '00000000111111100000',
-      '00000011111111000000',
-      '00000111111111110000',
-      '00001111111111110000',
-      '00001111111111100000',
-      '00011111111111111100',
-      '01111111111111111110',
-      '11111111111111111111',
-    ],
-    [
-      '00000000000000000000',
-      '00000000000000000000',
-      '00000002000000000000',
-      '00000000000000200000',
-      '00000000000011000000',
-      '00000000000111100000',
-      '00000000011111000000',
-      '00000001111111100000',
-      '00000000111111100000',
-      '00000011111111000000',
-      '00000111111111110000',
-      '00001111111111110000',
-      '00001111111111100000',
-      '00011111111111111100',
-      '01111111111111111110',
-      '11111111111111111111',
-    ]
   ];
   const colors = [
     "rgba(255,255,255,0)",
@@ -276,4 +190,26 @@ export function renderPoop(ctx, width, height, options = { frameIndex: 0, scale:
     "rgb(133,73,0)",
   ]
   drawPixels(ctx, poopFrames[options.frameIndex], { scale:1, colors, flipX: options.flipX })
+}
+
+export function updateMonsterBehavior(monster, deltaTime) {
+  monster.decisionTimer -= deltaTime;
+  if (monster.decisionTimer <= 0) {
+    monster.decisionTimer = monster.decisionInterval;
+    const decision = Math.floor(Math.random() * 4);
+
+    if (decision === 0) {
+      monster.velocityX = 0;
+    } else if (decision === 1) {
+      monster.velocityX = -monster.moveSpeed;
+      monster.facingRight = false;
+    } else if (decision === 2) {
+      monster.velocityX = monster.moveSpeed;
+      monster.facingRight = true;
+    } else if (decision === 3 && monster.onGround) {
+      monster.velocityY = monster.jumpForce;
+      monster.onGround = false;
+    }
+  }
+  return monster;
 }

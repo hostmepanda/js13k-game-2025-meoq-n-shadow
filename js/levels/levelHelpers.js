@@ -74,35 +74,13 @@ export function levelRender({ gameData, kontra}, levelBackgroundPatterns) {
   )
 
   renderWithCamera(context, GameState.camera, () => {
-    if (gameObjects.obstacles.length > 0) {
-      gameObjects.obstacles
-      .filter(obstacle => obstacle.isVisible)
-      .forEach(obstacle => {
-        obstacle.render()
-      })
-    }
-
-    if (gameObjects.collectables.length > 0) {
-      // renderFoodItems(context, gameObjects.collectables.filter(({ isVisible, collected }) => isVisible && !collected))
-      gameObjects.collectables
-      .filter(({ isVisible, collected }) => isVisible && !collected)
-      .forEach(collectable => {collectable?.render?.()})
-    }
-
-    if (gameObjects.enemies.length > 0) {
-      gameObjects.enemies
-      .forEach(enemy => {
-        enemy?.render?.()
-      })
-    }
-
-    if (gameObjects.effects.length > 0) {
-      gameObjects.effects.forEach(effect => {
-        effect?.render?.()
-      })
-    }
-    gameObjects.white.render()
-    gameObjects.black.render()
+    [
+      ...gameObjects.collectables.filter(({ isVisible, collected }) => isVisible && !collected),
+      ...gameObjects.obstacles.filter(obstacle => obstacle.isVisible),
+      ...gameObjects.enemies,
+      gameObjects.white,
+      gameObjects.black,
+    ].forEach(e => e.render?.())
 
     // Если кот атакует, добавляем визуализацию атаки
     if (gameObjects.black.isAttacking) {
@@ -115,12 +93,10 @@ export function levelRender({ gameData, kontra}, levelBackgroundPatterns) {
         // Атака вправо
         const attackX = gameObjects.black.x + gameObjects.black.width;
         context.arc(attackX, attackY, gameObjects.black.attackRange, Math.PI/2, -Math.PI/2, true); // правая половина
-        // context.fillRect(attackX, gameObjects.black.y, gameObjects.black.attackRange, gameObjects.black.height);
       } else {
         // Атака влево
         const attackX = gameObjects.black.x
         context.arc(attackX, attackY, gameObjects.black.attackRange, -Math.PI/2, Math.PI/2, true); // левая половина
-        // context.fillRect(attackX, gameObjects.black.y, gameObjects.black.attackRange, gameObjects.black.height);
       }
 
       context.closePath();

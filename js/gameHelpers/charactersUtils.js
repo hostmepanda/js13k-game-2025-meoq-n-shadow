@@ -1,4 +1,3 @@
-// Функция для увеличения размера кота
 import {GRAVITY_DOWN, GRAVITY_UP, MAX_FALL_SPEED} from './utils'
 
 export function increaseCatSize(ch) {
@@ -38,8 +37,6 @@ export function updateBlackCatAttack(ch, go, delta) {
 
       if (inAttackRange && e.isMonster) {
         e.health -= ch.attackDamage;
-        e.hitEffect = true;
-        e.hitTimer = 200 // длительность эффекта
         if (e.health <= 0) {
           e.isAlive = false
           e.isDead = e.canDie

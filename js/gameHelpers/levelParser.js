@@ -3,7 +3,7 @@ import {renderLamp, renderTable, renderTree, rndrTl} from './tileHelpers'
 import {renderCollectibleFish} from './collectableHelpers'
 import {renderCatSideView, updateSprite} from './catHelpers'
 import {GAME_STATE} from '../consts'
-import {createPoop} from './enemiesUtils'
+import {createPoop, updateMonsterBehavior} from './enemiesUtils'
 
 const pcm = {
   'Y': 'yellow', /* # = level exit */
@@ -169,6 +169,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           ...defCatCfg,
           attackDamage: 0,
           jumpForce: -450,
+          isPooping: false,
           maxSizeMultiplier: 2,
           originalJumpForce: -450,
           sizeMultiplier: 1,
@@ -345,6 +346,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           cfg.onGround = true
           cfg.spawnX = x * tileSize
           cfg.spawnY = y * tileSize
+          cfg.trashTimer = 0;
           cfg.trashCooldown = 10;
           cfg.velocityX = 0
           cfg.velocityY = 0
@@ -357,42 +359,24 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
             if (!this.onGround) {
               this.velocityY += GRAVITY_DOWN * deltaTime;
             }
-            this.decisionTimer -= deltaTime;
-            if (this.decisionTimer <= 0) {
-              this.decisionTimer = this.decisionInterval;
-              const decision = Math.floor(Math.random() * 4);
-
-              if (decision === 0) {
-                this.velocityX = 0;
-              } else if (decision === 1) {
-                this.velocityX = -this.moveSpeed;
-                this.facingRight = false;
-              } else if (decision === 2) {
-                this.velocityX = this.moveSpeed;
+            if (this.o.white.y <= 200 || this.o.black.y <= 200) {
+              updateMonsterBehavior(this, deltaTime)
+              if (this.x < this.boundaryLeft) {
+                this.x = this.boundaryLeft;
+                this.velocityX = this.moveSpeed; // Разворачиваемся, если достигли левой границы
                 this.facingRight = true;
-              } else if (decision === 3 && this.onGround) {
-                this.velocityY = this.jumpForce;
-                this.onGround = false;
+              } else if (this.x > this.boundaryRight) {
+                this.x = this.boundaryRight;
+                this.velocityX = -this.moveSpeed; // Разворачиваемся, если достигли правой границы
+                this.facingRight = false;
               }
-            }
-
-            if (this.x < this.boundaryLeft) {
-              this.x = this.boundaryLeft;
-              this.velocityX = this.moveSpeed; // Разворачиваемся, если достигли левой границы
-              this.facingRight = true;
-            } else if (this.x > this.boundaryRight) {
-              this.x = this.boundaryRight;
-              this.velocityX = -this.moveSpeed; // Разворачиваемся, если достигли правой границы
-              this.facingRight = false;
-            }
-
-            this.x += this.velocityX * deltaTime;
-            this.y += this.velocityY * deltaTime;
-
-            this.trashTimer += deltaTime;
-            if (this.trashTimer >= this.trashCooldown) {
-              createPoop(this.x, this.y, this.o, this.s, this.lifeSpan) // depends on level
-              this.trashTimer = 0; // сбрасываем таймер
+              this.x += this.velocityX * deltaTime;
+              this.y += this.velocityY * deltaTime;
+              this.trashTimer += deltaTime;
+              if (this.trashTimer >= this.trashCooldown) {
+                createPoop(this.x, this.y, this.o, this.s, this.lifeSpan) // depends on level
+                this.trashTimer = 0; // сбрасываем таймер
+              }
             }
           };
           cfg.render = function() {
