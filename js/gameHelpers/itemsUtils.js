@@ -28,11 +28,12 @@ export function checkEnvironmentCollisions(player, obstacles, deltaTime, GameSta
   player.onGround = false;
   obstacles
   .forEach(obstacle => {
-    if (!collides(player, obstacle)) {
+    if (!collides(player, obstacle)) return
+    // вычисляем перекрытия
+    if (obstacle.type === 'X' && player.color === 'white' && player.sizeMultiplier > 1) {
+      obstacle.isVisible = false
       return
     }
-
-    // вычисляем перекрытия
     const overlapX = Math.min(
       player.x + player.width - obstacle.x,
       obstacle.x + obstacle.width - player.x

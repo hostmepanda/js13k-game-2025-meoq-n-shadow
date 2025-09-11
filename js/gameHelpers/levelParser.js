@@ -71,6 +71,9 @@ const parseToColorTilesByLevel = {
       bodyColor: 'rgb(180, 180, 180)',
       injectColor: 'rgb(101,101,101)',
     },
+    X: {
+      bodyColor: 'rgba(188,128,0,0.53)',
+    },
     W: grayBg,
     w: grayBg,
     O: blueBg,
@@ -98,7 +101,7 @@ const parseToColorTilesByLevel = {
       bodyColor: 'rgb(128,128,128)',
     },
     X: {
-      bodyColor: 'rgba(39,150,230,0.51)',
+      bodyColor: 'rgb(0,149,255)',
     },
     W: {
       bodyColor: 'rgb(128,128,128)',
@@ -271,7 +274,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         })
       }
 
-        if (['W','M','m','N','n','w','F','f','O','o'].includes(ch)) {
+        if (['W','M','m','N','n','w','F','f','O','o','X'].includes(ch)) {
           cfg.render = function () {
             rndrTl(
               this.context,
@@ -349,7 +352,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           cfg.onGround = true
           cfg.spawnX = x * tileSize
           cfg.spawnY = y * tileSize
-          cfg.trashCooldown = 5;
+          cfg.trashCooldown = 10;
           cfg.trashDamage = 20;
           cfg.trashHeight = tileSize / 2;
           cfg.trashItems = [];
@@ -357,6 +360,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           cfg.trashWidth = tileSize / 2;
           cfg.velocityX = 0
           cfg.velocityY = 0
+          cfg.lifeSpan = 15;
 
           cfg.update = function(deltaTime) {
             if (!this.isAlive) return;
@@ -366,13 +370,9 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
             if (!this.onGround) {
               this.velocityY += GRAVITY_DOWN * deltaTime;
             }
-
-            // Обновляем таймер принятия решений
             this.decisionTimer -= deltaTime;
             if (this.decisionTimer <= 0) {
               this.decisionTimer = this.decisionInterval;
-
-              // Случайное решение: 0 - стоять, 1 - идти влево, 2 - идти вправо, 3 - прыгнуть
               const decision = Math.floor(Math.random() * 4);
 
               if (decision === 0) {
@@ -403,56 +403,9 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
             this.y += this.velocityY * deltaTime;
 
             this.trashTimer += deltaTime;
-            if (this.trashTimer >= this.trashCooldown && this.trashItems.length < this.maxTrashItems) {
-              createPoop(this.x, this.y, this.o, this.s) // depends on level
+            if (this.trashTimer >= this.trashCooldown) {
+              createPoop(this.x, this.y, this.o, this.s, this.lifeSpan) // depends on level
               this.trashTimer = 0; // сбрасываем таймер
-            }
-          };
-
-          cfg.renderTrash = function() {
-            for (const trash of this.trashItems) {
-              this.context.save()
-              const r = trash.width
-              this.context.translate(trash.x, trash.y);
-              this.context.beginPath();
-              this.context.arc(0, 0, r, 0, Math.PI * 2);
-              this.context.fillStyle = "#eee";
-              this.context.fill();
-              this.context.strokeStyle = "#aaa";
-              this.context.stroke();
-
-              // пара складок
-              this.context.strokeStyle = "rgba(0,0,0,0.2)";
-              this.context.beginPath();
-              this.context.moveTo(-r/2, -r/4);
-              this.context.lineTo(r/3, r/5);
-              this.context.moveTo(-r/3, r/4);
-              this.context.lineTo(r/2, -r/5);
-              this.context.stroke();
-              this.context.restore()
-
-              // // Отрисовка мусора (простой квадрат)
-              // this.context.fillStyle = 'rgba(150, 75, 0, 0.8)'; // коричневый с прозрачностью
-              // this.context.fillRect(trash.x, trash.y, trash.width, trash.height);
-              //
-              // // Можно добавить детали, чтобы он выглядел как мусор
-              // this.fillStyle = 'rgba(100, 50, 0, 0.9)';
-              // const segments = 3;
-              // const segWidth = trash.width / segments;
-              // const segHeight = trash.height / segments;
-              //
-              // for (let i = 0; i < segments; i++) {
-              //   for (let j = 0; j < segments; j++) {
-              //     if ((i + j) % 2 === 0) {
-              //       this.context.fillRect(
-              //         trash.x + i * segWidth,
-              //         trash.y + j * segHeight,
-              //         segWidth,
-              //         segHeight
-              //       );
-              //     }
-              //   }
-              // }
             }
           };
           cfg.render = function() {
@@ -480,10 +433,9 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
             this.context.arc(13, this.height - 15, this.height*0.15, 0, Math.PI*2);
             this.context.fill();
           }
-
         }
 
-      if (['E','X','B'].includes(ch)) {
+      if (['E','B'].includes(ch)) {
         cfg.canDie = true
         cfg.isDead = false
         cfg.isAlive = true
@@ -491,12 +443,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         cfg.isMonster = true
         cfg.health = 100
         cfg.collisionDamage = 50
-        if (ch === 'X') {
-          cfg.isMonster = false
-          cfg.collides = true
-          cfg.health = 12
-          cfg.breakable = true
-        }
+
         if (ch === 'E') {
           cfg.update = function (deltaTime) {
             if (!this.isAlive) {

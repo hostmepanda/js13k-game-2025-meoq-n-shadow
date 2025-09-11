@@ -1,45 +1,40 @@
 import {drawPixels, isCollided} from './utils'
 
-export function checkEnemyCollisionWithEnvironment(o, e) {
+export function checkEnemyCollisionWithEnvironment(o, e, clds) {
   o.forEach(obstacle => {
-    if (
-      e.x < obstacle.x + obstacle.width &&
-      e.x + e.width > obstacle.x &&
-      e.y < obstacle.y + obstacle.height &&
-      e.y + e.height > obstacle.y
-    ) {
-      if (e.y + e.height > obstacle.y &&
-        e.y + e.height < obstacle.y + obstacle.height / 2) {
-        e.y = obstacle.y - e.height
-        e.velocityY = 0
-        e.onGround = true
-      }
-      else if (e.velocityX > 0 && e.x + e.width > obstacle.x &&
-        e.x < obstacle.x) {
-        e.x = obstacle.x - e.width
-        e.direction = 'left'
-        e.velocityX *= -1
-      } else if (e.velocityX < 0 && e.x < obstacle.x + obstacle.width &&
-        e.x + e.width > obstacle.x + obstacle.width) {
-        e.x = obstacle.x + obstacle.width
-        e.direction = 'right'
-        e.velocityX *= -1
-      }
+    if (!clds(obstacle, e)) return
+
+    if (e.y + e.height > obstacle.y &&
+      e.y + e.height < obstacle.y + obstacle.height / 2) {
+      e.y = obstacle.y - e.height
+      e.velocityY = 0
+      e.onGround = true
+    } else if (e.velocityX > 0 && e.x + e.width > obstacle.x &&
+      e.x < obstacle.x) {
+      e.x = obstacle.x - e.width
+      e.facingRight = false
+      e.velocityX *= -1
+    } else if (e.velocityX < 0 && e.x < obstacle.x + obstacle.width &&
+      e.x + e.width > obstacle.x + obstacle.width) {
+      e.x = obstacle.x + obstacle.width
+      e.facingRight = true
+      e.velocityX *= -1
     }
   })
 }
 
-export function createPoop(x, y, gameObjects, Sprite) {
+export function createPoop(x, y, gameObjects, Sprite, lifeSpan = -100) {
     gameObjects.enemies.push(
       Sprite({
         canDie: true,
         color: 'brown',
         createdAt: Date.now(),
-        direction: Math.random() > 0.5 ? 'left' : 'right',
+        facingRight: Math.random() > 0.5,
         dt: 0,
         frame: 0,
         framesLength: 6,
         health: 5, //depends on level
+        moveSpeed: 20, // depend on level or size
         height: 15,
         isAlive: true,
         isDead: false,
@@ -52,6 +47,9 @@ export function createPoop(x, y, gameObjects, Sprite) {
         velocityX: 0,
         velocityY: 0,
         width: 15,
+        decisionTimer: 0,
+        decisionInterval: 5,
+        lifeSpan,
         x,
         y,
         render() {
@@ -67,38 +65,47 @@ export function createPoop(x, y, gameObjects, Sprite) {
             })
         },
         update(deltaTime) {
-          this.dt += deltaTime;
-          if (this.dt > 0.07) {
-            this.frame = (this.frame + 1) % this.framesLength;
-            this.dt = 0;
-          }
-
-          if (!this.isMonster && Date.now() >= this.transformAt) {
-            this.isMonster = true
-          }
-
-          if (this.isMonster) {
-            this.jumpTimer -= deltaTime
-            if (this.onGround && this.jumpTimer <= 0) {
-              if (Math.random() < 0.02) {
-                this.velocityY = -350 - Math.random() * 150 // Случайная сила прыжка
-                this.onGround = false
-                this.jumpTimer = 1 + Math.random() * 2 // Задержка между прыжками
-              }
-              if (Math.random() < 0.01) {
-                this.direction = this.direction === 'left' ? 'right' : 'left'
-                this.velocityX *= -1
-              }
-            }
-          }
-
           if (!this.onGround) {
-            this.velocityY += 980 * deltaTime
+            this.velocityY += 780 * deltaTime
           }
 
           this.y += this.velocityY * deltaTime
           this.x += this.velocityX * deltaTime
           this.onGround = false
+
+          this.lifeSpan -= deltaTime;
+          if (this.lifeSpan <= 0 && lifeSpan > -100) {
+            this.isDead = true;
+            this.isAlive = false;
+          }
+
+          if (!this.isMonster) {
+            this.dt += deltaTime;
+            if (this.dt > 0.07) {
+              this.frame = (this.frame + 1) % this.framesLength;
+              this.dt = 0;
+            }
+            if (Date.now() >= this.transformAt) {
+              this.isMonster = true
+              this.velocityX = this.moveSpeed;
+            }
+          } else {
+            this.decisionTimer -= deltaTime;
+            if (this.decisionTimer <= 0) {
+              const decision = Math.floor(Math.random() * 5);
+              if (decision === 0) {
+                this.velocityX = this.moveSpeed
+                this.facingRight = true;
+              } else if (decision === 1 || decision === 5) {
+                this.velocityX  = -1 * this.moveSpeed
+                this.facingRight = false;
+              } else if (decision >= 2 && this.onGround) {
+                this.velocityY = -450 - Math.random() * 150
+                this.onGround = false;
+              }
+              this.decisionTimer = this.decisionInterval;
+            }
+          }
         },
       })
     );

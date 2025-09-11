@@ -209,6 +209,8 @@ export function updateLevel({gameStates, kontra}, levelBackgroundPatterns) {
         ...gameObjects.enemies.filter(({ collides, isVisible }) => collides && isVisible),
       ],
       enemy,
+      collides,
+      deltaTime,
     )
   })
 
