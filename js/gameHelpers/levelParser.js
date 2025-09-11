@@ -285,7 +285,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         gameObjects.obstacles.push(Sprite(cfg));
         }
 
-      if (['L','c','T','D','O','R','Q', 'd'].includes(ch)) {
+      if (['L','c','T','D','O','R','Q','d'].includes(ch)) {
           cfg.width = 40
           cfg.height = 40
           cfg.y = y * tileSize - tileSize + 5
@@ -320,8 +320,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
 
         cfg.render = function () {
           renderCollectibleFish(this.context, this.width, this.height, {
-            fishColor: 'rgb(255, 210, 40)',
-            glowColor: 'rgb(255,255,255)'
+            fishColor: 'rgb(251,108,55)',
           });
         }
         gameObjects.collectables.push(Sprite(cfg));
