@@ -3,6 +3,7 @@ import {renderLamp, renderTable, renderTree, rndrTl} from './tileHelpers'
 import {renderCollectibleFish} from './collectableHelpers'
 import {renderCatSideView} from './catHelpers'
 import {GAME_STATE} from '../consts'
+import {createPoop} from './enemiesUtils'
 
 const pcm = {
   '#': 'yellow', /* # = level exit */
@@ -329,75 +330,65 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         gameObjects.collectables.push(Sprite(cfg));
       }
 
-      if (['E','X','B'].includes(ch)) {
-        cfg.canDie = true
-        cfg.isDead = false
-        cfg.isAlive = true
-        cfg.enemy = true
-        cfg.isMonster = true
-        cfg.health = 100
-        cfg.collisionDamage = 50
         if (ch === 'B') {
-          cfg.health = 2 // 200
-          cfg.collisionDamage = 25
-          cfg.velocityY = 0
-          cfg.velocityX = 0
-          cfg.isJumping = true
-          cfg.jumpForce = -350
-          cfg.moveSpeed = 300
-          cfg.onGround = true
-          cfg.facingRight = false
-          cfg.spawnX = x * tileSize
-          cfg.spawnY = y * tileSize
           cfg.boundaryLeft = cfg.spawnX - 12 * tileSize
           cfg.boundaryRight = cfg.spawnX + 12 * tileSize
+          cfg.canDie = true
+          cfg.collisionDamage = 5 // depends on level
+          cfg.decisionInterval = 2 // depend on level
           cfg.decisionTimer = 0
-          cfg.decisionInterval = 1
-          cfg.trashItems = [];
+          cfg.facingRight = false
+          cfg.health = 10 // depends on level
+          cfg.isAlive = true
+          cfg.isDead = false
+          cfg.isJumping = true
+          cfg.isMonster = true
+          cfg.jumpForce = -350
           cfg.maxTrashItems = 2;
+          cfg.moveSpeed = 300
+          cfg.onGround = true
+          cfg.spawnX = x * tileSize
+          cfg.spawnY = y * tileSize
           cfg.trashCooldown = 5;
-          cfg.trashTimer = 0;
-          cfg.trashLifespan = 10;
           cfg.trashDamage = 20;
-          cfg.trashWidth = tileSize / 2;
           cfg.trashHeight = tileSize / 2;
+          cfg.trashItems = [];
+          cfg.trashTimer = 0;
+          cfg.trashWidth = tileSize / 2;
+          cfg.velocityX = 0
+          cfg.velocityY = 0
 
           cfg.update = function(deltaTime) {
             if (!this.isAlive) return;
+            this.o = gameObjects
+            this.s = Sprite
 
-            // Гравитация
             if (!this.onGround) {
-              this.velocityY += GRAVITY_DOWN * deltaTime; // Сила гравитации
+              this.velocityY += GRAVITY_DOWN * deltaTime;
             }
 
             // Обновляем таймер принятия решений
             this.decisionTimer -= deltaTime;
             if (this.decisionTimer <= 0) {
-              // Время принять новое решение
               this.decisionTimer = this.decisionInterval;
 
               // Случайное решение: 0 - стоять, 1 - идти влево, 2 - идти вправо, 3 - прыгнуть
               const decision = Math.floor(Math.random() * 4);
 
               if (decision === 0) {
-                // Стоять на месте
                 this.velocityX = 0;
               } else if (decision === 1) {
-                // Идти влево
                 this.velocityX = -this.moveSpeed;
                 this.facingRight = false;
               } else if (decision === 2) {
-                // Идти вправо
                 this.velocityX = this.moveSpeed;
                 this.facingRight = true;
               } else if (decision === 3 && this.onGround) {
-                // Прыгнуть, если на земле
                 this.velocityY = this.jumpForce;
                 this.onGround = false;
               }
             }
 
-            // Проверяем границы
             if (this.x < this.boundaryLeft) {
               this.x = this.boundaryLeft;
               this.velocityX = this.moveSpeed; // Разворачиваемся, если достигли левой границы
@@ -408,47 +399,14 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
               this.facingRight = false;
             }
 
-            // Применяем движение
             this.x += this.velocityX * deltaTime;
             this.y += this.velocityY * deltaTime;
 
-            // Логика создания мусора
             this.trashTimer += deltaTime;
             if (this.trashTimer >= this.trashCooldown && this.trashItems.length < this.maxTrashItems) {
-              // Создаем новый мусор
-              this.trashItems.push(Sprite({
-                x: this.x + this.width / 2 - this.trashWidth / 2, // центрируем относительно босса
-                y: this.y + this.height - this.trashHeight, // внизу босса
-                width: this.trashWidth,
-                height: this.trashHeight,
-                timeLeft: this.trashLifespan, // время жизни в секундах
-                canDie: true,
-                isDead: false,
-                isAlive: true,
-                enemy: true,
-                isMonster: true,
-                health: 50,
-                collisionDamage: 15,
-                isVisible: true,
-                type: 'B',
-              }));
-
+              createPoop(this.x, this.y, this.o, this.s) // depends on level
               this.trashTimer = 0; // сбрасываем таймер
             }
-
-            // Обновляем все существующие мусоры
-            for (let i = this.trashItems.length - 1; i >= 0; i--) {
-              const trash = this.trashItems[i];
-              trash.timeLeft -= deltaTime;
-
-              // Удаляем мусор, если его время истекло
-              if (trash.timeLeft <= 0) {
-                this.trashItems.splice(i, 1);
-              }
-            }
-
-            // Здесь нужна будет проверка коллизий с землей и препятствиями
-            // ...
           };
 
           cfg.renderTrash = function() {
@@ -524,6 +482,15 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           }
 
         }
+
+      if (['E','X','B'].includes(ch)) {
+        cfg.canDie = true
+        cfg.isDead = false
+        cfg.isAlive = true
+        cfg.enemy = true
+        cfg.isMonster = true
+        cfg.health = 100
+        cfg.collisionDamage = 50
         if (ch === 'X') {
           cfg.isMonster = false
           cfg.collides = true

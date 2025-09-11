@@ -29,114 +29,79 @@ export function checkEnemyCollisionWithEnvironment(o, e) {
   })
 }
 
-export function createPoop(ch, gameObjects, Sprite) {
-  if (ch.sizeMultiplier > 1) {
-    const poopSizeReduction = 0.25 // Уменьшение размера на 25%
-    const bottomY = ch.y + ch.height
-    ch.sizeMultiplier = Math.max(1, ch.sizeMultiplier - poopSizeReduction)
-    ch.width = ch.originalWidth * ch.sizeMultiplier
-    ch.height = ch.originalHeight * ch.sizeMultiplier
-    ch.y = bottomY - ch.height
-    ch.jumpForce = ch.originalJumpForce * (1 / (1 + (ch.sizeMultiplier - 1) * 0.5))
-    ch.moveSpeed = ch.originalMoveSpeed * (1 / (1 + (ch.sizeMultiplier - 1) * 0.4))
+export function createPoop(x, y, gameObjects, Sprite) {
+    gameObjects.enemies.push(
+      Sprite({
+        canDie: true,
+        color: 'brown',
+        createdAt: Date.now(),
+        direction: Math.random() > 0.5 ? 'left' : 'right',
+        dt: 0,
+        frame: 0,
+        framesLength: 6,
+        health: 5, //depends on level
+        height: 15,
+        isAlive: true,
+        isDead: false,
+        isMonster: false,
+        jumpTimer: 0,
+        onGround: false,
+        size: 1,
+        transformAt: Date.now() + 5000,
+        type: 'P',
+        velocityX: 0,
+        velocityY: 0,
+        width: 15,
+        x,
+        y,
+        render() {
+          renderPoop(
+            this.context,
+            this.width,
+            this.height,
+            {
+              isMonster: this.isMonster,
+              frameIndex: this.frame,
+              scale: this.size,
+              flipX: this.direction !== 'left',
+            })
+        },
+        update(deltaTime) {
+          this.dt += deltaTime;
+          if (this.dt > 0.07) {
+            this.frame = (this.frame + 1) % this.framesLength;
+            this.dt = 0;
+          }
 
-    const poopSize = 15 + (ch.sizeMultiplier - 1) * 5
-    const poopX = ch.facingRight
-      ? ch.x - poopSize / 2
-      : ch.x + ch.width - poopSize / 2
-
-    const poop = Sprite({
-      canDie: false,
-      color: 'brown',
-      createdAt: Date.now(),
-      direction: Math.random() > 0.5 ? 'left' : 'right',
-      dt: 0,
-      frame: 0,
-      framesLength: 6,
-      health: 100,
-      height: poopSize,
-      isAlive: true,
-      isDead: false,
-      isMonster: false,
-      jumpTimer: 0,
-      onGround: false,
-      size: poopSize,
-      transformAt: Date.now() + 5000,
-      type: 'P',
-      velocityX: 0,
-      velocityY: 0,
-      width: poopSize,
-      x: poopX,
-      y: ch.y + ch.height - poopSize,
-      render() {
-        renderPoop(
-          this.context,
-          this.width,
-          this.height,
-          {
-          isMonster: this.isMonster,
-          frameIndex: this.frame,
-          scale: 1,
-          flipX: this.direction !== 'left',
-        })
-      },
-      update(deltaTime) {
-        this.dt += deltaTime;
-        if (this.dt > 0.07) {   // каждые 0.3 сек смена кадра
-          this.frame = (this.frame + 1) % this.framesLength;
-          this.dt = 0;
-        }
-
-        if (!this.isAlive) {
-          this.isMonster = false
-          this.isAlive = true
-          this.transformAt = Date.now() + 5000
-          this.velocityX = 0
-          this.velocityY = 0
-          this.onGround = false
-          this.jumpTimer = 0
-          this.health = 100
-        }
-
-        const now = Date.now()
-        if (!this.isMonster) {
-          if (now >= this.transformAt) {
+          if (!this.isMonster && Date.now() >= this.transformAt) {
             this.isMonster = true
-            const growFactor = 1.2
-            this.width *= growFactor
-            this.height *= growFactor
-            this.velocityX = this.direction === 'left' ? -50 : 50
           }
-        }
-        if (this.isMonster) {
-          this.jumpTimer -= deltaTime
-          if (this.onGround && this.jumpTimer <= 0) {
-            if (Math.random() < 0.02) {
-              this.velocityY = -350 - Math.random() * 150 // Случайная сила прыжка
-              this.onGround = false
-              this.jumpTimer = 1 + Math.random() * 2 // Задержка между прыжками
-            }
-            if (Math.random() < 0.01) {
-              this.direction = this.direction === 'left' ? 'right' : 'left'
-              this.velocityX *= -1
+
+          if (this.isMonster) {
+            this.jumpTimer -= deltaTime
+            if (this.onGround && this.jumpTimer <= 0) {
+              if (Math.random() < 0.02) {
+                this.velocityY = -350 - Math.random() * 150 // Случайная сила прыжка
+                this.onGround = false
+                this.jumpTimer = 1 + Math.random() * 2 // Задержка между прыжками
+              }
+              if (Math.random() < 0.01) {
+                this.direction = this.direction === 'left' ? 'right' : 'left'
+                this.velocityX *= -1
+              }
             }
           }
-        }
 
-        if (!this.onGround) {
-          this.velocityY += 980 * deltaTime
-        }
+          if (!this.onGround) {
+            this.velocityY += 980 * deltaTime
+          }
 
-        this.y += this.velocityY * deltaTime
-        this.x += this.velocityX * deltaTime
-        this.onGround = false
-      },
-    });
-    gameObjects.enemies.push(poop);
-    return true
-  }
-
-  return false
+          this.y += this.velocityY * deltaTime
+          this.x += this.velocityX * deltaTime
+          this.onGround = false
+        },
+      })
+    );
 }
 
 export function checkEnemyCollisions(p, enemies, states) {

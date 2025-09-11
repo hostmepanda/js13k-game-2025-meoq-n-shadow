@@ -241,17 +241,25 @@ export function updateLevel({gameStates, kontra}, levelBackgroundPatterns) {
     activeCharacter.isMoving = false;
   }
 
-  if (keyboard.isKeyPressed('Space') && !activeCharacter.poopCooldown) {
-    if (PlayerState.activeCharacter === 'white') {
-      if (createPoop(activeCharacter, gameObjects, Sprite)) {
-        // Устанавливаем задержку на какание, чтобы не спамить
-        activeCharacter.poopCooldown = true
+  if (keyboard.isKeyPressed('Space')) {
+    if (PlayerState.activeCharacter === 'white' && activeCharacter.sizeMultiplier > 1 && !activeCharacter.poopCooldown) {
+      createPoop(
+        activeCharacter.x,
+        activeCharacter.y - 15,
+        gameObjects, Sprite)
+      const poopSizeReduction = 0.25 // Уменьшение размера на 25%
+      const bottomY = activeCharacter.y + activeCharacter.height
+      activeCharacter.sizeMultiplier = Math.max(1, activeCharacter.sizeMultiplier - poopSizeReduction)
+      activeCharacter.width = activeCharacter.originalWidth * activeCharacter.sizeMultiplier
+      activeCharacter.height = activeCharacter.originalHeight * activeCharacter.sizeMultiplier
+      activeCharacter.y = bottomY - activeCharacter.height
+      activeCharacter.jumpForce = activeCharacter.originalJumpForce * (1 / (1 + (activeCharacter.sizeMultiplier - 1) * 0.5))
+      activeCharacter.moveSpeed = activeCharacter.originalMoveSpeed * (1 / (1 + (activeCharacter.sizeMultiplier - 1) * 0.4))
 
-        // Сбрасываем задержку через 1 секунду
-        setTimeout(() => {
-          activeCharacter.poopCooldown = false
-        }, 1000)
-      }
+      activeCharacter.poopCooldown = true
+      setTimeout(() => {
+        activeCharacter.poopCooldown = false
+      }, 1000)
     }
     if (PlayerState.activeCharacter === 'black' && !activeCharacter.isAttacking && activeCharacter.canAttack) {
       activeCharacter.isAttacking = true;
