@@ -32,6 +32,7 @@ export function checkEnvironmentCollisions(player, obstacles, deltaTime, GameSta
     // вычисляем перекрытия
     if (obstacle.type === 'X' && player.color === 'white' && player.sizeMultiplier > 1) {
       obstacle.isVisible = false
+      obstacle.collision = false
       return
     }
     const overlapX = Math.min(
@@ -67,7 +68,7 @@ export function checkEnvironmentCollisions(player, obstacles, deltaTime, GameSta
     }
 
     // Дополнительные типы тайлов
-    if (obstacle.type === '#') {
+    if (obstacle.type === 'Y') {
       const currentLevelIndex = Object.values(GAME_STATE).findIndex(
         value => value === GameState.currentState
       );

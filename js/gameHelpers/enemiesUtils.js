@@ -114,16 +114,7 @@ export function createPoop(x, y, gameObjects, Sprite, lifeSpan = -100) {
 export function checkEnemyCollisions(p, enemies, states) {
   enemies.forEach((e, index) => {
     if (isCollided(p, e)) {
-      if (e.type === 'X') {
-        if (p.color === 'white') {
-          const canBreak = p.sizeMultiplier * p.attackDamage >= e.health
-          if (canBreak) {
-            enemies[index].health = 0
-            enemies[index].isAlive = false
-            enemies[index].isDead = e.canDie
-          }
-        }
-      } else if (e.type === 'E' || e.type === 'P' || e.type === 'B') {
+      if (e.type === 'E' || e.type === 'P' || e.type === 'B') {
         if (['P','B'].includes(e.type) && e.isMonster) {
           if (p.dvl <= 0) {
             p.health -= e?.collisionDamage ?? 1

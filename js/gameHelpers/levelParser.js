@@ -6,7 +6,7 @@ import {GAME_STATE} from '../consts'
 import {createPoop} from './enemiesUtils'
 
 const pcm = {
-  '#': 'yellow', /* # = level exit */
+  'Y': 'yellow', /* # = level exit */
   'A': 'blue', /* fish */
   'B': 'purple', /* B = boss */
   'C': 'black', /* C = ceiling */
@@ -74,6 +74,11 @@ const parseToColorTilesByLevel = {
     X: {
       bodyColor: 'rgba(188,128,0,0.53)',
     },
+    Y:{
+      bodyColor: 'rgba(40,205,255,0.88)',
+      coverColor: 'rgb(255,247,46)',
+      rotation: 1,
+    },
     W: grayBg,
     w: grayBg,
     O: blueBg,
@@ -134,7 +139,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         color: pcm?.[ch] ?? "gray",
         type: ch,
         isVisible: !['f', 'a'].includes(ch),
-        collides: ['W','M','m','N','n','w','F','C', '#', 'f','O','o', 'X'].includes(ch),
+        collides: ['W','M','m','N','n','w','F','C', 'Y', 'f','O','o', 'X'].includes(ch),
       };
 
       const defCatCfg = {
@@ -274,7 +279,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         })
       }
 
-        if (['W','M','m','N','n','w','F','f','O','o','X'].includes(ch)) {
+        if (['W','M','m','N','n','w','F','f','O','o','X','Y'].includes(ch)) {
           cfg.render = function () {
             rndrTl(
               this.context,
@@ -287,7 +292,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         gameObjects.obstacles.push(Sprite(cfg));
         }
 
-      if (['L','c','T','f','D','O','R','Q', 'd'].includes(ch)) {
+      if (['L','c','T','D','O','R','Q', 'd'].includes(ch)) {
           cfg.width = 40
           cfg.height = 40
           cfg.y = y * tileSize - tileSize + 5
