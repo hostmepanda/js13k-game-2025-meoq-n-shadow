@@ -71,13 +71,45 @@ const levelBackground = {
         fgColor: 'rgba(255,227,53,0.47)',
       }
     ],
+  },
+  [GAME_STATE.LEVEL3]: {
+    tileSize: 390,
+    layers:[
+      { speed: 1, alpha: 1 },
+      { speed: 1, alpha: 1 },
+      { speed: 1, alpha: 1 },
+    ],
+    patterns: [
+      {
+        style: 'dots',
+        tileSize: 100,
+        bgColor: 'rgba(0,45,76,0.66)',
+        fgColor: 'rgba(255,255,255,0.66)',
+        accentColor: 'rgba(0,45,76,0.66)',
+        scale: 15,
+      },{
+        scale: 45,
+        tileSize: 100,
+        style: 'damask',
+        bgColor: 'rgba(0,17,25,0.66)',
+        fgColor: 'rgba(0,17,25,0.66)',
+        accentColor: 'rgb(255,201,201)',
+      },{
+        bgColor: 'rgba(255,227,53,0.11)',
+        accentColor: 'rgb(255,227,53)',
+        tileSize: 85,
+        scale: 30,
+        style: 'damask',
+        fgColor: 'rgba(255,227,53,0.47)',
+      }
+    ],
   }
 }
 
 function startGame() {
   const { canvas, context } = init();
 
-  const levelBackgroundPatterns = [GAME_STATE.LEVEL1, GAME_STATE.LEVEL2].map(
+  const levelBackgroundPatterns = [GAME_STATE.LEVEL1, GAME_STATE.LEVEL2, GAME_STATE.LEVEL3].map(
     (level) => ({
       layers:[{ speed: 1, alpha: 1 }, { speed: 1, alpha: 1 }, { speed: 1, alpha: 1 }],
       tileSize: 390,

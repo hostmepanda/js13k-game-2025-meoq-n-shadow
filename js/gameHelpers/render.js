@@ -37,6 +37,8 @@ export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, cs
             backgrounds = lvlBkPrns[0]
           } else if (GameState.currentState === GAME_STATE.LEVEL2) {
             backgrounds = lvlBkPrns[1]
+          } else if (GameState.currentState === GAME_STATE.LEVEL3) {
+            backgrounds = lvlBkPrns[2]
           }
 
           levelRender({

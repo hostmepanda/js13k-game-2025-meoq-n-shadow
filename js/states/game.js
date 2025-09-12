@@ -44,7 +44,7 @@ export function updateCamera(gameState, activeCharacter) {
 }
 
 export function loadLevel(targetLevel, states, drawHelpers, levelBackgroundPatterns = {}) {
-  if (![GAME_STATE.LEVEL1, GAME_STATE.LEVEL2, GAME_STATE.LEVEL3, GAME_STATE.LEVEL4].includes(targetLevel)) {
+  if (![GAME_STATE.LEVEL1, GAME_STATE.LEVEL2, GAME_STATE.LEVEL3].includes(targetLevel)) {
     return
   }
   if (targetLevel !== GAME_STATE.LEVEL1) {
@@ -62,6 +62,8 @@ export function loadLevel(targetLevel, states, drawHelpers, levelBackgroundPatte
     states.gameObjects.backgrounds = levelBackgroundPatterns[0]
   } else if (targetLevel === GAME_STATE.LEVEL2) {
     states.gameObjects.backgrounds = levelBackgroundPatterns[1]
+  } else if (targetLevel === GAME_STATE.LEVEL3) {
+    states.gameObjects.backgrounds = levelBackgroundPatterns[2]
   }
 
   return createLevel({ selectedLevel: targetLevel, gameStates: states, kontra: drawHelpers })

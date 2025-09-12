@@ -94,6 +94,6 @@ export function updateCharacterPhysics(ch, dt) {
   // Можно оставить только проверку верхней границы
   if (ch.y < 20) {
     ch.y = 20;
-    ch.velocityY = GRAVITY_DOWN;
+    ch.velocityY = 0;
   }
 }

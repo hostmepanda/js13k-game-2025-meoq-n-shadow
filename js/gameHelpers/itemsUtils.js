@@ -68,7 +68,7 @@ export function checkEnvironmentCollisions(player, obstacles, deltaTime, GameSta
     }
 
     // Дополнительные типы тайлов
-    if (obstacle.type === 'Y') {
+    if (obstacle.type === 'Y' && player.color !== 'pink') {
       const currentLevelIndex = Object.values(GAME_STATE).findIndex(
         value => value === GameState.currentState
       );
@@ -87,6 +87,6 @@ export function checkEnvironmentCollisions(player, obstacles, deltaTime, GameSta
   // ограничение по верхней границе карты
   if (player.y <= 10) {
     player.y = 10;
-    player.velocityY = -10 * deltaTime;
+    player.velocityY = 0;
   }
 }

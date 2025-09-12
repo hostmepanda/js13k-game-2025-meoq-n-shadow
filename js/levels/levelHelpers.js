@@ -80,6 +80,7 @@ export function levelRender({ gameData, kontra}, levelBackgroundPatterns) {
       ...gameObjects.enemies,
       gameObjects.white,
       gameObjects.black,
+      ...(gameObjects?.pink ? [gameObjects.pink] : []),
     ].forEach(e => e.render?.())
 
     // Если кот атакует, добавляем визуализацию атаки
@@ -144,8 +145,7 @@ export function updateLevel({gameStates, kontra}, levelBackgroundPatterns) {
   }
 
   const activeCharacter = PlayerState.activeCharacter === 'white' ? gameObjects.white : gameObjects.black
-  const cats = [gameObjects.white, gameObjects.black]
-  const boss = gameObjects.enemies?.find(({ type }) => type === 'B')
+  const cats = [gameObjects.white, gameObjects.black, ...gameObjects.pink ? [gameObjects.pink] : []]
   cats.forEach((player) => {
     player.update(deltaTime)
     updateCharacterPhysics(player, deltaTime)
@@ -184,25 +184,25 @@ export function updateLevel({gameStates, kontra}, levelBackgroundPatterns) {
   updateBlackCatAttack(activeCharacter, gameObjects, deltaTime)
 
   // Управление активным персонажем
-  if (keyboard.isKeyPressed('KeyW') && activeCharacter.onGround) {
+  if ((keyboard.isKeyPressed('KeyW') || keyboard.isKeyPressed('ArrowUp'))&& activeCharacter.onGround) {
     activeCharacter.velocityY = activeCharacter.jumpForce || JUMP_FORCE
     activeCharacter.isJumping = true
     activeCharacter.onGround = false
   }
   const currentMoveSpeed = activeCharacter.moveSpeed || MOVE_SPEED
 
-  if (keyboard.isKeyPressed('KeyA')) {
+  if (keyboard.isKeyPressed('KeyA') || keyboard.isKeyPressed('ArrowLeft')) {
     activeCharacter.x -= currentMoveSpeed * deltaTime
     activeCharacter.facingRight = false;
     activeCharacter.isMoving = true;
   }
-  if (keyboard.isKeyPressed('KeyD')) {
+  if (keyboard.isKeyPressed('KeyD') || keyboard.isKeyPressed('ArrowRight')) {
     activeCharacter.x += currentMoveSpeed * deltaTime
     activeCharacter.facingRight = true;
     activeCharacter.isMoving = true;
   }
 
-  if (!keyboard.isKeyPressed('KeyA') && !keyboard.isKeyPressed('KeyD')) {
+  if (!keyboard.isKeyPressed('KeyA') && !keyboard.isKeyPressed('KeyD') && !keyboard.isKeyPressed('ArrowLeft') && !keyboard.isKeyPressed('ArrowRight')) {
     activeCharacter.isMoving = false;
   }
 

@@ -15,6 +15,7 @@ const pcm = {
   'F': 'darkgreen', /* F = floor */
   'L': 'yellow', /* L = lamp */
   'G': 'white', /* white cat */
+  'I': 'pink', /* pink cat */
   'O': 'lightblue', /* O = window */
   'P': 'brown', /* P = poop */
   'R': 'saddlebrown', /* R = wardrobe */
@@ -47,6 +48,18 @@ const greenBg = {
   bodyColor: 'rgb(37,37,37)',
   coverColor: 'rgb(117,115,63)',
   injectColor: 'rgb(2,174,2)',
+}
+
+const sewerBg = {
+  bodyColor: 'rgb(161,161,161)',
+  coverColor: 'rgb(175,175,175)',
+  injectColor: 'rgb(255,255,255)',
+}
+
+const grayBg2 = {
+  bodyColor: 'rgb(80,80,80)',
+  coverColor: 'rgb(149,149,149)',
+  injectColor: 'rgb(255,255,255)',
 }
 
 const parseToColorTilesByLevel = {
@@ -129,6 +142,46 @@ const parseToColorTilesByLevel = {
       bodyColor: 'rgb(150,236,255)',
     },
   },
+  [GAME_STATE.LEVEL3]: {
+    F: sewerBg,
+    f: sewerBg,
+    M: {
+      ...grayBg2,
+      closingColor: 'rgb(142,142,142)',
+      rotation: 1,
+    },
+    m: {
+      ...grayBg2,
+      rotation: 2,
+    },
+    N: {
+      ...grayBg2,
+      rotation: 1,
+    },
+    T: {
+      bodyColor: 'rgba(251,108,55,0)',
+      coverColor: 'rgba(147,147,147,0.49)',
+      rotation: 2,
+    },
+    n: {
+      bodyColor: 'rgb(80,80,80)',
+      injectColor: 'rgb(255,255,255)',
+    },
+    X: {
+      bodyColor: 'rgba(207,207,207,0.45)',
+      injectColor: 'rgb(96,96,96)',
+    },
+    Y:{
+      bodyColor: 'rgb(2,174,2)',
+    },
+    W: grayBg2,
+    w: {
+      ...grayBg2,
+      rotation: 2,
+    },
+    O: blueBg,
+    o: blueBg,
+  },
 }
 
 export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileSize = 20}) {
@@ -169,6 +222,56 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         onGround: false,
       }
 
+      if (ch === 'I') {
+        gameObjects.pink = Sprite({
+          ...defCatCfg,
+          sizeMultiplier: 1,
+          decisionTimer: 0,
+          decisionInterval: 2,
+          moveSpeed: 50,
+          velocityX: 50,
+          onGround:true,
+          isJumping: false,
+          update(dt){
+            updateSprite(this, dt)
+            this.decisionTimer -= dt
+            if (this.decisionTimer <= 0) {
+              this.decisionTimer = this.decisionInterval
+              this.isMoving = Math.random() <= 0.3
+              this.facingRight = !this.facingRight
+            }
+          },
+          render() {
+            let pose
+
+            if (this.isMoving) {
+              pose = 'walk'
+            } else {
+              pose = 'idle'
+            }
+
+            renderCatSideView(
+              this.context,
+              {
+                pose,
+                flipX: !this.facingRight,
+                frameIndex: this.frame,
+                scale: this.sizeMultiplier + 1,
+                width: this.width,
+                heightShift: this.height -this.originalHeight,
+                colors: [
+                  'rgba(0,0,0,0)',
+                  '#000000',
+                  '#fafafa',
+                  '#ffbbdc',
+                  '#7a7a7a',
+                  '#ecdcc9',
+                  '#f26060',
+                ]
+              })
+          },
+        })
+      }
       if (ch === 'G') {
         gameObjects.white = Sprite({
           ...defCatCfg,
