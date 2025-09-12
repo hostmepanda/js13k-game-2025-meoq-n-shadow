@@ -129,6 +129,26 @@ export function renderCatSideView(ctx, options = {
       `111100000000011110`,
     ],
   ]
+  const poopingFrame = [
+    [
+      `0000000000000001000100`,
+      `0000000000000012101210`,
+      `0000000000000126313610`,
+      `0000000000001233333331`,
+      `0000000000001233333331`,
+      `0000000000001334333431`,
+      `1100000000001331353131`,
+      `5211000000001333565331`,
+      `1123111001113435555510`,
+      `0011434112553343222100`,
+      `0000143323233334441100`,
+      `0000013333333333324100`,
+      `0000014333444433324100`,
+      `0000001434111143414100`,
+      `0000000134100013141000`,
+      `0000000121310012131000`,
+    ]
+  ]
   const attackingFrames = [
     [
       `00000000000000000000`,
@@ -174,6 +194,8 @@ export function renderCatSideView(ctx, options = {
     frame = jumpingFrames?.[options.frameIndex] ?? jumpingFrames[0]
   } else if (options.pose === 'attack') {
     frame = attackingFrames?.[options.frameIndex] ?? attackingFrames[0]
+  } else if (options.pose === 'poop') {
+    frame = poopingFrame?.[options.frameIndex] ?? poopingFrame[0]
   } else {
     frame = frames?.[options.frameIndex] ?? frames[0]
   }

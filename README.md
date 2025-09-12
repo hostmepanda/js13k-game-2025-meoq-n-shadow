@@ -17,15 +17,15 @@ TODO:
 - [] +2 types of enemy: shooting and flying?
 - [] cut scenes
 - [X] designs
-- [X] add music and sounds
+- [] add music and sounds
 - [] add effects
 - [] cleanup all logs
-- [] fix poops for white cat
+- [X] fix poops for white cat
 - [] boss for 2nd and 3rd level
-- [] pink cat at 3rd level
-- [] compress to fit to 13k
+- [X] pink cat at 3rd level
+- [X] compress to fit to 13k
 - [] add visual effect of taking damage for cat and enemies
-- [] pooping pose
+- [X] pooping pose
 
 ## Maps
 There are two commands to compress and decompress maps, see package.json

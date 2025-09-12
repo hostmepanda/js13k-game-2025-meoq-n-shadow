@@ -206,24 +206,42 @@ export function updateLevel({gameStates, kontra}, levelBackgroundPatterns) {
     activeCharacter.isMoving = false;
   }
 
+  // before {mult: 2, height: 62, width: 80}
+  // after {mult: 1.75, height: 28, width: 38.5}
+  // before {mult: 1.75, height: 54.25, width: 70}
+  // after {mult: 1.5, height: 24, width: 33}
+  // before {mult: 1.5, height: 46.5, width: 60}
+  // after {mult: 1.25, height: 20, width: 27.5}
+  // before {mult: 1.25, height: 38.75, width: 50}
+  // after {mult: 1, height: 16, width: 22}
+
   if (keyboard.isKeyPressed('Space')) {
     if (PlayerState.activeCharacter === 'white' && activeCharacter.sizeMultiplier > 1 && !activeCharacter.poopCooldown) {
-      createPoop(
-        activeCharacter.x,
-        activeCharacter.y - 15,
-        gameObjects, Sprite)
-      const poopSizeReduction = 0.25 // Уменьшение размера на 25%
-      const bottomY = activeCharacter.y + activeCharacter.height
-      activeCharacter.sizeMultiplier = Math.max(1, activeCharacter.sizeMultiplier - poopSizeReduction)
+
+      const newY = activeCharacter.y + 7.75
+      // const newX = activeCharacter.X + 7.75
+      activeCharacter.sizeMultiplier = Math.max(1, activeCharacter.sizeMultiplier - 0.25)
       activeCharacter.width = activeCharacter.originalWidth * activeCharacter.sizeMultiplier
       activeCharacter.height = activeCharacter.originalHeight * activeCharacter.sizeMultiplier
-      activeCharacter.y = bottomY - activeCharacter.height
+      activeCharacter.y = newY
+      // activeCharacter.x = newX
+
       activeCharacter.jumpForce = activeCharacter.originalJumpForce * (1 / (1 + (activeCharacter.sizeMultiplier - 1) * 0.5))
       activeCharacter.moveSpeed = activeCharacter.originalMoveSpeed * (1 / (1 + (activeCharacter.sizeMultiplier - 1) * 0.4))
 
       activeCharacter.poopCooldown = true
+      activeCharacter.isPooping = true
+
+      createPoop(
+        activeCharacter.facingRight ? activeCharacter.x - 10 : activeCharacter.x + activeCharacter.width + 10,
+        newY + activeCharacter.width / 2,
+        gameObjects, Sprite)
+
       setTimeout(() => {
         activeCharacter.poopCooldown = false
+        activeCharacter.isPooping = false
+        activeCharacter.width = activeCharacter.originalWidth * activeCharacter.sizeMultiplier
+        activeCharacter.height = activeCharacter.originalHeight * activeCharacter.sizeMultiplier
       }, 1000)
     }
     if (PlayerState.activeCharacter === 'black' && !activeCharacter.isAttacking && activeCharacter.canAttack) {
