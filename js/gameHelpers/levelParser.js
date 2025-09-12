@@ -320,7 +320,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
 
         cfg.render = function () {
           renderCollectibleFish(this.context, this.width, this.height, {
-            fishColor: 'rgb(251,108,55)',
+            fishColor: 'rgb(161,161,161)',
           });
         }
         gameObjects.collectables.push(Sprite(cfg));

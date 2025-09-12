@@ -1,9 +1,7 @@
 import {renderMainMenu} from '../menus/main'
 import {levelRender} from '../levels/levelHelpers'
-import {renderGameOver} from '../menus/gameOver'
-import {renderVictoryBlack} from '../menus/victroryBlack'
-import {renderVictoryWhite} from '../menus/victoryWhite'
 import {GAME_STATE} from '../consts'
+import {renderGameScreen} from '../menus/helpers'
 
 export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, cs, cx, lvlBkPrns) {
     switch (GameState.currentState) {
@@ -48,13 +46,13 @@ export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, cs
         }
         break
       case GAME_STATE.GAMEOVER:
-        renderGameOver(cs, cx)
+        renderGameScreen(cs, ctx, 'gameOver');
         break
       case GAME_STATE.VICTORYBLACK:
-        renderVictoryBlack(cs, cx)
+        renderGameScreen(cs, cx, 'victoryBlack');
         break
       case GAME_STATE.VICTORYWHITE:
-        renderVictoryWhite(cs, cx)
+        renderGameScreen(cs, cx, 'victoryWhite');
         break
     }
 }

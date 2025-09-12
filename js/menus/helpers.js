@@ -48,3 +48,32 @@ export function updateMenuScreen({ redirectScreen, gameStates, kontra }, levelBa
     GameState.nextLevel = redirectScreen;
   }
 }
+
+export function renderGameScreen(canvas, context, type) {
+  const w = canvas.width;
+  const h = canvas.height;
+
+  context.fillStyle = 'black';
+  context.fillRect(0, 0, w, h);
+
+  context.fillStyle = 'white';
+  context.font = '30px Arial';
+  context.fillText('JS13K 2025: Meow & Shadow', w / 2 - 175, h / 2 - 30);
+
+  let message = '';
+  switch (type) {
+    case 'victoryWhite':
+      message = 'You have won! White cat took all the Glory!';
+      break;
+    case 'victoryBlack':
+      message = 'You have won! Black cat took all the Glory!';
+      break;
+    case 'gameOver':
+    default:
+      message = 'Game Over :(';
+      break;
+  }
+
+  context.fillText(message, w / 2 - 200, h / 2 + 30);
+  context.fillText('Hit space to start over', w / 2 - 200, h / 2 + 60);
+}

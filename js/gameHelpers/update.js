@@ -2,13 +2,13 @@ import {updateLevel} from '../levels/levelHelpers'
 import {initMenuScreen, updateMenuScreen} from '../menus/helpers'
 import {GAME_STATE} from '../consts'
 import {loadLevel} from '../states/game'
-import {playLevelMusic, stopLevelMusic} from '../sound/sounds'
+// import {playLevelMusic, stopLevelMusic} from '../sound/sounds'
 
 export async function gameLoopUpdateMethod(go, {GameState, PlayerState}, cs, cx, deltaTime, Sprite, collides, levelBackgroundPatterns) {
   if (GameState.musicEnabled) {
-    await playLevelMusic(GameState.currentState, GameState)
+    // await playLevelMusic(GameState.currentState, GameState)
   } else {
-    await stopLevelMusic(GameState)
+    // await stopLevelMusic(GameState)
   }
 
   switch (GameState.currentState) {
