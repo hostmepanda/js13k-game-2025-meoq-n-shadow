@@ -238,3 +238,255 @@ export function rndrRobotVac(sprite, {
   context.arc(13, height - 15, height * 0.15, 0, Math.PI * 2);
   context.fill();
 }
+
+export function rndrTrashCan(sprite, {
+  bodyColor = "#444",
+  lidColor = "#333",
+  highlightColor = "#555",
+  scale = 1
+} = {}) {
+  const { context, width, height } = sprite;
+
+  const w = width;
+  const h = height;
+
+  context.save();
+  context.translate(w / 2, h / 2);
+  context.scale(scale, scale);
+  context.translate(-w / 2, -h / 2);
+
+  // Группируем элементы по цвету для минимизации переключений fillStyle
+  // 1. Элементы цвета bodyColor
+  context.fillStyle = bodyColor;
+  context.fillRect(w * 0.1, h * 0.3, w * 0.8, h * 0.7);
+
+  // 2. Элементы цвета lidColor
+  context.fillStyle = lidColor;
+  context.fillRect(w * 0.05, h * 0.2, w * 0.9, h * 0.1);
+  context.fillRect(w * 0.1, h * 0.9, w * 0.8, h * 0.1);
+
+  // 3. Элементы цвета highlightColor (полосы)
+  context.fillStyle = highlightColor;
+  // Рисуем все полосы за один цикл
+  const stripes = [
+    [w * 0.25, h * 0.3, w * 0.05, h * 0.7],  // левая
+    [w * 0.475, h * 0.3, w * 0.05, h * 0.7], // центральная
+    [w * 0.7, h * 0.3, w * 0.05, h * 0.7]    // правая
+  ];
+
+  for (const [x, y, width, height] of stripes) {
+    context.fillRect(x, y, width, height);
+  }
+
+  // 4. Отверстие для мусора
+  context.fillStyle = "#111";
+  context.fillRect(w * 0.3, h * 0.22, w * 0.4, h * 0.06);
+
+  // 5. Блик сверху
+  context.fillStyle = "rgba(255,255,255,0.1)";
+  context.fillRect(w * 0.1, h * 0.3, w * 0.8, h * 0.05);
+
+  context.restore();
+}
+
+export function rndrWlkngRat(sprite, {
+  bodyColor = "#8a7c64",
+  bellyColor = "#b0a68e",
+  eyeColor = "#ff0000",
+  teethColor = "#fff5e1",
+  scale = 4,
+  angry = true,
+  direction = 1 // 1 - вправо, -1 - влево
+} = {}) {
+  const { context, width, height } = sprite;
+  const w = width;
+  const h = height;
+
+  // Базовая позиция крысы (нижняя часть, где должны быть лапы)
+  const baseY = h * 0.5;
+
+  context.save();
+
+  // Применяем направление до масштабирования
+  if (direction === -1) {
+    context.translate(w, 0);
+    context.scale(-1, 1);
+  }
+
+  // Масштабирование относительно опорной точки (лапы)
+  context.translate(w * 0.4, baseY);
+  context.scale(scale, scale);
+  context.translate(-w * 0.4, -baseY);
+
+  // Хвост
+  context.strokeStyle = bodyColor;
+  context.lineWidth = w * 0.035;
+  context.lineCap = "round";
+  context.beginPath();
+  context.moveTo(w * 0.25, baseY);
+  context.bezierCurveTo(
+    w * 0.15, baseY - h * 0.05,
+    w * 0.1, baseY - h * 0.1,
+    w * 0.05, baseY - h * 0.2
+  );
+  context.stroke();
+
+  // Задние лапы
+  context.fillStyle = bodyColor;
+  // Задняя лапа (видна только одна, т.к. вид сбоку)
+  context.beginPath();
+  context.ellipse(w * 0.35, baseY - h * 0.02, w * 0.08, h * 0.04, 0, 0, Math.PI * 2);
+  context.fill();
+
+  // Пальцы на задней лапе
+  context.fillStyle = "#5a5242";
+  for (let i = 0; i < 3; i++) {
+    context.beginPath();
+    context.ellipse(
+      w * (0.39 + i * 0.03),
+      baseY,
+      w * 0.01,
+      h * 0.01,
+      0,
+      0,
+      Math.PI * 2
+    );
+    context.fill();
+  }
+
+  // Тело (с совершенно прямой спиной)
+  context.fillStyle = bodyColor;
+  context.beginPath();
+  // Рисуем тело с прямой спиной
+  context.moveTo(w * 0.25, baseY - h * 0.05);  // Начало тела
+  context.lineTo(w * 0.25, baseY - h * 0.4);   // Прямая спина до шеи
+  context.lineTo(w * 0.4, baseY - h * 0.4);    // Плечи
+  context.quadraticCurveTo(w * 0.5, baseY - h * 0.3, w * 0.45, baseY - h * 0.05);  // Передняя часть и живот
+  context.closePath();
+  context.fill();
+
+  // Живот/грудь (светлее)
+  context.fillStyle = bellyColor;
+  context.beginPath();
+  context.ellipse(w * 0.38, baseY - h * 0.2, w * 0.07, h * 0.15, 0, -Math.PI/2, Math.PI/2);
+  context.fill();
+
+  // Передние лапы
+  // Ближняя передняя лапа
+  context.fillStyle = bodyColor;
+  context.beginPath();
+  context.ellipse(w * 0.45, baseY - h * 0.25, w * 0.04, h * 0.12, -Math.PI/6, 0, Math.PI * 2);
+  context.fill();
+
+  // Пальцы/когти на передней лапе
+  context.fillStyle = "#333";
+  for (let i = 0; i < 3; i++) {
+    context.beginPath();
+    context.ellipse(
+      w * (0.47 + i * 0.015),
+      baseY - h * (0.32 + i * 0.01),
+      w * 0.01,
+      h * 0.015,
+      -Math.PI/6,
+      0,
+      Math.PI * 2
+    );
+    context.fill();
+  }
+
+  // Голова (профиль, теперь ближе к телу)
+  context.fillStyle = bodyColor;
+  context.beginPath();
+  // Смещаем голову ближе к телу
+  context.ellipse(w * 0.45, baseY - h * 0.45, w * 0.13, h * 0.1, 0, 0, Math.PI * 2);
+  context.fill();
+
+  // Ухо (в профиль видно только одно)
+  context.beginPath();
+  context.ellipse(w * 0.4, baseY - h * 0.53, w * 0.05, h * 0.06, -Math.PI/6, 0, Math.PI * 2);
+  context.fill();
+
+  // Внутренность уха
+  context.fillStyle = "#e0c5b5";
+  context.beginPath();
+  context.ellipse(w * 0.4, baseY - h * 0.53, w * 0.03, h * 0.04, -Math.PI/6, 0, Math.PI * 2);
+  context.fill();
+
+  // Глаз (в профиль виден только один)
+  context.fillStyle = eyeColor;
+  context.beginPath();
+  context.ellipse(w * 0.52, baseY - h * 0.47, w * 0.03, angry ? h * 0.015 : h * 0.03, 0, 0, Math.PI * 2);
+  context.fill();
+
+  // Зрачок, если не злая
+  if (!angry) {
+    context.fillStyle = "#000";
+    context.beginPath();
+    context.ellipse(w * 0.52, baseY - h * 0.47, w * 0.015, h * 0.02, 0, 0, Math.PI * 2);
+    context.fill();
+  }
+
+  // Нос
+  context.fillStyle = "#222";
+  context.beginPath();
+  context.ellipse(w * 0.58, baseY - h * 0.45, w * 0.03, h * 0.02, 0, 0, Math.PI * 2);
+  context.fill();
+
+  // Рот
+  context.strokeStyle = "#600";
+  context.lineWidth = w * 0.01;
+  context.beginPath();
+  context.moveTo(w * 0.58, baseY - h * 0.43);
+  context.lineTo(w * 0.53, baseY - h * 0.41);
+  context.stroke();
+
+  // Зубы (в профиль виден только один)
+  context.fillStyle = teethColor;
+  context.beginPath();
+  context.moveTo(w * 0.56, baseY - h * 0.42);
+  context.lineTo(w * 0.57, baseY - h * 0.42);
+  context.lineTo(w * 0.565, baseY - h * 0.4);
+  context.fill();
+
+  // Усики в разные стороны
+  context.strokeStyle = "#222";
+  context.lineWidth = w * 0.005;
+
+  // Усики вперед (2 штуки)
+  for (let i = 0; i < 2; i++) {
+    context.beginPath();
+    context.moveTo(w * 0.58, baseY - h * (0.45 - i * 0.01));
+    context.bezierCurveTo(
+      w * 0.65, baseY - h * (0.45 - i * 0.01 - 0.01),
+      w * 0.7, baseY - h * (0.45 - i * 0.01),
+      w * 0.75, baseY - h * (0.45 - i * 0.01 + 0.02 * i)
+    );
+    context.stroke();
+  }
+
+  // Усики вниз (2 штуки)
+  for (let i = 0; i < 2; i++) {
+    context.beginPath();
+    context.moveTo(w * 0.58, baseY - h * (0.45 - i * 0.01));
+    context.bezierCurveTo(
+      w * 0.63, baseY - h * (0.45 - i * 0.01 - 0.01),
+      w * 0.65, baseY - h * (0.42 - i * 0.01),
+      w * 0.68, baseY - h * (0.37 - i * 0.02)
+    );
+    context.stroke();
+  }
+
+  // Усики назад (2 штуки)
+  for (let i = 0; i < 2; i++) {
+    context.beginPath();
+    context.moveTo(w * 0.57, baseY - h * (0.45 - i * 0.01));
+    context.bezierCurveTo(
+      w * 0.5, baseY - h * (0.45 - i * 0.01 - 0.01),
+      w * 0.45, baseY - h * (0.45 - i * 0.01),
+      w * 0.4, baseY - h * (0.45 - i * 0.01 + 0.02 * i)
+    );
+    context.stroke();
+  }
+
+  context.restore();
+}

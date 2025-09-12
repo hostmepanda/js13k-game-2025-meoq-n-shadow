@@ -3,7 +3,7 @@ import {renderLamp, renderTree, rndrTl} from './tileHelpers'
 import {renderCollectibleFish} from './collectableHelpers'
 import {renderCatSideView, updateSprite} from './catHelpers'
 import {GAME_STATE} from '../consts'
-import {createPoop, rndrRobotVac, updateMonsterBehavior} from './enemiesUtils'
+import {createPoop, rndrRobotVac, rndrTrashCan, rndrWlkngRat, updateMonsterBehavior} from './enemiesUtils'
 
 const pcm = {
   'Y': 'yellow', /* # = level exit */
@@ -172,6 +172,9 @@ const parseToColorTilesByLevel = {
     a:{
       fishColor: 'rgb(251,108,55)',
     },
+    B: {
+
+    },
     F: sewerBg,
     f: sewerBg,
     d: {
@@ -231,6 +234,13 @@ const parseToColorTilesByLevel = {
 }
 
 export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileSize = 20}) {
+  const renderHandlers = {
+    'B': {
+      [GAME_STATE.LEVEL1]: rndrRobotVac,
+      [GAME_STATE.LEVEL2]: rndrTrashCan,
+      [GAME_STATE.LEVEL3]: rndrWlkngRat,
+    },
+  }
   levelMap.forEach((row, y) => {
     [...row].forEach((ch, x) => {
       if (ch === ".") return
@@ -518,6 +528,9 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           cfg.trashCooldown = 10;
           cfg.velocityX = 0
           cfg.velocityY = 0
+          cfg.scale = 3
+          cfg.width = 36
+          cfg.height = 36
 
           cfg.update = function(deltaTime) {
             if (!this.isAlive) return;
@@ -547,8 +560,9 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
               }
             }
           };
+          const render = renderHandlers[cfg.type][selectedLevel]
           cfg.render = function() {
-            rndrRobotVac(this, {
+            render(this, {
               ...parseToColorTilesByLevel[selectedLevel]?.[cfg.type],
             })
           }
