@@ -26,6 +26,7 @@ TODO:
 - [X] compress to fit to 13k
 - [] add visual effect of taking damage for cat and enemies
 - [X] pooping pose
+- [] fix enemies strategy
 
 ## Maps
 There are two commands to compress and decompress maps, see package.json
