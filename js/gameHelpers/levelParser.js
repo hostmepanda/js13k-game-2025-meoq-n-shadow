@@ -473,17 +473,14 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         cfg.isVisible = ch === 'A'
         cfg.color = 'rgba(0, 0, 0, 0)'
         cfg.visibilityTime = 0
-        if (ch === 'a') {
-          cfg.update = function (deltaTime) {
-            if (this.visibilityTime <= 0) {
-              this.collected = false
-              this.visibilityTime = 0
-            } else {
-              this.visibilityTime -= deltaTime
-            }
+        cfg.update = function (deltaTime) {
+          if (this.visibilityTime <= 0) {
+            this.collected = false
+            this.visibilityTime = 0
+          } else {
+            this.visibilityTime -= deltaTime
           }
         }
-
         cfg.render = function () {
           renderCollectibleFish(this.context, this.width, this.height, {
             ...parseToColorTilesByLevel[selectedLevel]?.[cfg.type],

@@ -234,7 +234,7 @@ export function updateLevel({gameStates, kontra}, levelBackgroundPatterns) {
       activeCharacter.isPooping = true
 
       createPoop(
-        activeCharacter.facingRight ? activeCharacter.x - 10 : activeCharacter.x + activeCharacter.width + 10,
+        activeCharacter.facingRight ? activeCharacter.x - 10 : activeCharacter.x + activeCharacter.width - 13,
         newY + activeCharacter.width / 2,
         gameObjects, Sprite)
 
