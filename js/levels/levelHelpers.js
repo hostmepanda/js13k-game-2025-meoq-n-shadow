@@ -200,6 +200,7 @@ export function updateLevel({gameStates, kontra}, levelBackgroundPatterns) {
     activeCharacter.x += currentMoveSpeed * deltaTime
     activeCharacter.facingRight = true;
     activeCharacter.isMoving = true;
+    console.log(activeCharacter.width, activeCharacter.height, activeCharacter.sizeMultiplier)
   }
 
   if (!keyboard.isKeyPressed('KeyA') && !keyboard.isKeyPressed('KeyD') && !keyboard.isKeyPressed('ArrowLeft') && !keyboard.isKeyPressed('ArrowRight')) {
