@@ -213,3 +213,34 @@ export function updateMonsterBehavior(monster, deltaTime) {
   }
   return monster;
 }
+
+export function rndrRobotVac(sprite, options = {
+  baseColor: "#555",
+  frameColor: "#b1b1b1",
+  buttonColor: "#0f0",
+}) {
+  const { context, width, height } = sprite;
+  context.fillStyle = "#555";
+  context.beginPath();
+  context.rect(0, height - 8, width, 10); // прямоугольник-основа
+  context.fill();
+
+  // корпус (низкая шайба)
+  context.fillStyle = "#b1b1b1";
+  context.beginPath();
+  context.rect(0, height - 13, width, 5); // прямоугольник-основа
+  context.fill();
+
+  // сенсор (выпуклость сверху)
+  context.fillStyle = "#222";
+  context.beginPath();
+  context.rect(0, height - 19, width*0.2, height *0.3);
+  context.fill();
+
+  // кнопка на крышке
+  context.fillStyle = "#0f0";
+  context.beginPath();
+  context.arc(13, height - 15, height*0.15, 0, Math.PI*2);
+  context.fill();
+
+}

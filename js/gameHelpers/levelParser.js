@@ -3,7 +3,7 @@ import {renderLamp, renderTree, rndrTl} from './tileHelpers'
 import {renderCollectibleFish} from './collectableHelpers'
 import {renderCatSideView, updateSprite} from './catHelpers'
 import {GAME_STATE} from '../consts'
-import {createPoop, updateMonsterBehavior} from './enemiesUtils'
+import {createPoop, rndrRobotVac, updateMonsterBehavior} from './enemiesUtils'
 
 const pcm = {
   'Y': 'yellow', /* # = level exit */
@@ -75,6 +75,11 @@ const parseToColorTilesByLevel = {
     },
     a:{
       fishColor: 'rgb(161,161,161)',
+    },
+    B: {
+      baseColor: "#555",
+      frameColor: "#b1b1b1",
+      buttonColor: "#0f0",
     },
     F: woodBg,
     f: woodBg,
@@ -543,29 +548,9 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
             }
           };
           cfg.render = function() {
-            // корпус (низкая шайба)
-            this.context.fillStyle = "#555";
-            this.context.beginPath();
-            this.context.rect(0, this.height - 8, this.width, 10); // прямоугольник-основа
-            this.context.fill();
-
-            // корпус (низкая шайба)
-            this.context.fillStyle = "#b1b1b1";
-            this.context.beginPath();
-            this.context.rect(0, this.height - 13, this.width, 5); // прямоугольник-основа
-            this.context.fill();
-
-            // сенсор (выпуклость сверху)
-            this.context.fillStyle = "#222";
-            this.context.beginPath();
-            this.context.rect(0, this.height - 19, this.width*0.2, this.height *0.3);
-            this.context.fill();
-
-            // кнопка на крышке
-            this.context.fillStyle = "#0f0";
-            this.context.beginPath();
-            this.context.arc(13, this.height - 15, this.height*0.15, 0, Math.PI*2);
-            this.context.fill();
+            rndrRobotVac(this, {
+              ...parseToColorTilesByLevel[selectedLevel]?.[cfg.type],
+            })
           }
           gameObjects.enemies.push(Sprite(cfg));
         }
