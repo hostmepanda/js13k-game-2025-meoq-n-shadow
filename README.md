@@ -27,6 +27,7 @@ TODO:
 - [] add visual effect of taking damage for cat and enemies
 - [X] pooping pose
 - [] fix enemies strategy
+- [] add boss activation only near player
 
 ## Maps
 There are two commands to compress and decompress maps, see package.json
