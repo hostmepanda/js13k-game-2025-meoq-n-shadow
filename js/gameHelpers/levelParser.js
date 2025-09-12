@@ -32,6 +32,12 @@ const blueBg = {
   coverColor: 'rgb(115,183,197)',
 }
 
+const darkBg = {
+  bodyColor: 'rgb(167,204,213)',
+  coverColor: 'rgb(53,79,87)',
+}
+
+
 const grayBg = {
   bodyColor: 'rgb(180, 180, 180)',
   coverColor: 'rgb(142,142,142)',
@@ -58,7 +64,7 @@ const sewerBg = {
 
 const grayBg2 = {
   bodyColor: 'rgb(80,80,80)',
-  coverColor: 'rgb(149,149,149)',
+  coverColor: 'rgb(143,98,7)',
   injectColor: 'rgb(255,255,255)',
 }
 
@@ -168,8 +174,8 @@ const parseToColorTilesByLevel = {
       injectColor: 'rgb(255,255,255)',
     },
     X: {
-      bodyColor: 'rgba(207,207,207,0.45)',
-      injectColor: 'rgb(96,96,96)',
+      bodyColor: 'rgba(236,184,11,0.55)',
+      injectColor: 'rgb(255,255,255)',
     },
     Y:{
       bodyColor: 'rgb(2,174,2)',
@@ -179,8 +185,8 @@ const parseToColorTilesByLevel = {
       ...grayBg2,
       rotation: 2,
     },
-    O: blueBg,
-    o: blueBg,
+    O: darkBg,
+    o: darkBg,
   },
 }
 
