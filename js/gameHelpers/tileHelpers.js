@@ -59,16 +59,26 @@ export function rndrTl(cx, w, h, o = {}) {
 export function renderLamp(cx, w, h, o = {}) {
   const {
     shadeColor = '#FFD700',
-    standColor = '#333',
-    addGlow = true
+    standColor,
+    addGlow = true,
+    rotation = 0,
   } = o;
 
   cx.save();
+
+  // Переносим в центр для поворота
   cx.translate(w/2, h/2);
+
+  // Поворачиваем если нужно
+  if (rotation) {
+    // Упрощенный поворот: r*90 градусов
+    cx.rotate((Math.PI/2) * (rotation % 4));
+  }
 
   const lH = h*.8;
   const sW = w*.05;
-  const lTop = -lH/2; // верхняя точка лампы
+  const isUpsideDown = rotation === 2;
+  const lTop = isUpsideDown ? 0 - 7 : -lH/2; // Корректируем верхнюю точку лампы при повороте
   const gY = lTop + h*.15; // позиция Y для свечения
 
   // === СВЕЧЕНИЕ ===
@@ -86,14 +96,16 @@ export function renderLamp(cx, w, h, o = {}) {
     cx.fill();
   }
 
-  // === НОЖКА ===
-  cx.fillStyle = standColor;
-  cx.beginPath();
-  cx.rect(-sW/2, lTop, sW, lH);
-  cx.fill();
-  cx.strokeStyle = 'rgb(246,255,167)';
-  cx.lineWidth = 2;
-  cx.stroke();
+  // === НОЖКА === (рисуем только если задан цвет ножки)
+  if (standColor) {
+    cx.fillStyle = standColor;
+    cx.beginPath();
+    cx.rect(-sW/2, lTop, sW, lH);
+    cx.fill();
+    cx.strokeStyle = 'rgb(246,255,167)';
+    cx.lineWidth = 2;
+    cx.stroke();
+  }
 
   // === АБАЖУР ===
   const shW = w*.6;
@@ -108,6 +120,7 @@ export function renderLamp(cx, w, h, o = {}) {
   cx.lineTo(-shW4, lTop + shH);
   cx.closePath();
   cx.fill();
+  cx.strokeStyle = 'rgb(246,255,167)';
   cx.stroke();
 
   cx.restore();
@@ -116,10 +129,10 @@ export function renderLamp(cx, w, h, o = {}) {
 // Рисуем дерево в горшке
 export function renderTree(c, w, h, o = {}) {
   const isPalm = o.type === "palm";
-  const pot = o.potColor || (isPalm ? '#8B0000' : '#bc8000');
-  const trunk = o.trunkColor || (isPalm ? '#8B5A2B' : '#654321');
-  const fColor = o.foliageColor || '#228B22';
-  const leafC = o.leafColors || ['#7ada7a','#ffe335','#f6ffa7','#fb6c37','#228B22','#229B22'];
+  const pot = o?.potColor || (isPalm ? '#8B0000' : '#bc8000');
+  const trunk = o?.trunkColor || (isPalm ? '#8B5A2B' : '#654321');
+  const fColor = o?.foliageColor || '#228B22';
+  const leafC = o?.leafColors || ['#7ada7a','#ffe335','#f6ffa7','#fb6c37','#228B22','#229B22'];
 
   c.save();
   c.translate(w/2, h/2);

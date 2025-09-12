@@ -70,6 +70,12 @@ const grayBg2 = {
 
 const parseToColorTilesByLevel = {
   [GAME_STATE.LEVEL1]: {
+    A:{
+      fishColor: 'rgb(161,161,161)',
+    },
+    a:{
+      fishColor: 'rgb(161,161,161)',
+    },
     F: woodBg,
     f: woodBg,
     M: {
@@ -109,6 +115,12 @@ const parseToColorTilesByLevel = {
     o: blueBg,
   },
   [GAME_STATE.LEVEL2]: {
+    A:{
+      fishColor: 'rgb(255,227,53)',
+    },
+    a:{
+      fishColor: 'rgb(255,227,53)',
+    },
     F: greenBg,
     f: greenBg,
     M: {
@@ -149,8 +161,19 @@ const parseToColorTilesByLevel = {
     },
   },
   [GAME_STATE.LEVEL3]: {
+    A:{
+      fishColor: 'rgb(251,108,55)',
+    },
+    a:{
+      fishColor: 'rgb(251,108,55)',
+    },
     F: sewerBg,
     f: sewerBg,
+    d: {
+      potColor: 'rgb(161,161,161)',
+      trunkColor: 'rgb(251,108,55)',
+      foliageColor: 'rgb(255,222,0)',
+    },
     M: {
       ...grayBg2,
       closingColor: 'rgb(142,142,142)',
@@ -187,6 +210,18 @@ const parseToColorTilesByLevel = {
     },
     O: darkBg,
     o: darkBg,
+    Q: {
+      shadeColor: '#FFD700',
+      standColor: '#333',
+      addGlow: true,
+      rotation: 0,
+    },
+    q: {
+      shadeColor: '#FFD700',
+      // standColor: '#333',
+      addGlow: true,
+      rotation: 2,
+    },
   },
 }
 
@@ -402,18 +437,32 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         gameObjects.obstacles.push(Sprite(cfg));
         }
 
-      if (['L','c','T','D','O','R','Q','d'].includes(ch)) {
+      if (['L','c','T','D','O','R','Q','d','q'].includes(ch)) {
           cfg.width = 40
           cfg.height = 40
           cfg.y = y * tileSize - tileSize + 5
-        if (ch === 'Q') {
+        if (['q','Q'].includes(ch)) {
           cfg.render = function () {
-            renderLamp(this.context, this.width , this.height)
+            renderLamp(
+              this.context,
+              this.width,
+              this.height,
+              {
+                ...parseToColorTilesByLevel[selectedLevel]?.[cfg.type],
+              },
+              )
           }
         }
         if (['d','D'].includes(ch)) {
           cfg.render = function () {
-            renderTree(this.context, this.width , this.height, { type: ch === 'D' ? 'palm' : 'yolk' })
+            renderTree(
+              this.context,
+              this.width,
+              this.height,
+              {
+                type: ch === 'D' ? 'palm' : 'yolk',
+                ...parseToColorTilesByLevel[selectedLevel]?.[cfg.type],
+              })
           }
         }
         gameObjects.obstacles.push(Sprite(cfg));
@@ -437,7 +486,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
 
         cfg.render = function () {
           renderCollectibleFish(this.context, this.width, this.height, {
-            fishColor: 'rgb(161,161,161)',
+            ...parseToColorTilesByLevel[selectedLevel]?.[cfg.type],
           });
         }
         gameObjects.collectables.push(Sprite(cfg));
