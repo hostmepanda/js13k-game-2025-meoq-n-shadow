@@ -289,6 +289,14 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           sizeMultiplier: 1,
           update(dt){
             updateSprite(this, dt)
+            if (this.sizeMultiplier > 1.5) {
+              this.width = 16 * (1 + this.sizeMultiplier)
+              this.height = 18 * (1 + this.sizeMultiplier) + 7.75
+            }
+            if (this.sizeMultiplier === 1.5) {
+              this.width = 16 * (1 + this.sizeMultiplier)
+              this.height = 18 * (1 + this.sizeMultiplier)
+            }
           },
           render() {
             let pose
