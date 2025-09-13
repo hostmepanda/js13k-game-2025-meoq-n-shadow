@@ -3,7 +3,7 @@ import {renderLamp, renderTree, rndrTl} from './tileHelpers'
 import {renderCollectibleFish} from './collectableHelpers'
 import {renderCatSideView, updateSprite} from './catHelpers'
 import {GAME_STATE} from '../consts'
-import {createPoop, renderRat, rndrRobotVac, rndrTrashCan, updateMonsterBehavior} from './enemiesUtils'
+import {activateBoss, createPoop, renderRat, rndrRobotVac, rndrTrashCan, updateMonsterBehavior} from './enemiesUtils'
 
 const pcm = {
   'Y': 'yellow', /* # = level exit */
@@ -542,6 +542,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           cfg.scale = 3
           cfg.width = 36
           cfg.height = 36
+          cfg.isActivated = false
           cfg = {
             ...cfg,
             ...bossProps[selectedLevel],
@@ -554,7 +555,8 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
             if (!this.onGround) {
               this.velocityY += GRAVITY_DOWN * deltaTime;
             }
-            if (this.o.white.y <= 200 || this.o.black.y <= 200) {
+            activateBoss(this, this.o, deltaTime)
+            if (this.isActivated) {
               updateMonsterBehavior(this, deltaTime)
               if (this.x < this.boundaryLeft) {
                 this.x = this.boundaryLeft;

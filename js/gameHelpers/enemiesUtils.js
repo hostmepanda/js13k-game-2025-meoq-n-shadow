@@ -192,6 +192,23 @@ export function renderPoop(ctx, width, height, options = { frameIndex: 0, scale:
   drawPixels(ctx, poopFrames[options.frameIndex], { scale:1, colors, flipX: options.flipX })
 }
 
+export function activateBoss(boss, gameObjects, deltaTime) {
+  if (boss.isActivated) return
+  const activationZoneX = 10; // ±10 тайлов по горизонтали
+  const activationZoneY = 5;  // ±5 тайлов по вертикали
+
+  // Проверяем, находится ли игрок в зоне активации
+  const whiteInZoneX = Math.abs(gameObjects.white.x - boss.x) <= activationZoneX * 20;
+  const whiteInZoneY = Math.abs(gameObjects.white.y - boss.y) <= activationZoneY * 20;
+
+  const blackInZoneX = Math.abs(gameObjects.black.x - boss.x) <= activationZoneX * 20;
+  const blackInZoneY = Math.abs(gameObjects.black.y - boss.y) <= activationZoneY * 20;
+
+  if ((whiteInZoneX && whiteInZoneY) || (blackInZoneX && blackInZoneY)) {
+    boss.isActivated = true;
+  }
+}
+
 export function updateMonsterBehavior(monster, deltaTime) {
   monster.decisionTimer -= deltaTime;
   if (monster.decisionTimer <= 0) {
