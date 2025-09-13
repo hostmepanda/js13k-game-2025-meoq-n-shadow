@@ -21,7 +21,7 @@ export default {
           // Список свойств, которые НЕ нужно сокращать
           reserved: [
             'render', 'update', 'x', 'y', 'width', 'height',
-            'canvas', 'context', 'init', 'create',
+            'canvas', 'context', 'init', 'create', 'traslate', 'rect', 'fill', 'rectFill'
             // Добавьте здесь другие свойства, которые должны сохранить свои имена
             // (особенно те, которые используются в kontra.js или других библиотеках)
           ],

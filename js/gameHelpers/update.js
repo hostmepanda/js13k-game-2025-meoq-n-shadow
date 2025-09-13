@@ -15,7 +15,6 @@ export async function gameLoopUpdateMethod(go, {GameState, PlayerState}, cs, cx,
     case GAME_STATE.LEVEL1:
     case GAME_STATE.LEVEL2:
     case GAME_STATE.LEVEL3:
-    case GAME_STATE.LEVEL4:
       if (GameState.paused) {
 
       } else {

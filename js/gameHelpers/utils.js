@@ -50,8 +50,6 @@ function renderLevelName(levelNumber) {
     return 'CITY'
   } else if (levelNumber === GAME_STATE.LEVEL3) {
     return 'SEWER'
-  } else if (levelNumber === GAME_STATE.LEVEL4) {
-    return 'RAT\'S CAVE'
   }
 }
 

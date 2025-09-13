@@ -11,7 +11,6 @@ export function gameLoopRenderMethod(gameObjects, { GameState, PlayerState }, cs
       case GAME_STATE.LEVEL1:
       case GAME_STATE.LEVEL2:
       case GAME_STATE.LEVEL3:
-      case GAME_STATE.LEVEL4:
         if (GameState.paused) {
           // Первый прямоугольник (чёрный)
           cx.beginPath(); // Начинаем новый путь

@@ -278,7 +278,6 @@ function switchLevel(targetLevel, { GameState, gameObjects, PlayerState}, {Sprit
     GAME_STATE.LEVEL1,
     GAME_STATE.LEVEL2,
     GAME_STATE.LEVEL3,
-    GAME_STATE.LEVEL4,
   ].includes(targetLevel)) {
     const updatedLevel = loadLevel(targetLevel, { gameObjects }, {Sprite, canvas, context}, levelBackgroundPatterns)
     Object.assign(gameObjects, updatedLevel.gameObjects)
