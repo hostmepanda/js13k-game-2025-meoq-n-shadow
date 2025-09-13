@@ -50,15 +50,15 @@ export function updateMenuScreen({ redirectScreen, gameStates, kontra }, levelBa
 }
 
 export function renderGameScreen(canvas, context, type) {
-  const w = canvas.width;
-  const h = canvas.height;
+  const w = 800;
+  const h = 400;
 
   context.fillStyle = 'black';
   context.fillRect(0, 0, w, h);
 
   context.fillStyle = 'white';
   context.font = '30px Arial';
-  context.fillText('JS13K 2025: Meow & Shadow', w / 2 - 175, h / 2 - 30);
+  context.fillText('JS13K 2025: Meow & Shadow', w / 2, h / 2 - 30);
 
   let message = '';
   switch (type) {
@@ -74,6 +74,6 @@ export function renderGameScreen(canvas, context, type) {
       break;
   }
 
-  context.fillText(message, w / 2 - 200, h / 2 + 30);
-  context.fillText('Hit space to start over', w / 2 - 200, h / 2 + 60);
+  context.fillText(message, w / 2, h / 2 + 30);
+  context.fillText('Hit space to start over', w / 2, h / 2 + 60);
 }

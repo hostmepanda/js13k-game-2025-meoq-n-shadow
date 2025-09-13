@@ -13,8 +13,8 @@ MOOmN................nWWnnWWn..nWWnN............................................
 nwwnN................MOOmMOOm..MOOmN.................................FF...A...................XX....mFFFFFFFFFFFFFFM.....................................a..........mM.........WnnwnnwnMf..nwnM..ff...Qm
 nnnnN................MOOmMOOm..MOOmN......................................FF..................XX..Q.mwwwwwwwwwwwwwwMFFF..............FF............FF....ff.......FFmM.........X...........nWnM.......fm
 nNHG............FFFF.nwwnnwwn..nwwnN................Q...A...Q.................................mwwwwwnnOnOnOnOnOnWWnM................................................mM.........X..E.P..P...MOmM........m
-nN............FFnWWn.nWWnnWWn..nWWnN...............FFFFFFFFFFF................................mnWWWnnWWnnWWWWnnMOOmM...............................a.........ff.B...mM.........wwwwwwwwwwwwnwnM.......Qm
-nnFFF.........mnMOOm.MOOmMOOm..MOOmN....P.E...E....N...mN...mN....E..A.P.E..FF.P.A.E..P.E.....mNOOOnMOOmnOOmOOnMOOmM..........QQ............QQ..........QQ..........mM....a..ffWnnWWnnWnnWnnWnM.......fm
+nN............FFnWWn.nWWnnWWn..nWWnN...............FFFFFFFFFFF................................mnWWWnnWWnnWWWWnnMOOmM...............................a.........ff.B...mM.........wwwwwwwwwwwwnwnM...HG..Qm
+nnFFF.........mnMOOm.MOOmMOOm..MOOmN....P.E...E....N...mN...mN....E..A.P.E..FF.P.A.E..P.E.....mNOOOnMOOmnOOmOOnMOOmM..........QQ............QQ..........QQ..........mM....a..ffWnnWWnnWnnWnnWnM...A...fm
 nnnnN.........mnMOOm.MOOmMOOm..MOOmN...............N...mN...mN................................mNOOOnMwwmnOOmOOnMOOmM..........mM.....B......mM..........mM..........mMff.......WnMOOmMOmMOmMOmM........m
 nnnnN.......Q.mnnwwn.nwwnnwwn..nwwnN.Q.D....Q....D.Ndd.mNdd.mN.D.....mM...D...........Q...d...mnwwwnnnnnnnnnnnnMOOmM..........mM............mM..........mM..........mM.........WnnwwnnwnnwnnwnMFFXXXXFFm
 FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFmnnnnnnnnnnnnnnnnnwwnMnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnYYYYnnn

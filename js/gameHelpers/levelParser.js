@@ -264,10 +264,12 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
     [GAME_STATE.LEVEL1]: {
       trashCooldown: 10,
       canJump: true,
+      onGround: false,
     },
     [GAME_STATE.LEVEL2]: {
       trashCooldown: 5,
       canJump: true,
+      onGround: false,
     },
     [GAME_STATE.LEVEL3]: {
       width: 32,
@@ -554,7 +556,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           cfg.health = 10 // depends on level
           cfg.isAlive = true
           cfg.isDead = false
-          cfg.isJumping = true
+          cfg.isJumping = false
           cfg.isMonster = true
           cfg.jumpForce = -350
           cfg.lifeSpan = 15;
@@ -580,14 +582,14 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           }
           cfg.update = function(deltaTime) {
             if (!this.isAlive) return;
-            updateSprite(this, deltaTime)
-
-            if (!this.onGround) {
-              this.velocityY += GRAVITY_DOWN * deltaTime;
-            }
 
             activateBoss(this, this.o, deltaTime)
             if (this.isActivated) {
+              updateSprite(this, deltaTime)
+
+              if (!this.onGround) {
+                this.velocityY += GRAVITY_DOWN * deltaTime;
+              }
               updateMonsterBehavior(this, deltaTime, this.canJump)
               chckBounds(this)
 
@@ -603,7 +605,8 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           const render = renderHandlers[cfg.type][selectedLevel]
           cfg.render = function() {
             render(
-              this, {
+              this,
+              {
               ...parseToColorTilesByLevel[selectedLevel]?.[cfg.type],
               scale: this.sizeMultiplier,
               flipX: !this.facingRight,

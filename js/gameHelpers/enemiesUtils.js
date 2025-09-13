@@ -25,7 +25,6 @@ export function checkEnemyCollisionWithEnvironment(o, e, clds) {
 }
 
 export function createRat(x, y, gameObjects, Sprite, lifeSpan = -100) {
-  console.log(gameObjects.enemies, x, y)
   gameObjects.enemies.push(Sprite({
     canDie: true,
     facingRight: Math.random() > 0.5,
@@ -105,7 +104,7 @@ export function createTrash(x, y, gameObjects, Sprite, lifeSpan = -100) {
     x,
     y,
     render() {
-      rndrTrashCan(this.context)
+      rndrTrashCan(this)
     },
     update(deltaTime) {
       if (!this.onGround) {
@@ -220,7 +219,7 @@ export function checkEnemyCollisions(p, enemies, states) {
         if (['P','B','E'].includes(e.type) && e.isMonster) {
           if (p.dvl <= 0) {
             p.health -= e?.collisionDamage ?? 1
-            p.dvl = 10
+            p.dvl = 2
 
             if (p.health <= 0) {
               if (states.PlayerState[p.color].lives > 0) {
