@@ -1,4 +1,5 @@
-import {drawPixels, isCollided} from './utils'
+import {drawPixels, GRAVITY_DOWN, isCollided} from './utils'
+import {updateSprite} from './catHelpers'
 
 export function checkEnemyCollisionWithEnvironment(o, e, clds) {
   o.forEach(obstacle => {
@@ -23,6 +24,118 @@ export function checkEnemyCollisionWithEnvironment(o, e, clds) {
   })
 }
 
+export function createRat(x, y, gameObjects, Sprite, lifeSpan = -100) {
+  console.log(gameObjects.enemies, x, y)
+  gameObjects.enemies.push(Sprite({
+    canDie: true,
+    facingRight: Math.random() > 0.5,
+    color: 'brown',
+    dt: 0,
+    health: 5, //depends on level
+    moveSpeed: 50, // depend on level or size
+    height: 15,
+    isAlive: true,
+    isDead: false,
+    isMonster: true,
+    jumpTimer: 0,
+    onGround: false,
+    size: 1,
+    type: 'E',
+    velocityX: 0,
+    velocityY: 0,
+    width: 15,
+    decisionTimer: 0,
+    decisionInterval: 5,
+    frame: 0,
+    framesLength: 2,
+    sizeMultiplier: 2,
+    isVisible: true,
+    lifeSpan,
+    x,
+    y,
+    render() {
+      renderRat(this, {
+        frameIndex: this.frame,
+        scale: this.sizeMultiplier,
+        flipX: !this.facingRight,
+      })
+    },
+    update: function (deltaTime) {
+      if (!this.isAlive) return
+      updateSprite(this, deltaTime)
+
+      if (!this.onGround) {
+        this.velocityY += GRAVITY_DOWN * deltaTime
+      }
+
+      updateMonsterBehavior(this, deltaTime)
+      this.x += this.velocityX * deltaTime
+      this.y += this.velocityY * deltaTime
+    }
+  }))
+}
+export function createTrash(x, y, gameObjects, Sprite, lifeSpan = -100) {
+  gameObjects.enemies.push(Sprite({
+    canDie: true,
+    color: 'brown',
+    createdAt: Date.now(),
+    facingRight: Math.random() > 0.5,
+    dt: 0,
+    frame: 0,
+    framesLength: 2,
+    health: 5, //depends on level
+    moveSpeed: 20, // depend on level or size
+    height: 15,
+    isAlive: true,
+    isDead: false,
+    isMonster: true,
+    jumpTimer: 0,
+    onGround: false,
+    size: 1,
+    transformAt: Date.now() + 5000,
+    type: 'P',
+    velocityX: 0,
+    velocityY: 0,
+    width: 15,
+    decisionTimer: 0,
+    decisionInterval: 5,
+    lifeSpan,
+    x,
+    y,
+    render() {
+      rndrTrashCan(this.context)
+    },
+    update(deltaTime) {
+      if (!this.onGround) {
+        this.velocityY += 780 * deltaTime
+      }
+
+      this.y += this.velocityY * deltaTime
+      this.x += this.velocityX * deltaTime
+      this.onGround = false
+
+      this.lifeSpan -= deltaTime;
+      if (this.lifeSpan <= 0 && lifeSpan > -100) {
+        this.isDead = true;
+        this.isAlive = false;
+      }
+
+      if (!this.isMonster) {
+        this.dt += deltaTime;
+        if (this.dt > 0.07) {
+          this.frame = (this.frame + 1) % this.framesLength;
+          this.dt = 0;
+        }
+        if (Date.now() >= this.transformAt) {
+          this.isMonster = true
+          this.velocityX = this.moveSpeed;
+        }
+      } else {
+        updateMonsterBehavior(this, deltaTime)
+      }
+    },
+  }))
+}
 export function createPoop(x, y, gameObjects, Sprite, lifeSpan = -100) {
     gameObjects.enemies.push(
       Sprite({
@@ -101,7 +214,7 @@ export function checkEnemyCollisions(p, enemies, states) {
   enemies.forEach((e) => {
     if (isCollided(p, e)) {
       if (e.type === 'E' || e.type === 'P' || e.type === 'B') {
-        if (['P','B'].includes(e.type) && e.isMonster) {
+        if (['P','B','E'].includes(e.type) && e.isMonster) {
           if (p.dvl <= 0) {
             p.health -= e?.collisionDamage ?? 1
             p.dvl = 10
@@ -209,7 +322,19 @@ export function activateBoss(boss, gameObjects, deltaTime) {
   }
 }
 
-export function updateMonsterBehavior(monster, deltaTime) {
+export function chckBounds(sprite) {
+  if (sprite.x < sprite.boundaryLeft) {
+    sprite.x = sprite.boundaryLeft;
+    sprite.velocityX = sprite.moveSpeed; // Разворачиваемся, если достигли левой границы
+    sprite.facingRight = true;
+  } else if (sprite.x > sprite.boundaryRight) {
+    sprite.x = sprite.boundaryRight;
+    sprite.velocityX = -sprite.moveSpeed; // Разворачиваемся, если достигли правой границы
+    sprite.facingRight = false;
+  }
+}
+
+export function updateMonsterBehavior(monster, deltaTime, canJump= true) {
   monster.decisionTimer -= deltaTime;
   if (monster.decisionTimer <= 0) {
     monster.decisionTimer = monster.decisionInterval;
@@ -223,7 +348,7 @@ export function updateMonsterBehavior(monster, deltaTime) {
     } else if (decision === 2) {
       monster.velocityX = monster.moveSpeed;
       monster.facingRight = true;
-    } else if (decision === 3 && monster.onGround) {
+    } else if (decision === 3 && monster.onGround && canJump) {
       monster.velocityY = monster.jumpForce;
       monster.onGround = false;
     }
@@ -315,7 +440,10 @@ export function renderRat(sprite, options = { }) {
   } = options;
 
   if (scale === 3) {
-    ctx.translate(0, -19);
+    ctx.translate(0, -20);
+  }
+  if (scale === 2) {
+    ctx.translate(0, -10);
   }
 
   const walkFrame = [

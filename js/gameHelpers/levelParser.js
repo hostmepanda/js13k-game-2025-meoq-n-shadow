@@ -3,7 +3,16 @@ import {renderLamp, renderTree, rndrTl} from './tileHelpers'
 import {renderCollectibleFish} from './collectableHelpers'
 import {renderCatSideView, updateSprite} from './catHelpers'
 import {GAME_STATE} from '../consts'
-import {activateBoss, createPoop, renderRat, rndrRobotVac, rndrTrashCan, updateMonsterBehavior} from './enemiesUtils'
+import {
+  activateBoss,
+  chckBounds,
+  createPoop,
+  createRat, createTrash,
+  renderRat,
+  rndrRobotVac,
+  rndrTrashCan,
+  updateMonsterBehavior,
+} from './enemiesUtils'
 
 const pcm = {
   'Y': 'yellow', /* # = level exit */
@@ -240,17 +249,35 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
       [GAME_STATE.LEVEL2]: rndrTrashCan,
       [GAME_STATE.LEVEL3]: renderRat,
     },
+    'E': {
+      [GAME_STATE.LEVEL1]: rndrRobotVac,
+      [GAME_STATE.LEVEL2]: rndrTrashCan,
+      [GAME_STATE.LEVEL3]: renderRat,
+    }
+  }
+  const bossTrash = {
+    [GAME_STATE.LEVEL1]: createPoop,
+    [GAME_STATE.LEVEL2]: createTrash,
+    [GAME_STATE.LEVEL3]: createRat,
   }
   const bossProps = {
-    [GAME_STATE.LEVEL1]: {},
-    [GAME_STATE.LEVEL2]: {},
+    [GAME_STATE.LEVEL1]: {
+      trashCooldown: 10,
+      canJump: true,
+    },
+    [GAME_STATE.LEVEL2]: {
+      trashCooldown: 5,
+      canJump: true,
+    },
     [GAME_STATE.LEVEL3]: {
       width: 32,
+      canJump: false,
       height: 13,
       sizeMultiplier: 3,
       frame: 0,
       framesLength: 2,
       isAttacking: false,
+      trashCooldown: 5,
     },
   }
   levelMap.forEach((row, y) => {
@@ -561,28 +588,22 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
 
             activateBoss(this, this.o, deltaTime)
             if (this.isActivated) {
-              updateMonsterBehavior(this, deltaTime)
-              if (this.x < this.boundaryLeft) {
-                this.x = this.boundaryLeft;
-                this.velocityX = this.moveSpeed; // Разворачиваемся, если достигли левой границы
-                this.facingRight = true;
-              } else if (this.x > this.boundaryRight) {
-                this.x = this.boundaryRight;
-                this.velocityX = -this.moveSpeed; // Разворачиваемся, если достигли правой границы
-                this.facingRight = false;
+              updateMonsterBehavior(this, deltaTime, this.canJump)
+              chckBounds(this)
+
+              this.trashTimer += deltaTime;
+              if (this.trashTimer >= this.trashCooldown) {
+                bossTrash[selectedLevel](this.x, this.y, this.o, this.s, -100)
+                this.trashTimer = 0; // сбрасываем таймер
               }
               this.x += this.velocityX * deltaTime;
               this.y += this.velocityY * deltaTime;
-              this.trashTimer += deltaTime;
-              if (this.trashTimer >= this.trashCooldown) {
-                createPoop(this.x, this.y, this.o, this.s, this.lifeSpan) // depends on level
-                this.trashTimer = 0; // сбрасываем таймер
-              }
             }
           };
           const render = renderHandlers[cfg.type][selectedLevel]
-          cfg.render = function(deltaTime) {
-            render(this, {
+          cfg.render = function() {
+            render(
+              this, {
               ...parseToColorTilesByLevel[selectedLevel]?.[cfg.type],
               scale: this.sizeMultiplier,
               flipX: !this.facingRight,
@@ -593,7 +614,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
         }
 
       if (['E'].includes(ch)) {
-        createPoop(cfg.x, cfg.y, gameObjects, Sprite, -100) // depends on level
+        bossTrash[selectedLevel](cfg.x, cfg.y, gameObjects, Sprite, -100)
       }
 
       if (ch === 'P') {

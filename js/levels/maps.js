@@ -62,7 +62,7 @@ export const LEVEL_MAPS = {
     "N.T...T...........WWW.....WWWWWWWWWWWWWWW.....XXWnWWWWWWWWWWWWWWW.........T......T........XXX..T.WWWWWWWWWWWWWWW......T....TWWnnnnnnnnnnnW............................TFF.........M.....T..f..........m",
     "N.T...T....Q.d..WWnN......TXXXXXXXXXXXXXXX......XX...XX..T..XX........XXXXXXX......XX...XXXXX..T..........q.T.........T....T.WnnnnnnnnnnnW.....FF....HG.....A.........T..........fM.....T..fff........m",
     "N.T...T.WWWWWWWWnnnN......TXXXXXXXXXXXXXXX..d...T........T..T...........XXXXXXX......XX..XXXX..T..d.........T........WW....TWWWWWWWWWWWWWW............................T...........M.....T.............m",
-    "N.T...T.XXXXXXXXnnnnWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW.....T..W..............XXXXXXXXXXXX...........FF............FF.T......ff...M.....T........fffffm",
+    "N.T...T.XXXXXXXXnnnnWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW.....T..W..............XXXXXXXXXXXX......E....FF............FF.T......ff...M.....T........fffffm",
     "NWW...T.XXXXXXXX........q.T..............q......T........T.qT................qT..................qT.........T.WW........A.....XXXXXXXXXXXX............................T...........M.....T........nnnnnm",
     "N.T...T.XXXXXXXX..........T......d..............T...........T..........d......T...................T.........T.WW.............dXXXXXXXXXXXX.d........Q......B..d.......T.Q........fM.....T......nnnnnnnm",
     "nWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWnnnnnnnnnnnnm",
