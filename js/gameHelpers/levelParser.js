@@ -173,7 +173,7 @@ const parseToColorTilesByLevel = {
       fishColor: 'rgb(251,108,55)',
     },
     B: {
-
+      flipX: true,
     },
     F: sewerBg,
     f: sewerBg,
