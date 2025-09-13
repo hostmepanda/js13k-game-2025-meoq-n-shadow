@@ -250,6 +250,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
       sizeMultiplier: 3,
       frame: 0,
       framesLength: 2,
+      isAttacking: false,
     },
   }
   levelMap.forEach((row, y) => {
@@ -543,18 +544,21 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           cfg.width = 36
           cfg.height = 36
           cfg.isActivated = false
+          cfg.dt = 0
+          cfg.o = gameObjects
+          cfg.s = Sprite
           cfg = {
             ...cfg,
             ...bossProps[selectedLevel],
           }
           cfg.update = function(deltaTime) {
             if (!this.isAlive) return;
-            this.o = gameObjects
-            this.s = Sprite
+            updateSprite(this, deltaTime)
 
             if (!this.onGround) {
               this.velocityY += GRAVITY_DOWN * deltaTime;
             }
+
             activateBoss(this, this.o, deltaTime)
             if (this.isActivated) {
               updateMonsterBehavior(this, deltaTime)
@@ -577,10 +581,12 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
             }
           };
           const render = renderHandlers[cfg.type][selectedLevel]
-          cfg.render = function() {
+          cfg.render = function(deltaTime) {
             render(this, {
               ...parseToColorTilesByLevel[selectedLevel]?.[cfg.type],
               scale: this.sizeMultiplier,
+              flipX: !this.facingRight,
+              frameIndex: this.frame,
             })
           }
           gameObjects.enemies.push(Sprite(cfg));
