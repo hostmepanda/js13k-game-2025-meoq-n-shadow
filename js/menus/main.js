@@ -66,12 +66,12 @@ export function renderMainMenu(cv, cx, GameState) {
     })
   cx.restore()
   cx.translate(0, 0)
-
-  cx.fillStyle = '#ffffff'
-  cx.font = '25px Arial'
-  cx.fillText(GameState.musicEnabled ? '🔉' : '🔇', w - 80, h - 50)
-  cx.font = '15px Arial'
-  cx.fillText(`(press M to ${GameState.musicEnabled ? 'disable' : 'enable'})`, w - 80, h - 28)
+  //
+  // cx.fillStyle = '#ffffff'
+  // cx.font = '25px Arial'
+  // cx.fillText(GameState.musicEnabled ? '🔉' : '🔇', w - 80, h - 50)
+  // cx.font = '15px Arial'
+  // cx.fillText(`(press M to ${GameState.musicEnabled ? 'disable' : 'enable'})`, w - 80, h - 28)
 
   GameState.msl = {
     titlePos: { x: w / 2 + 5, y: h / 2 - 60 },

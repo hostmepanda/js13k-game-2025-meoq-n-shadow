@@ -151,17 +151,17 @@ export function renderUI({context: cx, canvas: cs}, {playerState, GameState}) {
     }
 
     cx.fillStyle = '#000000';
-    if (GameState.musicEnabled) {
-      cx.font = '15px Arial';  // Меньший шрифт для имени создателя
-      cx.fillText('🔉', cs.width - 60, 15);
-      cx.font = '10px Arial';  // Меньший шрифт для имени создателя
-      cx.fillText('(press M to disable)', cs.width - 100, 28);
-    } else {
-      cx.font = '15px Arial';  // Меньший шрифт для имени создателя
-      cx.fillText('🔇', cs.width - 60, 15);
-      cx.font = '10px Arial';  // Меньший шрифт для имени создателя
-      cx.fillText('(press M to enable)', cs.width - 100, 28);
-    }
+    // if (GameState.musicEnabled) {
+    //   cx.font = '15px Arial';  // Меньший шрифт для имени создателя
+    //   cx.fillText('🔉', cs.width - 60, 15);
+    //   cx.font = '10px Arial';  // Меньший шрифт для имени создателя
+    //   cx.fillText('(press M to disable)', cs.width - 100, 28);
+    // } else {
+    //   cx.font = '15px Arial';  // Меньший шрифт для имени создателя
+    //   cx.fillText('🔇', cs.width - 60, 15);
+    //   cx.font = '10px Arial';  // Меньший шрифт для имени создателя
+    //   cx.fillText('(press M to enable)', cs.width - 100, 28);
+    // }
   }
 
   // Восстанавливаем состояние контекста
