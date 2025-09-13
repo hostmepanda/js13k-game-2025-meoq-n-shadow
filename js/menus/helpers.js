@@ -13,20 +13,20 @@ export function initMenuScreen(gameState, canvas) {
       document.removeEventListener('keydown', spclk)
     }
   })
-
-  document.addEventListener('click', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const halfWidth = gameState.msl.authorWidth / 2;
-    if (y >= gameState.msl.authorPos.y - gameState.msl.authorHeight &&
-      y <= gameState.msl.authorPos.y + 5 &&
-      x >= gameState.msl.authorPos.x - halfWidth &&
-      x <= gameState.msl.authorPos.x + halfWidth) {
-      window.open('https://github.com/hostmepanda', '_blank');
-    }
-  });
+  //
+  // document.addEventListener('click', (e) => {
+  //   const rect = canvas.getBoundingClientRect();
+  //   const x = e.clientX - rect.left;
+  //   const y = e.clientY - rect.top;
+  //
+  //   const halfWidth = gameState.msl.authorWidth / 2;
+  //   if (y >= gameState.msl.authorPos.y - gameState.msl.authorHeight &&
+  //     y <= gameState.msl.authorPos.y + 5 &&
+  //     x >= gameState.msl.authorPos.x - halfWidth &&
+  //     x <= gameState.msl.authorPos.x + halfWidth) {
+  //     window.open('https://github.com/hostmepanda', '_blank');
+  //   }
+  // });
 
 }
 

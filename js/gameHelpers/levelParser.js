@@ -250,7 +250,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
       [GAME_STATE.LEVEL3]: renderRat,
     },
     'E': {
-      [GAME_STATE.LEVEL1]: rndrRobotVac,
+      [GAME_STATE.LEVEL1]: rndrTrashCan,
       [GAME_STATE.LEVEL2]: rndrTrashCan,
       [GAME_STATE.LEVEL3]: renderRat,
     }

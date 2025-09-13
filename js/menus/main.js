@@ -1,5 +1,3 @@
-import {renderCatSideView} from '../gameHelpers/catHelpers'
-
 export function renderMainMenu(cv, cx, GameState) {
   const w = cv.width
   const h = cv.height
@@ -29,43 +27,43 @@ export function renderMainMenu(cv, cx, GameState) {
   cx.fillStyle = '#66ccff'
   cx.fillText('(github.com/hostmepanda)', w / 2, h / 2 + 155)
 
-  cx.save()
-  cx.translate(w / 2 - 40, h / 2 - 45)
-  renderCatSideView(cx,
-    {
-      scale: 2,
-      width: 40,
-      heightShift: 0,
-      colors: [
-        'rgba(0,0,0,0)',
-        '#000000',
-        '#ececec',
-        '#cfcfcf',
-        '#7a7a7a',
-        '#ecdcc9',
-        '#f26060',
-      ]
-    })
-  cx.translate(50, 0)
-  renderCatSideView(cx,
-    {
-      flipX: true,
-      scale: 2,
-      width: 40,
-      heightShift: 0,
-      colors: [
-        'rgba(0,0,0,0)',
-        '#000000',
-        '#a2998d',
-        '#5c5751',
-        '#413f3a',
-        '#ecdcc9',
-        '#f26060',
-        'rgba(255,255,255,1)',
-      ]
-    })
-  cx.restore()
-  cx.translate(0, 0)
+  // cx.save()
+  // cx.translate(w / 2 - 40, h / 2 - 45)
+  // renderCatSideView(cx,
+  //   {
+  //     scale: 2,
+  //     width: 40,
+  //     heightShift: 0,
+  //     colors: [
+  //       'rgba(0,0,0,0)',
+  //       '#000000',
+  //       '#ececec',
+  //       '#cfcfcf',
+  //       '#7a7a7a',
+  //       '#ecdcc9',
+  //       '#f26060',
+  //     ]
+  //   })
+  // cx.translate(50, 0)
+  // renderCatSideView(cx,
+  //   {
+  //     flipX: true,
+  //     scale: 2,
+  //     width: 40,
+  //     heightShift: 0,
+  //     colors: [
+  //       'rgba(0,0,0,0)',
+  //       '#000000',
+  //       '#a2998d',
+  //       '#5c5751',
+  //       '#413f3a',
+  //       '#ecdcc9',
+  //       '#f26060',
+  //       'rgba(255,255,255,1)',
+  //     ]
+  //   })
+  // cx.restore()
+  // cx.translate(0, 0)
   //
   // cx.fillStyle = '#ffffff'
   // cx.font = '25px Arial'
@@ -73,11 +71,11 @@ export function renderMainMenu(cv, cx, GameState) {
   // cx.font = '15px Arial'
   // cx.fillText(`(press M to ${GameState.musicEnabled ? 'disable' : 'enable'})`, w - 80, h - 28)
 
-  GameState.msl = {
-    titlePos: { x: w / 2 + 5, y: h / 2 - 60 },
-    gameNamePos: { x: w / 2, y: h / 2 + 110 },
-    authorPos: { x: w / 2, y: h / 2 + 155 },
-    authorWidth: cx.measureText('(github.com/hostmepanda)').width,
-    authorHeight: 12
-  }
+  // GameState.msl = {
+  //   titlePos: { x: w / 2 + 5, y: h / 2 - 60 },
+  //   gameNamePos: { x: w / 2, y: h / 2 + 110 },
+  //   authorPos: { x: w / 2, y: h / 2 + 155 },
+  //   authorWidth: cx.measureText('(github.com/hostmepanda)').width,
+  //   authorHeight: 12
+  // }
 }
