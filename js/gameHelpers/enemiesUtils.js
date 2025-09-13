@@ -34,6 +34,7 @@ export function createRat(x, y, gameObjects, Sprite, lifeSpan = -100) {
     health: 5, //depends on level
     moveSpeed: 50, // depend on level or size
     height: 15,
+    collisionDamage: 10,
     isAlive: true,
     isDead: false,
     isMonster: true,
@@ -80,6 +81,7 @@ export function createTrash(x, y, gameObjects, Sprite, lifeSpan = -100) {
     color: 'brown',
     createdAt: Date.now(),
     facingRight: Math.random() > 0.5,
+    collisionDamage: 15,
     dt: 0,
     frame: 0,
     framesLength: 2,
@@ -143,6 +145,7 @@ export function createPoop(x, y, gameObjects, Sprite, lifeSpan = -100) {
         color: 'brown',
         createdAt: Date.now(),
         facingRight: Math.random() > 0.5,
+        collisionDamage: 3,
         dt: 0,
         frame: 0,
         framesLength: 2,

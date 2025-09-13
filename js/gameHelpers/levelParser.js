@@ -547,7 +547,7 @@ export function parseLevel({ selectedLevel, gameObjects, levelMap, Sprite, tileS
           cfg.boundaryLeft = cfg.spawnX - 12 * tileSize
           cfg.boundaryRight = cfg.spawnX + 12 * tileSize
           cfg.canDie = true
-          cfg.collisionDamage = 5 // depends on level
+          cfg.collisionDamage = 15 // depends on level
           cfg.decisionInterval = 2 // depend on level
           cfg.decisionTimer = 0
           cfg.facingRight = false
