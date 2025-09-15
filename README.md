@@ -1,12 +1,14 @@
+## Meoq and Shadow: js13k 2025
+Playable versions see [DEMO README](./demo/README.md)
+
+### RAW
 pixel kit and packs are taken from itch.io
 cats https://bowpixel.itch.io/meow-cat-85-animation?download
 
 Music:
-You must give appropriate credit: Song title, artist name, source (Free Music Archive) and license type (CC BY)
+~~You must give appropriate credit: Song title, artist name, source (Free Music Archive) and license type (CC BY)~~
 
-Home level: [Lenny Pixels](https://freemusicarchive.org/music/lenny-pixels/)
-
-TODO:
+### TODO:
 - [X] Cats death and game over screens
 - [X] fix start over mechanics
 - [X] fix collision
