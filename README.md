@@ -27,7 +27,21 @@ TODO:
 - [] add visual effect of taking damage for cat and enemies
 - [X] pooping pose
 - [] fix enemies strategy
-- [] add boss activation only near player
+- [X] add boss activation only near player
+
+## How to cook for js13k
+1. run build
+```bash
+npm run build
+```
+2. then compress with roadroller js file
+```bash
+cd ./dist/assets
+```
+3. then either archive the js or copy-paste the content to the html file
+```bash
+advzip -a index.zip -4 ./index.html
+```
 
 ## Maps
 There are two commands to compress and decompress maps, see package.json
@@ -44,3 +58,4 @@ Progress
 
 12-09-2025
 ![img_3.png](img_3.png)
+

@@ -160,23 +160,23 @@ export function renderTree(c, w, h, o = {}) {
   c.stroke();
 
   if (isPalm) {
-    // // Листья пальмы
-    // const lL = w*.35, lW = w*.12;
-    // const angles = [-60, -30, 0, 30, 60, 90];
-    //
-    // c.strokeStyle = 'rgb(172,188,0)';
-    // c.translate(0, topY);
-    //
-    // for(let i = 0; i < 6; i++) {
-    //   c.save();
-    //   c.fillStyle = leafC[i];
-    //   c.rotate(angles[i] * Math.PI/180);
-    //   c.beginPath();
-    //   c.ellipse(0, 0, lL, lW, 0, 0, Math.PI*2);
-    //   c.fill();
-    //   c.stroke();
-    //   c.restore();
-    // }
+    // Листья пальмы
+    const lL = w*.35, lW = w*.12;
+    const angles = [-60, -30, 0, 30, 60, 90];
+
+    c.strokeStyle = 'rgb(172,188,0)';
+    c.translate(0, topY);
+
+    for(let i = 0; i < 6; i++) {
+      c.save();
+      c.fillStyle = leafC[i];
+      c.rotate(angles[i] * Math.PI/180);
+      c.beginPath();
+      c.ellipse(0, 0, lL, lW, 0, 0, Math.PI*2);
+      c.fill();
+      c.stroke();
+      c.restore();
+    }
   } else {
     // Елочка
     c.fillStyle = fColor;
